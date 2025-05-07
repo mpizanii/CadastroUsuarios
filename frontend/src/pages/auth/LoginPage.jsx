@@ -3,6 +3,7 @@ import { supabase } from "../../services/supabase"
 import styled from "styled-components"
 import svgAnimado from "../../assets/svgAnimado.svg"
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom"
 
 const Container = styled.div`
     width: 100vw;
@@ -92,6 +93,7 @@ export default function LoginPage() {
     const [password, setPassword] = useState("")
     const [message, setMessage] = useState("")
     const [messageType, setMessageType] = useState("success")
+    const navigate = useNavigate()
 
     async function handleSignIn() {
         if (!email || !password) {
@@ -110,8 +112,7 @@ export default function LoginPage() {
             return;
         } 
         if (session){
-            setMessageType("success")
-            setMessage("Login realizado com sucesso!")
+            navigate("/home")
         }
     }
     async function handleForgotPassword() {
