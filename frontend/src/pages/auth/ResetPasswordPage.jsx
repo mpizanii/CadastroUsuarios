@@ -1,7 +1,8 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { supabase } from "../../services/supabase"
 import styled from "styled-components"
 import svgAnimadoRedefinirSenha from "../../assets/svgAnimadoRedefinirSenha.svg"
+import { useNavigate } from "react-router-dom"
 
 const Container = styled.div`
     width: 100vw;
@@ -86,11 +87,13 @@ const Message = styled.div`
   color: ${(props) => (props.type === "success" ? "green" : "red")};
 `;
 
-export default function LoginPage() {
-    const [newPassword, setNewPassword] = useState("")
-    const [repeatNewPassword, setRepeatNewPassword] = useState("")
-    const [message, setMessage] = useState("")
-    const [messageType, setMessageType] = useState("success")
+export default function ResetPasswordPage() {
+    const [newPassword, setNewPassword] = useState("");
+    const [repeatNewPassword, setRepeatNewPassword] = useState("");
+    const [message, setMessage] = useState("");
+    const [messageType, setMessageType] = useState("success");
+    const [tokenPresente, setTokenPresente] = useState(false);
+    const navigate = useNavigate();
 
     async function handleSubmit(e) {
         e.preventDefault();
@@ -120,6 +123,24 @@ export default function LoginPage() {
         }
       }
       
+    useEffect(() => {
+        const hash = window.location.hash;
+        const params = new URLSearchParams(hash.replace("#", ""));
+        const accessToken = params.get("access_token");
+        const type = params.get("type");
+
+        if (accessToken && type === "recovery"){
+            setTokenPresente(true);
+            supabase.auth.setSession({ access_token: accessToken, refresh_token: "" });
+        } else {
+            navigate("/");
+        }
+    }, []);
+    
+    if (!tokenPresente){
+        return null;
+    }
+
     return (
         <Container>
             <Card>
