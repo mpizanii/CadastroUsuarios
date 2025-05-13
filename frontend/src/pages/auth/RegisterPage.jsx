@@ -1,90 +1,7 @@
 import { useState } from "react"
 import { supabase } from "../../services/supabase"
-import styled from "styled-components"
+import { Container, Card, RegisterLeftCard, RegisterRightCard, InputDiv, Icon, RightCardInput, Button, Message } from "./StyledAuthPages"
 import svgAnimadoCadastro from "../../assets/svgAnimadoCadastro.svg"
-
-const Container = styled.div`
-    width: 100vw;
-    height: 100vh;
-    background-color: #e9ecef;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 8px;
-    font-family: Roboto, sans-serif;
-`;
-const Card = styled.div`
-    width: 70%;
-    height: 70%;
-    background-color: #fff;
-    display: flex;
-    border-radius: 10px;
-`;
-const LeftCard = styled.div`
-    background-color: #162521;
-    width: 40%;
-    height: 100%;
-    border-top-left-radius: 10px;
-    border-bottom-left-radius: 10px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    color: white;
-    gap: 8px;
-    text-align: center; 
-`;
-const RightCard = styled.div`
-    width: 60%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    color: #162521;
-`;
-const InputDiv = styled.div`
-    display: flex;
-    align-items: center;
-    justify-content: center
-    gap: 8px;
-    width: 70%;
-    position: relative;
-    height: 30px;
-    background: transparent;
-    padding: 10px;
-`;
-const Icon = styled.i`
-    position: absolute;
-    left: 20px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #aaa;
-    font-size: 20px;
-`;
-const RightCardInput = styled.input`
-    background-color: #e9ecef;
-    width: 100%;
-    padding: 10px 10px 10px 36px;
-    height: 100%;
-    border: none;
-    border-radius: 10px;
-`;
-const Button = styled.button`
-    width: 40%;
-    height: 35px;
-    background-color: #355352;
-    margin-top: 10px;
-    border: none;
-    border-radius: 20px;
-    color: #fff;
-    font-weight: bold;
-    cursor: pointer;
-`;
-const Message = styled.div`
-  margin-top: 20px;
-  color: ${(props) => (props.type === "success" ? "green" : "red")};
-`;
 
 export default function RegisterPage() {
     const [email, setEmail] = useState("")
@@ -124,7 +41,7 @@ export default function RegisterPage() {
     return (
         <Container>
             <Card>
-                <LeftCard>
+                <RegisterLeftCard>
                     <h1>Cadastro</h1>
                     <InputDiv style={{ marginTop: "20px" }}>
                         <Icon className="bi bi-person" />
@@ -144,13 +61,13 @@ export default function RegisterPage() {
                     </InputDiv>
                     <Button onClick={handleSignUp}>Cadastrar</Button>
                     {message && <Message type={messageType}>{message}</Message>}
-                </LeftCard>
-                <RightCard>
+                </RegisterLeftCard>
+                <RegisterRightCard>
                     <h1>Seja bem vindo!</h1>
                     <p>Preencha com as suas credenciais.</p>
                     <img src={svgAnimadoCadastro} alt="svg" style={{ width: "400px" }} />
                     <a href="https://storyset.com/business" style={{ fontSize: "12px" }}>Business illustrations by Storyset</a>
-                </RightCard>
+                </RegisterRightCard>
             </Card>
         </Container>
     )
