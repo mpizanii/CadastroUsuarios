@@ -73,14 +73,51 @@ export const AddUserButton = styled.button`
 `;
 
 export const TableHeader = styled.div`
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    height: 40px;
     background-color: #a9a6a6;
-    padding: 0px 5px;
-    color: white
+    color: white;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 80px 250px 300px 200px 250px 80px;
+    height: 40px;
+    align-items: center;
+    text-align: center;
+`;
+
+export const TableBody = styled.div`
+    width: 100%;
+    display: grid;
+    grid-template-columns: 80px 250px 300px 200px 250px 80px;
+    align-items: center;
+    height: 40px;
+    border-bottom: 1px solid #162521;
+    text-align: center;
+`;
+
+export const TableEditUserButton = styled.button`
+    width: 30%;
+    height: 60%;
+    background-color: #355352;
+    border: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+    cursor: pointer;
+    color: white;
+
+`;
+
+export const TableDeleteUserButton = styled.button`
+    width: 30%;
+    height: 60%;
+    background-color:rgb(92, 4, 4);
+    border: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+    cursor: pointer;
+    color: white;
 `;
 
 export const DivFormAddUser = styled.div`
