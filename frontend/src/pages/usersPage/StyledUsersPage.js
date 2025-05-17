@@ -2,12 +2,13 @@ import styled from "styled-components";
 
 export const Container = styled.div`
     width: 100vw;
-    height: 100vh;
+    min-height: 100vh;
     background-color: #e9ecef;
     display: flex;
     align-items: center;
     justify-content: flex-end;
     font-family: Roboto, sans-serif;
+    overflow-y: auto;
 
     &.blur{
         filter: blur(2px);
@@ -17,8 +18,7 @@ export const Container = styled.div`
 
 export const Card = styled.div`
     width: calc(100% - 372px);
-    height: 85%;
-    padding: 32px;
+    padding: 32px; 
     margin: 32px;
     background-color: white;
     border-radius: 10px;
@@ -26,7 +26,7 @@ export const Card = styled.div`
     align-items: center;
     flex-direction: column;
     color: #162521;
-    `;
+`;
     
 export const CardButtons = styled.div`
     display: flex;
@@ -34,7 +34,7 @@ export const CardButtons = styled.div`
     align-items: center;
     width: 100%;
     height: 50px;
-    marginBottom: 10px
+    margin-bottom: 10px;
 `;
 
 export const SearchWrapper = styled.div`
@@ -87,15 +87,16 @@ export const TableBody = styled.div`
     width: 100%;
     display: grid;
     grid-template-columns: 80px 250px 300px 200px 250px 80px;
+    min-height: 50px;
+    overflow-y: auto;
     align-items: center;
-    height: 40px;
     border-bottom: 1px solid #162521;
     text-align: center;
 `;
 
 export const TableEditUserButton = styled.button`
     width: 30%;
-    height: 60%;
+    height: 25px;
     background-color: #355352;
     border: none;
     display: flex;
@@ -103,13 +104,12 @@ export const TableEditUserButton = styled.button`
     align-items: center;
     border-radius: 5px;
     cursor: pointer;
-    color: white;
-
+    color: white;   
 `;
 
 export const TableDeleteUserButton = styled.button`
     width: 30%;
-    height: 60%;
+    height: 25px;
     background-color:rgb(92, 4, 4);
     border: none;
     display: flex;

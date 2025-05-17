@@ -95,7 +95,7 @@ export default function UsersPage() {
           <h2 style={{ marginBottom: "20px" }}>Clientes</h2>
           <CardButtons>
             <SearchWrapper>
-              <SearchInput type="text" placeholder="Buscar E-mail" />
+              <SearchInput type="text" placeholder="Buscar Nome" />
               <SearchButton>
                 <i className="bi bi-search"></i>
               </SearchButton>
