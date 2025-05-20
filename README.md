@@ -1,1 +1,1 @@
-Cadastro de Usuarios
+Cadastro de Usuarios com react e supabase (postgresql)
