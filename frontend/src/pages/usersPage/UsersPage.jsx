@@ -15,15 +15,19 @@ import MenuLateral from "../../components/menu/menulateral";
 import { useState, useEffect } from "react";
 import { supabase } from "../../services/supabase";
 import FormAddUser from "../../components/menu/FormAddUser.jsx";
+import FormEditUser from "../../components/menu/FormEditUser.jsx";
 
 export default function UsersPage() {
   const [menuAddUserAtivo, setMenuAddUserAtivo] = useState(false);
+  const [menuEditUserAtivo, setMenuEditUserAtivo] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
   const [customers, setCustomers] = useState([]);
 
   useEffect(() =>{
-    getUsers()
+      getUsers()
   },[])
 
+  
   async function getUsers() {
     const { data: { user } } = await supabase.auth.getUser();
 
@@ -39,11 +43,12 @@ export default function UsersPage() {
     } else {
       setCustomers(data);
     }
+
   }
 
   return (
     <>
-      <Container className={menuAddUserAtivo ? "blur" : ""}>
+      <Container className={menuAddUserAtivo || menuEditUserAtivo ? "blur" : ""}>
         <MenuLateral />
         <Card>
           <h2 style={{ marginBottom: "20px" }}>Clientes</h2>
@@ -82,7 +87,11 @@ export default function UsersPage() {
                             width: "100%", 
                             height: "100%", 
                             alignItems: "center" }}>
-                <TableEditUserButton><i className="bi bi-pencil-square"/></TableEditUserButton>
+                <TableEditUserButton><i className="bi bi-pencil-square" onClick={() => { 
+                  setSelectedUser(customer); 
+                  setMenuEditUserAtivo(true) 
+                  }} />
+                </TableEditUserButton>
                 <TableDeleteUserButton><i className="bi bi-trash-fill"/></TableDeleteUserButton>
               </div>
             </TableBody>
@@ -91,7 +100,23 @@ export default function UsersPage() {
         </Card>
       </Container>
 
-      <FormAddUser visible={menuAddUserAtivo} setVisible={setMenuAddUserAtivo}/>
+      <FormAddUser 
+      visible={menuAddUserAtivo} 
+      setVisible={setMenuAddUserAtivo} 
+      getUsersFunction={getUsers}/>
+
+      {menuEditUserAtivo && selectedUser && (
+        <FormEditUser
+          visible={menuEditUserAtivo}
+          setVisible={setMenuEditUserAtivo}
+          userID={selectedUser.id}
+          userName={selectedUser.nome}
+          userEmail={selectedUser.email}
+          userPhone={selectedUser.telefone}
+          userAddress={selectedUser.endereco}
+          getUsersFunction={getUsers}
+        />
+      )}
     </>
   );
 }
