@@ -46,6 +46,21 @@ export default function UsersPage() {
 
   }
 
+  async function deleteUsers(id) {
+    const { error } = await supabase
+      .from('users')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      setMessageType("error");
+      alert("Erro ao deletar usuario")
+      return;
+    } else {
+      await getUsers();
+    }
+  }
+
   return (
     <>
       <Container className={menuAddUserAtivo || menuEditUserAtivo ? "blur" : ""}>
@@ -92,7 +107,9 @@ export default function UsersPage() {
                   setMenuEditUserAtivo(true) 
                   }} />
                 </TableEditUserButton>
-                <TableDeleteUserButton><i className="bi bi-trash-fill"/></TableDeleteUserButton>
+                <TableDeleteUserButton><i className="bi bi-trash-fill" onClick={() => {
+                  deleteUsers(customer.id);
+                }}/></TableDeleteUserButton>
               </div>
             </TableBody>
           ))}

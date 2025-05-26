@@ -108,6 +108,7 @@ export default function FormAddUser( { visible, setVisible, getUsersFunction } )
             setEmail("");
             setPhone("");
             setAddress("");
+            setMessage("")
 
             await getUsersFunction()
             setVisible(false);
