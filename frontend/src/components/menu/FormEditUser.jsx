@@ -109,9 +109,14 @@ export default function FormEditUser( { visible, setVisible, userID, userName, u
         } else {
             setMessageType("success");
             setMessage("Cliente editado com sucesso");
+            setNewName("")
+            setNewEmail("")
+            setNewPhone("")
+            setNewAddress("")
             
             await getUsersFunction()
             setVisible(false);
+            setMessage("")
         }
     }
 

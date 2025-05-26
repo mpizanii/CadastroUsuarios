@@ -57,7 +57,7 @@ export default function UsersPage() {
       alert("Erro ao deletar usuario")
       return;
     } else {
-      await getUsers();
+      await getUsers()
     }
   }
 
@@ -122,7 +122,7 @@ export default function UsersPage() {
       setVisible={setMenuAddUserAtivo} 
       getUsersFunction={getUsers}/>
 
-      {menuEditUserAtivo && selectedUser && (
+      {selectedUser && (
         <FormEditUser
           visible={menuEditUserAtivo}
           setVisible={setMenuEditUserAtivo}
