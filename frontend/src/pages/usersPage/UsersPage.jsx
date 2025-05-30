@@ -24,12 +24,12 @@ export default function UsersPage() {
   const [menuDeleteUserAtivo, setMenuDeleteUserAtivo] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [customers, setCustomers] = useState([]);
+  const [busca, setBusca] = useState('');
 
   useEffect(() =>{
       getUsers()
-  },[])
-
-  
+    },[])
+    
   async function getUsers() {
     const { data: { user } } = await supabase.auth.getUser();
 
@@ -45,8 +45,9 @@ export default function UsersPage() {
     } else {
       setCustomers(data);
     }
-
   }
+
+  const clientesFiltrados = customers.filter((customer) => customer.nome.toLowerCase().includes(busca.toLowerCase()))
 
   return (
     <>
@@ -56,7 +57,7 @@ export default function UsersPage() {
           <h2 style={{ marginBottom: "20px" }}>Clientes</h2>
           <CardButtons>
             <SearchWrapper>
-              <SearchInput type="text" placeholder="Buscar Nome" />
+              <SearchInput type="text" placeholder="Buscar Nome" value={busca} onChange={(e) => setBusca(e.target.value) } />
               <SearchButton>
                 <i className="bi bi-search"></i>
               </SearchButton>
@@ -77,7 +78,7 @@ export default function UsersPage() {
             <div>Ações</div>
           </TableHeader>
 
-          {customers.map((customer) => (
+          {clientesFiltrados.map((customer) => (
             <TableBody key={customer.id}>
               <div>{customer.id}</div>
               <div>{customer.nome}</div>

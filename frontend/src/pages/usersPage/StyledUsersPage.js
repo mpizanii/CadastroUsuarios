@@ -50,7 +50,6 @@ export const SearchInput = styled.input`
 `;
 
 export const SearchButton = styled.button`
-    cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
