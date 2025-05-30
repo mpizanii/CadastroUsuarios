@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { supabase } from "../../services/supabase";
 
 const StyledDivFormEditUser = styled.div`

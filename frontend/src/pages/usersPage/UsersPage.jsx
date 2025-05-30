@@ -11,15 +11,17 @@ import {
   TableDeleteUserButton,
   AddUserButton,
 } from "./StyledUsersPage";
-import MenuLateral from "../../components/menu/menulateral";
+import MenuLateral from "../../components/menu/MenuLateral.jsx";
 import { useState, useEffect } from "react";
 import { supabase } from "../../services/supabase";
 import FormAddUser from "../../components/menu/FormAddUser.jsx";
 import FormEditUser from "../../components/menu/FormEditUser.jsx";
+import FormDeleteUser from "../../components/menu/FormDeleteUser.jsx"
 
 export default function UsersPage() {
   const [menuAddUserAtivo, setMenuAddUserAtivo] = useState(false);
   const [menuEditUserAtivo, setMenuEditUserAtivo] = useState(false);
+  const [menuDeleteUserAtivo, setMenuDeleteUserAtivo] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [customers, setCustomers] = useState([]);
 
@@ -46,24 +48,9 @@ export default function UsersPage() {
 
   }
 
-  async function deleteUsers(id) {
-    const { error } = await supabase
-      .from('users')
-      .delete()
-      .eq('id', id);
-
-    if (error) {
-      setMessageType("error");
-      alert("Erro ao deletar usuario")
-      return;
-    } else {
-      await getUsers()
-    }
-  }
-
   return (
     <>
-      <Container className={menuAddUserAtivo || menuEditUserAtivo ? "blur" : ""}>
+      <Container className={menuAddUserAtivo || menuEditUserAtivo || menuDeleteUserAtivo ? "blur" : ""}>
         <MenuLateral />
         <Card>
           <h2 style={{ marginBottom: "20px" }}>Clientes</h2>
@@ -108,7 +95,8 @@ export default function UsersPage() {
                   }} />
                 </TableEditUserButton>
                 <TableDeleteUserButton><i className="bi bi-trash-fill" onClick={() => {
-                  deleteUsers(customer.id);
+                  setSelectedUser(customer);
+                  setMenuDeleteUserAtivo(true)
                 }}/></TableDeleteUserButton>
               </div>
             </TableBody>
@@ -131,6 +119,15 @@ export default function UsersPage() {
           userEmail={selectedUser.email}
           userPhone={selectedUser.telefone}
           userAddress={selectedUser.endereco}
+          getUsersFunction={getUsers}
+        />
+      )}
+
+      {selectedUser && (
+        <FormDeleteUser
+          visible={menuDeleteUserAtivo}
+          setVisible={setMenuDeleteUserAtivo}
+          userID={selectedUser.id}
           getUsersFunction={getUsers}
         />
       )}
