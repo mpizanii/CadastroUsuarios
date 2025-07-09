@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "HC8iiiWNtDc=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\mpiza\\OneDrive\\Documents\\Projetos\\CadastroUsuáriosSoft\\api\\api.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\mpiza\\.nuget\\packages\\microsoft.aspnetcore.openapi\\9.0.5\\microsoft.aspnetcore.openapi.9.0.5.nupkg.sha512",
+    "C:\\Users\\mpiza\\.nuget\\packages\\microsoft.openapi\\1.6.17\\microsoft.openapi.1.6.17.nupkg.sha512"
+  ],
+  "logs": []
+}
