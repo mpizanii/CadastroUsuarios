@@ -1,6 +1,6 @@
 # 📋 Cadastro de Clientes - Em desenvolvimento
 
-Aplicação web para **cadastro de clientes e controle de estoque de uma empresa**, desenvolvida com **React.js**, **Supabase** e **PostgreSQL**.
+Aplicação web para **cadastro de clientes e controle de estoque de uma empresa**, desenvolvida com **React.js**, **Supabase**, **PostgreSQL** e **Asp.Net Core**.
 
 ## ✨ Funcionalidades até o momento
 
