@@ -29,6 +29,7 @@ namespace api.Controllers
             .Where(c => c.User_Id == userId)
             .Select(c => new ClientesDTO
             {
+                Id = c.Id,
                 Nome = c.Nome,
                 Email = c.Email,
                 Telefone = c.Telefone,
@@ -45,6 +46,7 @@ namespace api.Controllers
             .Where(c => c.Id == id)
             .Select(c => new ClientesDTO
             {
+                Id = c.Id,
                 Nome = c.Nome,
                 Email = c.Email,
                 Telefone = c.Telefone,
