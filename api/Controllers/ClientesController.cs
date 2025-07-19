@@ -22,10 +22,12 @@ namespace api.Controllers
             _context = context;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> ObterTodos()
+        [HttpGet("usuario/{userId}")]
+        public async Task<IActionResult> ObterTodosClientesPorUsuario(Guid userId)
         {
-            var clientes = await _context.Clientes.Select(c => new ClientesDTO
+            var clientes = await _context.Clientes
+            .Where(c => c.User_Id == userId)
+            .Select(c => new ClientesDTO
             {
                 Nome = c.Nome,
                 Email = c.Email,
