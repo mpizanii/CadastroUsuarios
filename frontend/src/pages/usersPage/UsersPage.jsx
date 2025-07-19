@@ -16,7 +16,8 @@ import { useState, useEffect } from "react";
 import { supabase } from "../../services/supabase";
 import FormAddUser from "../../components/menu/FormAddUser.jsx";
 import FormEditUser from "../../components/menu/FormEditUser.jsx";
-import FormDeleteUser from "../../components/menu/FormDeleteUser.jsx"
+import FormDeleteUser from "../../components/menu/FormDeleteUser.jsx";
+import axios from 'axios';
 
 export default function UsersPage() {
   const [menuAddUserAtivo, setMenuAddUserAtivo] = useState(false);
@@ -26,28 +27,32 @@ export default function UsersPage() {
   const [customers, setCustomers] = useState([]);
   const [busca, setBusca] = useState('');
 
+  const api_url = import.meta.env.VITE_API_URL;
+
   useEffect(() =>{
       getUsers()
     },[])
     
-  async function getUsers() {
+    async function getUsers() {
     const { data: { user } } = await supabase.auth.getUser();
 
-    const { data, error } = await supabase
-      .from('users')
-      .select()
-      .eq('user_id', user.id);
-
-    if (error) {
+    const response = await axios.get(`${api_url}/Clientes/usuario/${user.id}`)
+    console.log(response)
+    
+    if (response.status != 200){
       setMessageType("error");
       setMessage("Erro ao buscar os usuários");
       return;
-    } else {
-      setCustomers(data);
     }
+    setCustomers(response.data)
   }
 
-  const clientesFiltrados = customers.filter((customer) => customer.nome.toLowerCase().includes(busca.toLowerCase()))
+  const clientesNumerados = customers.map((cliente, index) => ({
+    ...cliente,
+    numero: index + 1,
+  }))
+
+  const clientesFiltrados = clientesNumerados.filter((customer) => customer.nome.toLowerCase().includes(busca.toLowerCase()))
 
   return (
     <>
@@ -80,7 +85,7 @@ export default function UsersPage() {
 
           {clientesFiltrados.map((customer) => (
             <TableBody key={customer.id}>
-              <div>{customer.id}</div>
+              <div>{customer.numero}</div>
               <div>{customer.nome}</div>
               <div>{customer.email}</div>
               <div>{customer.telefone}</div>
