@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import { useState } from "react";
 import { supabase } from "../../services/supabase";
+import axios from "axios";
 
 const StyledDivFormEditUser = styled.div`
     position: fixed;
@@ -84,39 +85,34 @@ export default function FormEditUser( { visible, setVisible, userID, userName, u
     const [newPhone, setNewPhone] = useState("");
     const [newAddress, setNewAddress] = useState("");
 
+    const api_url = import.meta.env.VITE_API_URL;
+
     async function EditUser(e) {
         e.preventDefault()
         
-        const updatedName = newName === '' ? userName : newName
-        const updatedEmail = newEmail === '' ? userEmail : newEmail
-        const updatedPhone = newPhone === '' ? userPhone : newPhone
-        const updatedAdress = newAddress === '' ? userAddress : newAddress
+        try {
+            const response = await axios.patch(`${api_url}/Clientes/${userID}`, {
+                nome: newName || userName,
+                email: newEmail || userEmail,
+                telefone: newPhone || userPhone,
+                endereco: newAddress || userAddress
+            });
 
-        console.log(userID, newName, newEmail, newPhone, newAddress)  
-        const { error } = await supabase
-            .from('users')
-            .update({ 
-                nome: updatedName,
-                email: updatedEmail,
-                telefone: updatedPhone,
-                endereco: updatedAdress
-             })
-            .eq('id', userID);
-        
-        if (error){
+            if (response.status === 200 || response.status === 201) {
+                setMessageType("success");
+                setMessage("Informações atualizadas com sucesso!");
+                setNewName("");
+                setNewEmail("");
+                setNewPhone("");
+                setNewAddress("");
+
+                await getUsersFunction();
+                setVisible(false);
+                setMessage("");
+            }
+        } catch (error) {
             setMessageType("error");
-            setMessage("Erro: " + error.message);
-        } else {
-            setMessageType("success");
-            setMessage("Cliente editado com sucesso");
-            setNewName("")
-            setNewEmail("")
-            setNewPhone("")
-            setNewAddress("")
-            
-            await getUsersFunction()
-            setVisible(false);
-            setMessage("")
+            setMessage("Erro: " + (error.response?.data?.message || error.message));
         }
     }
 
