@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import { useState } from "react";
 import { supabase } from "../../services/supabase";
+import axios from "axios";
 
 const StyledDivFormDeleteUser = styled.div`
     position: fixed;
@@ -71,22 +72,25 @@ export default function FormDeleteUser( { visible, setVisible, getUsersFunction,
     const [message, setMessage] = useState("");
     const [messageType, setMessageType] = useState("success");
 
+    const api_url = import.meta.env.VITE_API_URL;
+
     async function deleteUsers(e) {
         e.preventDefault();
 
-        const { error } = await supabase
-            .from('users')
-            .delete()
-            .eq('id', userID);
+        try {
+            const response = await axios.delete(`${api_url}/Clientes/${userID}`);
 
-        if (error) {
+            if (response.status === 200 || response.status === 201) {
+                setMessageType("success");
+                setMessage("Cliente deletado com sucesso.");
+
+                await getUsersFunction();
+                setVisible(false);
+                setMessage("");
+            }
+        } catch (error) {
             setMessageType("error");
-            setMessage("Erro ao deletar usuario")
-            return;
-        } else {
-            await getUsersFunction()
-            setVisible(false);
-            setMessage("")
+            setMessage("Erro: " + (error.response?.data?.message || error.message));
         }
     }
 
