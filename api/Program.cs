@@ -1,4 +1,5 @@
 using api.Data;
+using api.Servicos;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,6 +19,7 @@ builder.Services.AddCors(options =>
         });
 });
 
+builder.Services.AddScoped<IClientesServico, ClientesServico>();
 builder.Services.AddAuthorization();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
