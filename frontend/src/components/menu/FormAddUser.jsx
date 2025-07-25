@@ -119,7 +119,7 @@ export default function FormAddUser( { visible, setVisible, getUsersFunction } )
                         />
                     </div>
 
-                        <div style={{ display: "flex", justifyContent: "space-evenly", marginTop: "5px", whidth: "100%" }}>
+                        <div style={{ display: "flex", justifyContent: "space-evenly", marginTop: "5px", width: "100%" }}>
                             <Button variant="success" type="submit">Confirmar</Button>
                             <Button variant="danger" type="button" onClick={() => { setVisible(false) }}>Cancelar</Button>
                         </div>
