@@ -5,6 +5,7 @@ import ResetPasswordPage from "./pages/auth/ResetPasswordPage"
 import UsersPage from './pages/usersPage/UsersPage';
 import ProtectedRoutes from './services/protectedroutes';
 import "bootstrap-icons/font/bootstrap-icons.css";
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
   return (

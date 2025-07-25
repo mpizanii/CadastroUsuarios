@@ -9,11 +9,6 @@ export const Container = styled.div`
     justify-content: flex-end;
     font-family: Roboto, sans-serif;
     overflow-y: auto;
-
-    &.blur{
-        filter: blur(2px);
-        transition: filter 0.5s ease;
-    }
 `;
 
 export const Card = styled.div`
