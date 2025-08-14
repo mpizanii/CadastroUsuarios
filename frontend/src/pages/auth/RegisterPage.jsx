@@ -1,14 +1,9 @@
 import { useState } from "react";
 import { supabase } from "../../services/supabase";
-import {
-  CustomContainer,
-  LeftSectionDark,
-  RightSectionLight,
-  IconWrapper,
-  Message,
-} from "./StyledAuthPages";
+import { CustomContainer, LeftSectionRegister, RightSectionRegister, Message } from "./StyledAuthPages";
 import svgAnimadoCadastro from "../../assets/svgAnimadoCadastro.svg";
-import { Container, Row, Col, Card, Form, Button } from "react-bootstrap";
+import { Row, Col, Card, Form, Button } from "react-bootstrap";
+import { Link } from "react-router-dom";
 
 export default function RegisterPage() {
   const [email, setEmail] = useState("");
@@ -57,66 +52,65 @@ export default function RegisterPage() {
         <Col md={8}>
           <Card className="shadow-lg" style={{ borderRadius: "10px", overflow: "hidden" }}>
             <Row className="g-0">
-              {/* Lado esquerdo (formulário escuro) */}
               <Col md={6}>
-                <LeftSectionDark>
+                <LeftSectionRegister>
                   <h1>Cadastro</h1>
-                  <Form className="mt-3 w-100 px-4" onSubmit={handleSignUp}>
-                    <Form.Group className="mb-3 position-relative" controlId="formName">
-                      <IconWrapper className="bi bi-person" />
+                  <Form className="mt-3 d-flex justify-content-center align-items-center flex-column text-start w-100" onSubmit={handleSignUp}>
+                    <Form.Group className="mb-2 position-relative" controlId="formName" style={{ width: "70%" }}>
+                      <label htmlFor="formName">Nome</label>
                       <Form.Control
                         type="text"
-                        placeholder="Nome"
+                        placeholder="Digite seu nome completo..."
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        style={{ paddingLeft: "36px" }}
                       />
                     </Form.Group>
 
-                    <Form.Group className="mb-3 position-relative" controlId="formEmail">
-                      <IconWrapper className="bi bi-envelope" />
+                    <Form.Group className="mb-2 position-relative" controlId="formEmail" style={{ width: "70%" }}>
+                      <label htmlFor="formEmail">E-mail</label>
                       <Form.Control
                         type="email"
-                        placeholder="E-mail"
+                        placeholder="Digite seu e-mail..."
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        style={{ paddingLeft: "36px" }}
                       />
                     </Form.Group>
 
-                    <Form.Group className="mb-3 position-relative" controlId="formPhone">
-                      <IconWrapper className="bi bi-telephone" />
+                    <Form.Group className="mb-2 position-relative" controlId="formPhone" style={{ width: "70%" }}>
+                      <label htmlFor="formPhone">Telefone</label>
                       <Form.Control
                         type="text"
-                        placeholder="Telefone"
+                        placeholder="Digite seu telefone..."
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
-                        style={{ paddingLeft: "36px" }}
                       />
                     </Form.Group>
 
-                    <Form.Group className="mb-3 position-relative" controlId="formPassword">
-                      <IconWrapper className="bi bi-lock-fill" />
+                    <Form.Group className="mb-4 position-relative" controlId="formPassword" style={{ width: "70%" }}>
+                      <label htmlFor="formPassword">Senha</label>
                       <Form.Control
                         type="password"
-                        placeholder="Senha"
+                        placeholder="Digite sua senha..."
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        style={{ paddingLeft: "36px" }}
                       />
                     </Form.Group>
 
-                    <Button variant="light" className="w-50 fw-bold" type="submit">
+                    <Button variant="outline-success" className="w-50 fw-bold" type="submit">
                       Cadastrar
                     </Button>
                   </Form>
+
+                  <p className="mt-3">
+                    Já possui cadastro? <Link to="/">Faça login</Link>
+                  </p>
+
                   {message && <Message type={messageType}>{message}</Message>}
-                </LeftSectionDark>
+                </LeftSectionRegister>
               </Col>
 
-              {/* Lado direito (informativo claro) */}
               <Col md={6}>
-                <RightSectionLight>
+                <RightSectionRegister>
                   <h1>Seja bem-vindo!</h1>
                   <p>Preencha com as suas credenciais.</p>
                   <img
@@ -130,7 +124,7 @@ export default function RegisterPage() {
                   >
                     Business illustrations by Storyset
                   </a>
-                </RightSectionLight>
+                </RightSectionRegister>
               </Col>
             </Row>
           </Card>

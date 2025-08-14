@@ -1,14 +1,8 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../../services/supabase";
-import {
-  CustomContainer,
-  LeftSectionLight,
-  RightSectionDark,
-  IconWrapper,
-  Message,
-} from "./StyledAuthPages";
+import { CustomContainer, LeftSectionLogin, RightSectionLogin, Message } from "./StyledAuthPages";
 import svgAnimadoRedefinirSenha from "../../assets/svgAnimadoRedefinirSenha.svg";
-import { Container, Row, Col, Card, Form, Button } from "react-bootstrap";
+import { Row, Col, Card, Form, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
 export default function ResetPasswordPage() {
@@ -71,14 +65,13 @@ export default function ResetPasswordPage() {
         <Col md={8}>
           <Card className="shadow-lg" style={{ borderRadius: "10px", overflow: "hidden" }}>
             <Row className="g-0">
-              {/* Lado esquerdo (claro com imagem) */}
               <Col md={6}>
-                <LeftSectionLight>
+                <LeftSectionLogin>
                   <h1>Redefinição de senha!</h1>
                   <img
                     src={svgAnimadoRedefinirSenha}
                     alt="svg"
-                    style={{ width: "450px" }}
+                    style={{ width: "400px" }}
                   />
                   <a
                     href="https://storyset.com/business"
@@ -86,43 +79,40 @@ export default function ResetPasswordPage() {
                   >
                     Business illustrations by Storyset
                   </a>
-                </LeftSectionLight>
+                </LeftSectionLogin>
               </Col>
 
-              {/* Lado direito (formulário escuro) */}
               <Col md={6}>
-                <RightSectionDark>
+                <RightSectionLogin>
                   <h1>Redefinir Senha</h1>
-                  <Form className="mt-3 w-100 px-4" onSubmit={handleSubmit}>
-                    <Form.Group className="mb-3 position-relative" controlId="formNewPassword">
-                      <IconWrapper className="bi bi-lock-fill" />
+                  <Form className="mt-3 d-flex justify-content-center align-items-center flex-column text-start w-100" onSubmit={handleSubmit}>
+                    <Form.Group className="mb-3 position-relative" controlId="formNewPassword" style={{ width: "70%" }}>
+                      <label htmlFor="formNewPassword">Nova Senha</label>
                       <Form.Control
                         type="password"
-                        placeholder="Nova Senha"
+                        placeholder="Digite a nova senha..."
                         value={newPassword}
                         onChange={(e) => setNewPassword(e.target.value)}
-                        style={{ paddingLeft: "36px" }}
                       />
                     </Form.Group>
 
-                    <Form.Group className="mb-3 position-relative" controlId="formRepeatNewPassword">
-                      <IconWrapper className="bi bi-lock-fill" />
+                    <Form.Group className="mb-3 position-relative" controlId="formRepeatNewPassword" style={{ width: "70%" }}>
+                      <label htmlFor="formRepeatNewPassword">Repetir Nova Senha</label>
                       <Form.Control
                         type="password"
-                        placeholder="Repetir Nova Senha"
+                        placeholder="Repita a nova senha..."
                         value={repeatNewPassword}
                         onChange={(e) => setRepeatNewPassword(e.target.value)}
-                        style={{ paddingLeft: "36px" }}
                       />
                     </Form.Group>
 
-                    <Button variant="light" className="w-50 fw-bold" type="submit">
+                    <Button variant="outline-success" type="submit" style={{ width: "40%" }} className="mt-2">
                       Confirmar
                     </Button>
                   </Form>
 
                   {message && <Message type={messageType}>{message}</Message>}
-                </RightSectionDark>
+                </RightSectionLogin>
               </Col>
             </Row>
           </Card>

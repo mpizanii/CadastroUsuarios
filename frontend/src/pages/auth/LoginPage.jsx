@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { supabase } from "../../services/supabase";
-import { CustomContainer, LeftSection, RightSection, IconWrapper, Message } from "./StyledAuthPages.js";
+import { CustomContainer, LeftSectionLogin, RightSectionLogin, Message } from "./StyledAuthPages.js";
 import svgAnimado from "../../assets/svgAnimado.svg";
 import { Link, useNavigate } from "react-router-dom";
 import { Row, Col, Card, Form, Button } from "react-bootstrap";
@@ -60,46 +60,43 @@ export default function LoginPage() {
         <Col md={8}>
           <Card className="shadow-lg" style={{ borderRadius: "10px", overflow: "hidden" }}>
             <Row className="g-0">
-              {/* Lado esquerdo */}
               <Col md={6}>
-                <LeftSection>
+                <LeftSectionLogin>
                   <h1>Bem-vindo novamente!</h1>
                   <p>Faça login com o seu e-mail.</p>
                   <img src={svgAnimado} alt="svg" style={{ width: "300px" }} />
                   <a href="https://storyset.com/business" style={{ fontSize: "12px" }}>
                     Business illustrations by Storyset
                   </a>
-                </LeftSection>
+                </LeftSectionLogin>
               </Col>
 
-              {/* Lado direito */}
               <Col md={6}>
-                <RightSection>
+                <RightSectionLogin>
                   <h1>Login</h1>
-                  <Form className="mt-3" onSubmit={(e) => e.preventDefault()}>
-                    <Form.Group className="mb-3" controlId="formEmail">
-                      <IconWrapper className="bi bi-envelope" />
+                  <Form className="mt-3 d-flex justify-content-center align-items-center flex-column text-start w-100" onSubmit={(e) => e.preventDefault()}>
+                    <Form.Group className="mb-3" controlId="formEmail" style={{ width: "70%" }}>
+                      <label htmlFor="formEmail">Email</label>
                       <Form.Control
                         type="email"
-                        placeholder="E-mail"
+                        placeholder="Digite seu email..."
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        style={{ paddingLeft: "36px" }}
+                        className="no-outline"
                       />
                     </Form.Group>
 
-                    <Form.Group className="mb-3" controlId="formPassword">
-                      <IconWrapper className="bi bi-lock-fill" />
+                    <Form.Group className="mb-3" controlId="formPassword" style={{ width: "70%" }}>
+                      <label htmlFor="formPassword">Senha</label>
                       <Form.Control
                         type="password"
-                        placeholder="Senha"
+                        placeholder="Digite sua senha..."
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        style={{ paddingLeft: "36px" }}
                       />
                     </Form.Group>
 
-                    <Button variant="dark" className="w-50" onClick={handleSignIn}>
+                    <Button variant="outline-success" style={{ width: "40%" }} onClick={handleSignIn}>
                       Entrar
                     </Button>
                   </Form>
@@ -121,7 +118,7 @@ export default function LoginPage() {
                   </p>
 
                   {message && <Message type={messageType}>{message}</Message>}
-                </RightSection>
+                </RightSectionLogin>
               </Col>
             </Row>
           </Card>

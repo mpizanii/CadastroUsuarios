@@ -7,7 +7,7 @@ export const CustomContainer = styled(Container)`
   background-color: #e9ecef;
 `;
 
-export const LeftSection = styled.div`
+export const LeftSectionLogin = styled.div`
   background-color: white;
   height: 100%;
   display: flex;
@@ -18,19 +18,19 @@ export const LeftSection = styled.div`
   color: #162521;
 `;
 
-export const RightSection = styled.div`
+export const RightSectionLogin = styled.div`
   background-color: #162521;
   height: 100%;
   display: flex;
+  width: 100%;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
   padding: 2rem;
   color: white;
   text-align: center;
 `;
 
-export const LeftSectionDark = styled.div`
+export const LeftSectionRegister = styled.div`
   background-color: #162521;
   height: 100%;
   display: flex;
@@ -41,9 +41,10 @@ export const LeftSectionDark = styled.div`
   text-align: center;
 `;
 
-export const RightSectionLight = styled.div`
+export const RightSectionRegister = styled.div`
   background-color: white;
   height: 100%;
+  width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -51,39 +52,6 @@ export const RightSectionLight = styled.div`
   color: #162521;
   text-align: center;
   padding: 2rem;
-`;
-
-export const LeftSectionLight = styled.div`
-  background-color: white;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  color: #162521;
-  text-align: center;
-  padding: 2rem;
-`;
-
-export const RightSectionDark = styled.div`
-  background-color: #162521;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  color: white;
-  text-align: center;
-`;
-
-
-export const IconWrapper = styled.i`
-  position: absolute;
-  left: 20px;
-  top: 35%;
-  transform: translateY(-50%);
-  color: #aaa;
-  font-size: 18px;
 `;
 
 export const Message = styled.div`
