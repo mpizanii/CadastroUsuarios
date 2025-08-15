@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../../services/supabase";
 import axios from "axios";
-import NavbarSuperior from "../../components/menu/MenuLateral.jsx";
+import NavbarSuperior from "../../components/menu/Navbar.jsx";
 import FormAddUser from "../../components/menu/FormAddUser.jsx";
 import FormEditUser from "../../components/menu/FormEditUser.jsx";
 import FormDeleteUser from "../../components/menu/FormDeleteUser.jsx";
