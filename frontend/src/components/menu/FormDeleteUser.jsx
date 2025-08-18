@@ -45,15 +45,13 @@ export default function FormDeleteUser( { visible, setVisible, getUsersFunction,
                 <Modal.Title>Deletar Cliente</Modal.Title>
             </Modal.Header>
 
-            <Modal.Body>
-                <Form $visible={visible} onSubmit={deleteUsers} style={{ display: "flex", flexDirection: "column", gap: "10px", alignItems: "center" }}>
-                    <h6>Tem certeza que deseja deletar o cliente? <br />Essa ação não pode ser desfeita</h6>
-                </Form> 
+            <Modal.Body style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                <h6>Tem certeza que deseja deletar o cliente? <br />Essa ação não pode ser desfeita</h6>
             </Modal.Body>
 
             <Modal.Footer>
                 <div style={{ display: "flex", justifyContent: "space-evenly", marginTop: "5px", width: "100%" }}>
-                        <Button variant="success" type="submit">Confirmar</Button>
+                        <Button variant="success" type="button" onClick={deleteUsers}>Confirmar</Button>
                         <Button variant="danger" type="button" onClick={() => { setVisible(false) }}>Cancelar</Button>
                     </div>
 
