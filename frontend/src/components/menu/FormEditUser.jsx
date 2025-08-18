@@ -4,7 +4,7 @@ import { Modal, Button, Form } from "react-bootstrap";
 import axios from "axios";
 
 const StyledFormEditUserInput = styled.input`
-    width: 90%;
+    width: 80%;
     height: 30px;
     border-radius: 10px;
     border: 1px solid #ccc;

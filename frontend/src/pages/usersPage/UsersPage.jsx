@@ -7,17 +7,14 @@ import FormEditUser from "../../components/menu/FormEditUser.jsx";
 import FormDeleteUser from "../../components/menu/FormDeleteUser.jsx";
 import {
   Container,
-  Card,
-  CardButtons,
-  SearchWrapper,
-  SearchButton,
+  CardTable,
   SearchInput,
-  TableHeader,
-  TableBody,
-  TableEditUserButton,
-  TableDeleteUserButton,
-  AddUserButton,
+  TableActionButton,
+  DivActionsButtons,
+  CardTableHeader,
+  SearchButton,
 } from "./StyledUsersPage";
+import { Button, Table } from "react-bootstrap";
 
 export default function UsersPage() {
   const [menuAddUserAtivo, setMenuAddUserAtivo] = useState(false);
@@ -57,73 +54,69 @@ export default function UsersPage() {
       <NavbarSuperior />
 
       <Container className={menuAddUserAtivo || menuEditUserAtivo || menuDeleteUserAtivo ? "blur" : ""}>
-        <Card>
-          <h2 style={{ marginBottom: "20px" }}>Clientes</h2>
+        <h2 style={{ marginTop: "40px" }}>Cadastro e monitoramento de clientes</h2>
 
-          <CardButtons>
-            <SearchWrapper>
-              <SearchInput
-                type="text"
-                placeholder="Buscar Nome"
+        <CardTable>
+          <CardTableHeader>
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <SearchInput 
+                type="text" 
+                placeholder="Buscar por nome..." 
                 value={busca}
                 onChange={(e) => setBusca(e.target.value)}
               />
-              <SearchButton>
-                <i className="bi bi-search"></i>
-              </SearchButton>
-            </SearchWrapper>
+              <SearchButton><i className="bi bi-search" /></SearchButton>
+            </div>
 
-            <AddUserButton onClick={() => setMenuAddUserAtivo(true)}>
-              Adicionar Cliente
-            </AddUserButton>
-          </CardButtons>
+            <Button variant="outline-success" onClick={() => setMenuAddUserAtivo(true)}>
+              Adicionar cliente
+            </Button>
+          </CardTableHeader>
 
-          <TableHeader>
-            <div>ID</div>
-            <div>Nome</div>
-            <div>E-mail</div>
-            <div>Telefone</div>
-            <div>Endereço</div>
-            <div>Ações</div>
-          </TableHeader>
+          <Table striped style={{ textAlign: "center", margin: 0 }}>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>E-mail</th>
+                <th>Telefone</th>
+                <th>Endereço</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
 
-          {clientesFiltrados.map((customer) => (
-            <TableBody key={customer.id}>
-              <div>{customer.numero}</div>
-              <div>{customer.nome}</div>
-              <div>{customer.email}</div>
-              <div>{customer.telefone}</div>
-              <div>{customer.endereco}</div>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-evenly",
-                  width: "100%",
-                  height: "100%",
-                  alignItems: "center",
-                }}
-              >
-                <TableEditUserButton
-                  onClick={() => {
-                    setSelectedUser(customer);
-                    setMenuEditUserAtivo(true);
-                  }}
-                >
-                  <i className="bi bi-pencil-square"></i>
-                </TableEditUserButton>
+            <tbody>
+              {clientesFiltrados.map((customer) => (
+                <tr key={customer.id}>
+                  <td>{customer.numero}</td>
+                  <td>{customer.nome}</td>
+                  <td>{customer.email}</td>
+                  <td>{customer.telefone}</td>
+                  <td>{customer.endereco}</td>
+                  <td>
+                    <TableActionButton
+                      onClick={() => {
+                        setSelectedUser(customer);
+                        setMenuEditUserAtivo(true);
+                      }}
+                    >
+                      <i className="bi bi-pencil-square"></i>
+                    </TableActionButton>
 
-                <TableDeleteUserButton
-                  onClick={() => {
-                    setSelectedUser(customer);
-                    setMenuDeleteUserAtivo(true);
-                  }}
-                >
-                  <i className="bi bi-trash-fill"></i>
-                </TableDeleteUserButton>
-              </div>
-            </TableBody>
-          ))}
-        </Card>
+                    <TableActionButton
+                      onClick={() => {
+                        setSelectedUser(customer);
+                        setMenuDeleteUserAtivo(true);
+                      }}
+                    >
+                      <i className="bi bi-trash-fill"></i>
+                    </TableActionButton>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        </CardTable>
       </Container>
 
       {menuAddUserAtivo && (
