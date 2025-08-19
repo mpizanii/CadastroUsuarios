@@ -1,6 +1,18 @@
 import { Navbar, Nav, Container, Dropdown } from "react-bootstrap";
 import { supabase } from "../../services/supabase";
 import { useNavigate } from "react-router-dom";
+import styled from "styled-components";
+
+const StyledNavLink = styled(Nav.Link)`
+  color: #fff !important;
+  padding: 0.75rem 1rem;
+  transition: all 0.3s ease;
+
+  &:hover {
+    color: #228b22 !important; 
+    transform: scale(1.05);    
+  }
+`;
 
 export default function NavbarSuperior() {
 
@@ -41,60 +53,55 @@ export default function NavbarSuperior() {
             </Nav>
 
             <Nav>
-              <Nav.Link 
+              <StyledNavLink 
                 style={{ 
                   color: '#fff',
                   padding: '0.75rem 1rem',
-                  transition: 'all 0.3s ease'
                 }} 
                 onClick={() => navigate("/clientes")}
               >
                 Clientes
-              </Nav.Link>
+              </StyledNavLink>
 
-              <Nav.Link 
+              <StyledNavLink 
                 style={{ 
                   color: '#fff',
                   padding: '0.75rem 1rem',
-                  transition: 'all 0.3s ease'
                 }} 
                 onClick={() => navigate("/produtos")}
               >
                 Produtos
-              </Nav.Link>
+              </StyledNavLink>
 
-              <Nav.Link 
+              <StyledNavLink 
                 style={{ 
                   color: '#fff',
                   padding: '0.75rem 1rem',
-                  transition: 'all 0.3s ease'
                 }} 
                 onClick={() => navigate("/estoque")}
               >
                 Estoque
-              </Nav.Link>
+              </StyledNavLink>
 
-              <Nav.Link 
+              <StyledNavLink 
                 style={{ 
                   color: '#fff',
                   padding: '0.75rem 1rem',
-                  transition: 'all 0.3s ease'
                 }} 
                 onClick={() => navigate("/pedidos")}
               >
                 Pedidos
-              </Nav.Link>
+              </StyledNavLink>
 
-              <Nav.Link 
+              <StyledNavLink 
                 style={{ 
                   color: '#fff',
                   padding: '0.75rem 1rem',
-                  transition: 'all 0.3s ease'
                 }} 
                 onClick={() => navigate("/receitas")}
               >
                 Receitas
-              </Nav.Link>
+              </StyledNavLink>
             </Nav>
 
             <Dropdown align="end">
