@@ -1,14 +1,16 @@
-import { Navbar, Nav, Container, Button, Dropdown } from "react-bootstrap";
+import { Navbar, Nav, Container, Dropdown } from "react-bootstrap";
 import { supabase } from "../../services/supabase";
+import { useNavigate } from "react-router-dom";
 
 export default function NavbarSuperior() {
+
+  const navigate = useNavigate();
 
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
       console.error("Erro ao deslogar:", error.message);
     } else {
-      alert("Logout realizado com sucesso!");
       window.location.href = "/";
     }
   };
@@ -35,41 +37,63 @@ export default function NavbarSuperior() {
                }}
           >
             <Nav>
-              Logo Soft
+              Logo
             </Nav>
 
             <Nav>
               <Nav.Link 
-                href="#"  
                 style={{ 
                   color: '#fff',
                   padding: '0.75rem 1rem',
                   transition: 'all 0.3s ease'
                 }} 
+                onClick={() => navigate("/clientes")}
               >
                 Clientes
               </Nav.Link>
 
               <Nav.Link 
-                href="#" 
                 style={{ 
                   color: '#fff',
                   padding: '0.75rem 1rem',
                   transition: 'all 0.3s ease'
                 }} 
+                onClick={() => navigate("/produtos")}
               >
                 Produtos
               </Nav.Link>
 
               <Nav.Link 
-                href="#" 
                 style={{ 
                   color: '#fff',
                   padding: '0.75rem 1rem',
                   transition: 'all 0.3s ease'
                 }} 
+                onClick={() => navigate("/estoque")}
               >
                 Estoque
+              </Nav.Link>
+
+              <Nav.Link 
+                style={{ 
+                  color: '#fff',
+                  padding: '0.75rem 1rem',
+                  transition: 'all 0.3s ease'
+                }} 
+                onClick={() => navigate("/pedidos")}
+              >
+                Pedidos
+              </Nav.Link>
+
+              <Nav.Link 
+                style={{ 
+                  color: '#fff',
+                  padding: '0.75rem 1rem',
+                  transition: 'all 0.3s ease'
+                }} 
+                onClick={() => navigate("/receitas")}
+              >
+                Receitas
               </Nav.Link>
             </Nav>
 

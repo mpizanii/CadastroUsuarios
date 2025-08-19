@@ -10,7 +10,6 @@ import {
   CardTable,
   SearchInput,
   TableActionButton,
-  DivActionsButtons,
   CardTableHeader,
   SearchButton,
 } from "./StyledUsersPage";
