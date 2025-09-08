@@ -15,11 +15,11 @@ export const LeftSectionLogin = styled.div`
   justify-content: center;
   align-items: center;
   padding: 2rem;
-  color: #162521;
+  color: #212121;
 `;
 
 export const RightSectionLogin = styled.div`
-  background-color: #162521;
+  background-color: #8B0000;
   height: 100%;
   display: flex;
   width: 100%;

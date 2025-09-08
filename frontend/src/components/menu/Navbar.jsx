@@ -30,7 +30,7 @@ export default function NavbarSuperior() {
   return (
     <Navbar 
       style={{ 
-        backgroundColor: "#162521", 
+        backgroundColor: "#8B0000", 
         minHeight: "90px", 
         color: "white" 
       }} 

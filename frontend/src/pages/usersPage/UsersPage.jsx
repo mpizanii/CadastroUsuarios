@@ -53,7 +53,7 @@ export default function UsersPage() {
       <NavbarSuperior />
 
       <Container className={menuAddUserAtivo || menuEditUserAtivo || menuDeleteUserAtivo ? "blur" : ""}>
-        <h2 style={{ marginTop: "40px" }}>Cadastro e monitoramento de clientes</h2>
+        <h2 style={{ marginTop: "40px", color: "#212121" }}>Cadastro e monitoramento de clientes</h2>
 
         <CardTable>
           <CardTableHeader>
@@ -67,7 +67,7 @@ export default function UsersPage() {
               <SearchButton><i className="bi bi-search" /></SearchButton>
             </div>
 
-            <Button variant="outline-success" onClick={() => setMenuAddUserAtivo(true)}>
+            <Button variant="outline-dark" onClick={() => setMenuAddUserAtivo(true)}>
               Adicionar cliente
             </Button>
           </CardTableHeader>

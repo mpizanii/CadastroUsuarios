@@ -18,7 +18,7 @@ export const CardTable = styled.div`
     border-radius: 10px;
     align-items: center;
     justify-content: center;
-    color: #162521;
+    color: #212121;
     box-shadow: 0 8px 10px rgba(0, 0, 0, 0.1);
     flex-direction: column;
     text-align: start;
@@ -46,10 +46,10 @@ export const SearchButton = styled.button`
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #162521;
+    background-color: #8B0000;
     color: white;
     padding: 5px 10px;
-    border: 1px solid #162521;
+    border: 1px solid #8B0000;
     cursor: default;
     border-top-right-radius: 5px;
     border-bottom-right-radius: 5px;
@@ -67,5 +67,5 @@ export const TableActionButton = styled.button`
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    color: #162521;   
+    color: #212121;   
 `;
