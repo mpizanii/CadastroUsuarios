@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../../services/supabase";
 import axios from "axios";
-import NavbarSuperior from "../../components/menu/Navbar.jsx";
 import FormAddUser from "../../components/menu/FormAddUser.jsx";
 import FormEditUser from "../../components/menu/FormEditUser.jsx";
 import FormDeleteUser from "../../components/menu/FormDeleteUser.jsx";
@@ -10,7 +9,6 @@ import {
   CardTable,
   SearchInput,
   TableActionButton,
-  DivActionsButtons,
   CardTableHeader,
   SearchButton,
 } from "./StyledUsersPage";
@@ -51,8 +49,6 @@ export default function UsersPage() {
 
   return (
     <>
-      <NavbarSuperior />
-
       <Container className={menuAddUserAtivo || menuEditUserAtivo || menuDeleteUserAtivo ? "blur" : ""}>
         <h2 style={{ marginTop: "40px" }}>Cadastro e monitoramento de clientes</h2>
 
@@ -68,7 +64,7 @@ export default function UsersPage() {
               <SearchButton><i className="bi bi-search" /></SearchButton>
             </div>
 
-            <Button variant="outline-success" onClick={() => setMenuAddUserAtivo(true)}>
+            <Button variant="outline-danger" onClick={() => setMenuAddUserAtivo(true)}>
               Adicionar cliente
             </Button>
           </CardTableHeader>
@@ -99,6 +95,7 @@ export default function UsersPage() {
                         setSelectedUser(customer);
                         setMenuEditUserAtivo(true);
                       }}
+                      title="Editar dados do cliente"
                     >
                       <i className="bi bi-pencil-square"></i>
                     </TableActionButton>
@@ -108,6 +105,7 @@ export default function UsersPage() {
                         setSelectedUser(customer);
                         setMenuDeleteUserAtivo(true);
                       }}
+                      title="Excluir cliente"
                     >
                       <i className="bi bi-trash-fill"></i>
                     </TableActionButton>

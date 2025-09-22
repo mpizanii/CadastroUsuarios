@@ -46,11 +46,10 @@ export const SearchButton = styled.button`
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #162521;
+    background-color: #8B0000;
     color: white;
     padding: 5px 10px;
-    border: 1px solid #162521;
-    cursor: default;
+    border: 1px solid #8B0000;
     border-top-right-radius: 5px;
     border-bottom-right-radius: 5px;
 `;
@@ -67,5 +66,5 @@ export const TableActionButton = styled.button`
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    color: #162521;   
+    color: #162521;
 `;

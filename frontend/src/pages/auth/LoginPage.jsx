@@ -30,7 +30,7 @@ export default function LoginPage() {
       return;
     }
     if (session) {
-      navigate("/home");
+      navigate("/clientes");
     }
   }
 
@@ -96,7 +96,7 @@ export default function LoginPage() {
                       />
                     </Form.Group>
 
-                    <Button variant="outline-success" style={{ width: "40%" }} onClick={handleSignIn}>
+                    <Button variant="outline-light" style={{ width: "40%" }} onClick={handleSignIn}>
                       Entrar
                     </Button>
                   </Form>

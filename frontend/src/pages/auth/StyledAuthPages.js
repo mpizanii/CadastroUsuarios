@@ -15,11 +15,11 @@ export const LeftSectionLogin = styled.div`
   justify-content: center;
   align-items: center;
   padding: 2rem;
-  color: #162521;
+  color: #000;
 `;
 
 export const RightSectionLogin = styled.div`
-  background-color: #162521;
+  background-color: #8B0000;
   height: 100%;
   display: flex;
   width: 100%;
@@ -31,7 +31,7 @@ export const RightSectionLogin = styled.div`
 `;
 
 export const LeftSectionRegister = styled.div`
-  background-color: #162521;
+  background-color: #8B0000;
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -49,7 +49,7 @@ export const RightSectionRegister = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  color: #162521;
+  color: #000;
   text-align: center;
   padding: 2rem;
 `;

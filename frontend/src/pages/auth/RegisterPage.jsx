@@ -96,7 +96,7 @@ export default function RegisterPage() {
                       />
                     </Form.Group>
 
-                    <Button variant="outline-success" className="w-50 fw-bold" type="submit">
+                    <Button variant="outline-light" className="w-50 fw-bold" type="submit">
                       Cadastrar
                     </Button>
                   </Form>
