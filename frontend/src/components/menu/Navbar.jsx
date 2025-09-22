@@ -1,7 +1,7 @@
-import { Navbar, Nav, Container, Button, Dropdown } from "react-bootstrap";
+import { Navbar, Nav, Container, Dropdown } from "react-bootstrap";
 import { supabase } from "../../services/supabase";
 
-export default function NavbarSuperior() {
+export default function NavbarSuperior({ path }) {
 
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
@@ -16,7 +16,7 @@ export default function NavbarSuperior() {
   return (
     <Navbar 
       style={{ 
-        backgroundColor: "#162521", 
+        backgroundColor: "#8B0000", 
         minHeight: "90px", 
         color: "white" 
       }} 
@@ -40,36 +40,63 @@ export default function NavbarSuperior() {
 
             <Nav>
               <Nav.Link 
-                href="#"  
+                href="/clientes"  
                 style={{ 
                   color: '#fff',
                   padding: '0.75rem 1rem',
-                  transition: 'all 0.3s ease'
+                  transition: 'all 0.3s ease',
+                  fontWeight: path === '/clientes' ? 'bold' : 'normal'
                 }} 
               >
                 Clientes
               </Nav.Link>
 
               <Nav.Link 
-                href="#" 
+                href="/produtos" 
                 style={{ 
                   color: '#fff',
                   padding: '0.75rem 1rem',
-                  transition: 'all 0.3s ease'
+                  transition: 'all 0.3s ease',
+                  fontWeight: path === '/produtos' ? 'bold' : 'normal'
                 }} 
               >
                 Produtos
               </Nav.Link>
 
               <Nav.Link 
-                href="#" 
+                href="/estoque" 
                 style={{ 
                   color: '#fff',
                   padding: '0.75rem 1rem',
-                  transition: 'all 0.3s ease'
+                  transition: 'all 0.3s ease',
+                  fontWeight: path === '/estoque' ? 'bold' : 'normal'
                 }} 
               >
                 Estoque
+              </Nav.Link>
+
+              <Nav.Link 
+                href="/pedidos" 
+                style={{ 
+                  color: '#fff',
+                  padding: '0.75rem 1rem',
+                  transition: 'all 0.3s ease',
+                  fontWeight: path === '/pedidos' ? 'bold' : 'normal'
+                }} 
+              >
+                Pedidos
+              </Nav.Link>
+
+              <Nav.Link 
+                href="/metricas" 
+                style={{ 
+                  color: '#fff',
+                  padding: '0.75rem 1rem',
+                  transition: 'all 0.3s ease',
+                  fontWeight: path === '/metricas' ? 'bold' : 'normal'
+                }} 
+              >
+                Métricas
               </Nav.Link>
             </Nav>
 
