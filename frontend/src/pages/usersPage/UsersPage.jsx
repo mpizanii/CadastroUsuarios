@@ -50,7 +50,7 @@ export default function UsersPage() {
   return (
     <>
       <Container className={menuAddUserAtivo || menuEditUserAtivo || menuDeleteUserAtivo ? "blur" : ""}>
-        <h2 style={{ marginTop: "40px" }}>Cadastro e monitoramento de clientes</h2>
+        <h2 style={{ marginTop: "40px", color: "#212121" }}>Cadastro e monitoramento de clientes</h2>
 
         <CardTable>
           <CardTableHeader>

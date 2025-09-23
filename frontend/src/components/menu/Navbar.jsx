@@ -1,5 +1,19 @@
 import { Navbar, Nav, Container, Dropdown } from "react-bootstrap";
+import { Navbar, Nav, Container, Dropdown } from "react-bootstrap";
 import { supabase } from "../../services/supabase";
+import { useNavigate } from "react-router-dom";
+import styled from "styled-components";
+
+const StyledNavLink = styled(Nav.Link)`
+  color: #fff !important;
+  padding: 0.75rem 1rem;
+  transition: all 0.3s ease;
+
+  &:hover {
+    color: #228b22 !important; 
+    transform: scale(1.05);    
+  }
+`;
 
 export default function NavbarSuperior({ path }) {
 
@@ -8,7 +22,6 @@ export default function NavbarSuperior({ path }) {
     if (error) {
       console.error("Erro ao deslogar:", error.message);
     } else {
-      alert("Logout realizado com sucesso!");
       window.location.href = "/";
     }
   };
@@ -35,7 +48,7 @@ export default function NavbarSuperior({ path }) {
                }}
           >
             <Nav>
-              Logo Soft
+              Logo
             </Nav>
 
             <Nav>
@@ -47,6 +60,7 @@ export default function NavbarSuperior({ path }) {
                   transition: 'all 0.3s ease',
                   fontWeight: path === '/clientes' ? 'bold' : 'normal'
                 }} 
+                onClick={() => navigate("/clientes")}
               >
                 Clientes
               </Nav.Link>
@@ -59,6 +73,7 @@ export default function NavbarSuperior({ path }) {
                   transition: 'all 0.3s ease',
                   fontWeight: path === '/produtos' ? 'bold' : 'normal'
                 }} 
+                onClick={() => navigate("/produtos")}
               >
                 Produtos
               </Nav.Link>
@@ -71,6 +86,7 @@ export default function NavbarSuperior({ path }) {
                   transition: 'all 0.3s ease',
                   fontWeight: path === '/estoque' ? 'bold' : 'normal'
                 }} 
+                onClick={() => navigate("/estoque")}
               >
                 Estoque
               </Nav.Link>
