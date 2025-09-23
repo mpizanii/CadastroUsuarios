@@ -1,19 +1,6 @@
 import { Navbar, Nav, Container, Dropdown } from "react-bootstrap";
-import { Navbar, Nav, Container, Dropdown } from "react-bootstrap";
 import { supabase } from "../../services/supabase";
-import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-
-const StyledNavLink = styled(Nav.Link)`
-  color: #fff !important;
-  padding: 0.75rem 1rem;
-  transition: all 0.3s ease;
-
-  &:hover {
-    color: #228b22 !important; 
-    transform: scale(1.05);    
-  }
-`;
 
 export default function NavbarSuperior({ path }) {
 

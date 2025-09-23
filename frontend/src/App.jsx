@@ -24,21 +24,23 @@ function Layout() {
   const location = useLocation();
   const path = location.pathname;
 
+  const rotasSemNavbar = ["/", "/register", "/resetpassword"];
+
   return (
     <>
-      <NavbarSuperior path={path}/>
+      {!rotasSemNavbar.includes(path) && <NavbarSuperior path={path} />}
       <Routes>
         <Route path='/' element={<LoginPage/>}/>
         <Route path='/register' element={<RegisterPage/>}/>
         <Route path='/resetpassword' element={<ResetPasswordPage/>}/>
-        <Route path='/clientes' element={ <ProtectedRoutes> <UsersPage/> </ProtectedRoutes>}/>
-        <Route path='/produtos' element={ <ProtectedRoutes> <ProductsPage/> </ProtectedRoutes>}/>
-        <Route path='/estoque' element={ <ProtectedRoutes> <StockPage/> </ProtectedRoutes>}/>
-        <Route path='/pedidos' element={ <ProtectedRoutes> <OrdersPage/> </ProtectedRoutes>}/>
-        <Route path='/metricas' element={ <ProtectedRoutes> <DashboardPage/> </ProtectedRoutes>}/>
+        <Route path='/clientes' element={<ProtectedRoutes><UsersPage/></ProtectedRoutes>}/>
+        <Route path='/produtos' element={<ProtectedRoutes><ProductsPage/></ProtectedRoutes>}/>
+        <Route path='/estoque' element={<ProtectedRoutes><StockPage/></ProtectedRoutes>}/>
+        <Route path='/pedidos' element={<ProtectedRoutes><OrdersPage/></ProtectedRoutes>}/>
+        <Route path='/metricas' element={<ProtectedRoutes><DashboardPage/></ProtectedRoutes>}/>
       </Routes>
     </>
-  )
+  );
 }
 
 
