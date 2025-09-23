@@ -106,7 +106,7 @@ export default function ResetPasswordPage() {
                       />
                     </Form.Group>
 
-                    <Button variant="outline-success" type="submit" style={{ width: "40%" }} className="mt-2">
+                    <Button variant="outline-light" type="submit" style={{ width: "40%" }} className="mt-2">
                       Confirmar
                     </Button>
                   </Form>
