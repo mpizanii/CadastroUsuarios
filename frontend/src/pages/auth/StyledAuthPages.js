@@ -30,30 +30,6 @@ export const RightSectionLogin = styled.div`
   text-align: center;
 `;
 
-export const LeftSectionRegister = styled.div`
-  background-color: #8B0000;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  color: white;
-  text-align: center;
-`;
-
-export const RightSectionRegister = styled.div`
-  background-color: white;
-  height: 100%;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  color: #000;
-  text-align: center;
-  padding: 2rem;
-`;
-
 export const Message = styled.div`
   margin-top: 20px;
   color: ${(props) => (props.type === "success" ? "green" : "red")};

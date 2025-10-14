@@ -1,6 +1,5 @@
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import LoginPage from "./pages/auth/LoginPage";
-import RegisterPage from "./pages/auth/RegisterPage"
 import ResetPasswordPage from "./pages/auth/ResetPasswordPage"
 import UsersPage from './pages/usersPage/UsersPage';
 import ProductsPage from './pages/productsPage/ProductsPage';
@@ -24,14 +23,13 @@ function Layout() {
   const location = useLocation();
   const path = location.pathname;
 
-  const rotasSemNavbar = ["/", "/register", "/resetpassword"];
+  const rotasSemNavbar = ["/", "/resetpassword"];
 
   return (
     <>
       {!rotasSemNavbar.includes(path) && <NavbarSuperior path={path} />}
       <Routes>
         <Route path='/' element={<LoginPage/>}/>
-        <Route path='/register' element={<RegisterPage/>}/>
         <Route path='/resetpassword' element={<ResetPasswordPage/>}/>
         <Route path='/clientes' element={<ProtectedRoutes><UsersPage/></ProtectedRoutes>}/>
         <Route path='/produtos' element={<ProtectedRoutes><ProductsPage/></ProtectedRoutes>}/>

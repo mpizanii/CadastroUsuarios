@@ -113,10 +113,6 @@ export default function LoginPage() {
                     Esqueceu a senha?
                   </a>
 
-                  <p className="mt-2">
-                    Não possui cadastro? <Link to="/register">Cadastre-se</Link>
-                  </p>
-
                   {message && <Message type={messageType}>{message}</Message>}
                 </RightSectionLogin>
               </Col>
