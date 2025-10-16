@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { supabase } from "../../services/supabase";
-import axios from "axios";
-import FormAddUser from "../../components/menu/FormAddUser.jsx";
+import ModalFormAdd from "../../components/menu/ModalFormAdd.jsx";
+import { getCustomers } from "./ApiCalls.js";
+import { formAddUser } from "./Forms.js";
 import FormEditUser from "../../components/menu/FormEditUser.jsx";
 import FormDeleteUser from "../../components/menu/FormDeleteUser.jsx";
 import {
@@ -22,21 +22,22 @@ export default function UsersPage() {
   const [customers, setCustomers] = useState([]);
   const [busca, setBusca] = useState("");
 
-  const api_url = import.meta.env.VITE_API_URL;
+  const { title, fields, handleSubmit, message, messageType } = formAddUser({
+    onSuccess: () => {
+      setMenuAddUserAtivo(false);
+    },
+  });  
 
   useEffect(() => {
-    getUsers();
-  }, []);
+    if (!menuAddUserAtivo && !menuEditUserAtivo && !menuDeleteUserAtivo){
+      async function fetchCustomers() {
+        const data = await getCustomers(); 
+        setCustomers(data || []);
+      }
 
-  async function getUsers() {
-    const { data: { user } } = await supabase.auth.getUser();
-    const response = await axios.get(`${api_url}/Clientes/usuario/${user.id}`);
-    if (response.status !== 200) {
-      console.error("Erro ao buscar os usuários");
-      return;
-    }
-    setCustomers(response.data);
-  }
+      fetchCustomers();
+    };
+  }, [menuAddUserAtivo, menuEditUserAtivo, menuDeleteUserAtivo]);
 
   const clientesNumerados = customers.map((cliente, index) => ({
     ...cliente,
@@ -118,10 +119,14 @@ export default function UsersPage() {
       </Container>
 
       {menuAddUserAtivo && (
-        <FormAddUser
+        <ModalFormAdd
+          title={title}
           visible={menuAddUserAtivo}
           setVisible={setMenuAddUserAtivo}
-          getUsersFunction={getUsers}
+          fields={fields}
+          onSubmit={handleSubmit}
+          message={message}
+          messageType={messageType}
         />
       )}
 
