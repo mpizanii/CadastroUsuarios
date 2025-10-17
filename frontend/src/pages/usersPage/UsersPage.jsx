@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import ModalForm from "../../components/menu/ModalForm.jsx";
 import { getCustomers } from "./ApiCalls.js";
-import { formAddUser, formEditUser } from "./Forms.js";
-import FormDeleteUser from "../../components/menu/FormDeleteUser.jsx";
+import { formAddUser, formEditUser, formDeleteUser } from "./Forms.js";
 import { Container, CardTable, SearchInput, TableActionButton, CardTableHeader, SearchButton } from "./StyledUsersPage";
 import { Button, Table, Spinner } from "react-bootstrap";
 
@@ -26,8 +25,16 @@ export default function UsersPage() {
       setMenuEditUserAtivo(false);
       setMessageFormEditUser("");
     },
-    selectedUser,
+    selectedUser
   });  
+
+  const { titleFormDeleteUser, handleSubmitFormDeleteUser, messageFormDeleteUser, setMessageFormDeleteUser, messageTypeFormDeleteUser } = formDeleteUser({
+    onSuccess: () => {
+      setMenuDeleteUserAtivo(false);
+      setMessageFormDeleteUser("");
+    },
+    selectedUser
+  });
 
   useEffect(() => {
     if (!menuAddUserAtivo && !menuEditUserAtivo && !menuDeleteUserAtivo){
@@ -137,6 +144,7 @@ export default function UsersPage() {
           onSubmit={handleSubmitFormAddUser}
           message={messageFormAddUser}
           messageType={messageTypeFormAddUser}
+          action={"add"}
         />
       )}
 
@@ -149,15 +157,19 @@ export default function UsersPage() {
           onSubmit={handleSubmitFormEditUser}
           message={messageFormEditUser}
           messageType={messageTypeFormEditUser}
+          action={"edit"}
         />
       )}
 
       {selectedUser && menuDeleteUserAtivo && (
-        <FormDeleteUser
+        <ModalForm
+          title={titleFormDeleteUser}
           visible={menuDeleteUserAtivo}
           setVisible={setMenuDeleteUserAtivo}
-          userID={selectedUser.id}
-          getUsersFunction={getUsers}
+          onSubmit={handleSubmitFormDeleteUser}
+          message={messageFormDeleteUser}
+          messageType={messageTypeFormDeleteUser}
+          action={"delete"}
         />
       )}
     </>

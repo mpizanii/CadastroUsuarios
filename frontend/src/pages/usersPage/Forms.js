@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { addUser, editUser } from "./ApiCalls.js";
+import { addUser, editUser, deleteUser } from "./ApiCalls.js";
 
 export const formAddUser = ({ onSuccess }) => {
     const [name, setName] = useState("");
@@ -86,5 +86,32 @@ export const formEditUser = ({ onSuccess, selectedUser }) => {
         messageFormEditUser,
         setMessageFormEditUser,
         messageTypeFormEditUser
+    }
+}
+
+export const formDeleteUser = ({ onSuccess, selectedUser }) => {
+    const [messageFormDeleteUser, setMessageFormDeleteUser] = useState("");
+    const [messageTypeFormDeleteUser, setMessageTypeFormDeleteUser] = useState("success");
+
+    const titleFormDeleteUser = "Deletar Cliente";
+
+    async function handleSubmitFormDeleteUser(e) {
+        e.preventDefault();
+        try{
+            await deleteUser(selectedUser?.id);
+            setMessageTypeFormDeleteUser("success");
+            setMessageFormDeleteUser("Cliente deletado com sucesso.");
+            if (onSuccess) onSuccess();
+        } catch (error) {
+            setMessageTypeFormDeleteUser("error");
+            setMessageFormDeleteUser("Erro: " + (error.response?.data?.message || error.message));
+        }
+    }
+    return {
+        titleFormDeleteUser,
+        handleSubmitFormDeleteUser,
+        messageFormDeleteUser,
+        setMessageFormDeleteUser,
+        messageTypeFormDeleteUser
     }
 }

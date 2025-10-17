@@ -55,3 +55,16 @@ export const editUser = async ({ nome, email, telefone, endereco, id }) => {
         throw error;  
     }
 }
+
+export const deleteUser = async (id) => {
+    try {
+        const response = await axios.delete(`${API_URL}/Clientes/${id}`);
+
+        if (response.status === 200 || response.status === 201) {
+            return response.data; 
+        }
+    }
+    catch (error) {
+        throw error;
+    }
+}
