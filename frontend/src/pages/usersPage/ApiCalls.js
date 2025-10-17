@@ -37,3 +37,21 @@ export const addUser = async ({ name, email, phone, address }) => {
         throw error;
     }
 }
+
+export const editUser = async ({ nome, email, telefone, endereco, id }) => {
+    try {
+        const response = await axios.patch(`${API_URL}/Clientes/${id}`, {
+            nome,
+            email,
+            telefone,
+            endereco
+        });
+
+        if (response.status === 200 || response.status === 201) {
+            return response.data; 
+        }
+    }
+    catch (error) { 
+        throw error;  
+    }
+}

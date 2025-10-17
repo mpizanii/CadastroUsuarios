@@ -14,7 +14,7 @@ export default function ProtectedRoutes({ children }){
         checkUser();
     }, []);
     if (isAuthenticated === null){
-        return <div>Carregando...</div>;
+        return;
     }
     if (!isAuthenticated){
         return <Navigate to="/" replace />;

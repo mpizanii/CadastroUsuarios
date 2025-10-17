@@ -14,7 +14,7 @@ const Message = styled.div`
   color: ${(props) => (props.type === "success" ? "green" : "red")};
 `;
 
-export default function ModalFormAdd( { title, visible, setVisible, fields, onSubmit, message, messageType = "success" } ){
+export default function ModalForm( { title, visible, setVisible, fields, onSubmit, message, messageType = "success" } ){
     return(
         <Modal
             show={visible}

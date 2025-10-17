@@ -1,18 +1,10 @@
 import { useState, useEffect } from "react";
-import ModalFormAdd from "../../components/menu/ModalFormAdd.jsx";
+import ModalForm from "../../components/menu/ModalForm.jsx";
 import { getCustomers } from "./ApiCalls.js";
-import { formAddUser } from "./Forms.js";
-import FormEditUser from "../../components/menu/FormEditUser.jsx";
+import { formAddUser, formEditUser } from "./Forms.js";
 import FormDeleteUser from "../../components/menu/FormDeleteUser.jsx";
-import {
-  Container,
-  CardTable,
-  SearchInput,
-  TableActionButton,
-  CardTableHeader,
-  SearchButton,
-} from "./StyledUsersPage";
-import { Button, Table } from "react-bootstrap";
+import { Container, CardTable, SearchInput, TableActionButton, CardTableHeader, SearchButton } from "./StyledUsersPage";
+import { Button, Table, Spinner } from "react-bootstrap";
 
 export default function UsersPage() {
   const [menuAddUserAtivo, setMenuAddUserAtivo] = useState(false);
@@ -22,10 +14,19 @@ export default function UsersPage() {
   const [customers, setCustomers] = useState([]);
   const [busca, setBusca] = useState("");
 
-  const { title, fields, handleSubmit, message, messageType } = formAddUser({
+  const { titleFormAddUser, fieldsFormAddUser, handleSubmitFormAddUser, messageFormAddUser, setMessageFormAddUser, messageTypeFormAddUser } = formAddUser({
     onSuccess: () => {
       setMenuAddUserAtivo(false);
+      setMessageFormAddUser("");
     },
+  });  
+
+  const { titleFormEditUser, fieldsFormEditUser, handleSubmitFormEditUser, messageFormEditUser, setMessageFormEditUser, messageTypeFormEditUser } = formEditUser({
+    onSuccess: () => {
+      setMenuEditUserAtivo(false);
+      setMessageFormEditUser("");
+    },
+    selectedUser,
   });  
 
   useEffect(() => {
@@ -47,6 +48,15 @@ export default function UsersPage() {
   const clientesFiltrados = clientesNumerados.filter((customer) =>
     customer.nome.toLowerCase().includes(busca.toLowerCase())
   );
+
+  if (customers.length === 0) {
+    return(
+      <div style={{ display: "flex", flexDirection: "column", gap: "5px", justifyContent: "center", alignItems: "center", height: "100vh" }}>
+        <Spinner animation="border" role="status" />
+        <span>Carregando dados dos clientes</span>
+      </div>
+    )
+  }
 
   return (
     <>
@@ -119,27 +129,26 @@ export default function UsersPage() {
       </Container>
 
       {menuAddUserAtivo && (
-        <ModalFormAdd
-          title={title}
+        <ModalForm
+          title={titleFormAddUser}
           visible={menuAddUserAtivo}
           setVisible={setMenuAddUserAtivo}
-          fields={fields}
-          onSubmit={handleSubmit}
-          message={message}
-          messageType={messageType}
+          fields={fieldsFormAddUser}
+          onSubmit={handleSubmitFormAddUser}
+          message={messageFormAddUser}
+          messageType={messageTypeFormAddUser}
         />
       )}
 
       {selectedUser && menuEditUserAtivo && (
-        <FormEditUser
+        <ModalForm
+          title={titleFormEditUser}
           visible={menuEditUserAtivo}
           setVisible={setMenuEditUserAtivo}
-          userID={selectedUser.id}
-          userName={selectedUser.nome}
-          userEmail={selectedUser.email}
-          userPhone={selectedUser.telefone}
-          userAddress={selectedUser.endereco}
-          getUsersFunction={getUsers}
+          fields={fieldsFormEditUser}
+          onSubmit={handleSubmitFormEditUser}
+          message={messageFormEditUser}
+          messageType={messageTypeFormEditUser}
         />
       )}
 
