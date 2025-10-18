@@ -1,7 +1,7 @@
 using api.DTOs;
 using api.Models;
 
-namespace api.Servicos
+namespace api.Interfaces
 {
     public interface IClientesServico
     {
