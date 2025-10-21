@@ -6,6 +6,7 @@ using api.Interfaces;
 using api.Data;
 using api.DTOs;
 using Microsoft.EntityFrameworkCore;
+using api.Models;
 
 namespace api.Servicos
 {
@@ -25,8 +26,58 @@ namespace api.Servicos
                     Id = p.Id,
                     Nome = p.Nome,
                     Preco = p.Preco,
-                    Custo = p.Preco,
+                    Custo = p.Custo,
                 }).ToListAsync();
         }
+
+        public async Task<ProdutosDTO> ObterProdutoPorId(int id)
+        {
+            var produto = await _context.Produtos
+                .Where(p => p.Id == id)
+                .Select(p => new ProdutosDTO
+                {
+                    Id = p.Id,
+                    Nome = p.Nome,
+                    Preco = p.Preco,
+                    Custo = p.Custo,
+                }).FirstOrDefaultAsync();
+
+            return produto;
+        }
+
+        public async Task<Produtos> AdicionarProduto(Produtos produto)
+        {
+            _context.Produtos.Add(produto);
+            await _context.SaveChangesAsync();
+            return produto;
+        }
+
+        public async Task<bool> EditarProduto(int id, ProdutosDTO produtoDTO)
+        {
+            var produto = await _context.Produtos.FindAsync(id);
+            if (produto == null) return false;
+
+            if (!string.IsNullOrWhiteSpace(produtoDTO.Nome) && produtoDTO.Nome != "string")
+                produto.Nome = produtoDTO.Nome;
+
+            if (produtoDTO.Preco != 0)
+                produto.Preco = produtoDTO.Preco;
+
+            if (produtoDTO.Custo != 0)
+                produto.Custo = produtoDTO.Custo;
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+        
+        public async Task<bool> DeletarProduto(int id)
+        {
+            var produto = await _context.Produtos.FindAsync(id);
+            if (produto == null) return false;
+
+            _context.Produtos.Remove(produto);
+            await _context.SaveChangesAsync();
+            return true;
+        }  
     }
 }

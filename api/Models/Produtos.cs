@@ -19,17 +19,15 @@ namespace api.Models
 
         [Column("preco")]
         public double Preco { get; set; } = 0;
-
-        [Column("telefone")]
-        public string Telefone { get; set; } = string.Empty;
-
+        
         [Column("receita_id")]
-        public int Receita_id { get; set; }
+        public int? Receita_id { get; set; }
 
         [Column("created_at")]
         public DateTime Created_At { get; set; }
 
         [Column("custo")]
         public double Custo { get; set; } = 0;
+
     }
 }
