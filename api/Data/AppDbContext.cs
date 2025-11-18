@@ -13,10 +13,14 @@ namespace api.Data
 
         public DbSet<Cliente> Clientes { get; set; }
         public DbSet<Produtos> Produtos { get; set; }
+        public DbSet<Receitas> Receitas { get; set; }
+        public DbSet<Ingrediente> Ingredientes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Cliente>().ToTable("clientes");
+            modelBuilder.Entity<Receitas>().ToTable("receitas");
+            modelBuilder.Entity<Ingrediente>().ToTable("receitaIngredientes");
         }
     }
 }
