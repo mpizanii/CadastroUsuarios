@@ -62,5 +62,11 @@ namespace api.Servicos
             return await _context.Receitas
                 .FirstOrDefaultAsync(r => r.Id == id);
         }
+
+        public async Task<List<Receitas?>> ObterReceitas()
+        {
+            return await _context.Receitas
+                .ToListAsync();
+        }
     }
 }

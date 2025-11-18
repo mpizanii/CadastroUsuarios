@@ -31,6 +31,13 @@ namespace api.Controllers
             return CreatedAtAction(nameof(ObterPorId), new { id = novaReceita.Id }, novaReceita);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> ObterReceitas()
+        {
+            var receita = await _receitasServico.ObterReceitas();
+            return Ok(receita);
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> ObterPorId(int id)
         {

@@ -12,5 +12,6 @@ namespace api.Interfaces
     {
         Task<Receitas> AdicionarReceita(ReceitasDTO receita);
         Task<Receitas?> ObterPorId(int id);
+        Task<List<Receitas?>> ObterReceitas();
     }
 }

@@ -82,9 +82,14 @@ export default function OrdersPage() {
               <SearchButton><i className="bi bi-search" /></SearchButton>
             </div>
 
-            <Button variant="outline-danger" onClick={() => setMenuAddProductAtivo(true)}>
-              Adicionar produto
-            </Button>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              <Button variant="outline-danger" onClick={() => setMenuAddProductAtivo(true)}>
+                Adicionar receita
+              </Button>
+              <Button variant="outline-danger" onClick={() => setMenuAddProductAtivo(true)}>
+                Adicionar produto
+              </Button>
+            </div>
           </CardTableHeader>
 
           <Table striped style={{ textAlign: "center", margin: 0 }}>
