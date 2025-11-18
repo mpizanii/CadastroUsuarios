@@ -5,9 +5,8 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddOpenApi();
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("SupabaseDb")));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("NeonDb")));
 
 builder.Services.AddCors(options =>
 {
