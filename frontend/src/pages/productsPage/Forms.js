@@ -1,19 +1,33 @@
-import { useState } from "react";
-import { addProduct, editProduct, deleteProduct } from "./ApiCalls.js";
+import { useEffect, useState } from "react";
+import { addProduct, editProduct, deleteProduct, getRecipes } from "./ApiCalls.js";
 
 export const formAddProduct = ({ onSuccess }) => {
     const [name, setName] = useState("");
     const [price, setPrice] = useState("");
+    const [recipes, setRecipes] = useState([]);
     const [recipeId, setRecipeId] = useState("");
     const [cost, setCost] = useState("");
     const [messageFormAddProduct, setMessageFormAddProduct] = useState("");
     const [messageTypeFormAddProduct, setMessageTypeFormAddProduct] = useState("success");
 
+    useEffect(() => {
+        const loadRecipes = async () => {
+            try {
+                const data = await getRecipes();
+                setRecipes(data);
+            } catch (error) {
+                setMessageTypeFormAddProduct("error");
+                setMessageFormAddProduct("Erro ao carregar receitas.");
+            }
+        };
+        loadRecipes();
+    }, []);
+
     const titleFormAddProduct = "Cadastrar Produto";
     const fieldsFormAddProduct = [
         { id: "name", label: "Nome", placeholder: "Obrigatório", value: name, onChange: setName, required: true },
         { id: "price", label: "Preço", placeholder: "Obrigatório", value: price, onChange: setPrice },
-        { id: "Receita", label: "Receita", placeholder: "Obrigatório", value: recipeId, onChange: setRecipeId },
+        { id: "recipeId", label: "Receita", type: "select", options: recipes.map(r => ({ value: r.id, label: r.nome })), value: recipeId, onChange: setRecipeId, required: true, placeholder: "Selecione uma receita" },
         { id: "cost", label: "Custo Unitário", placeholder: "Obrigatório", value: cost, onChange: setCost },
     ];
 

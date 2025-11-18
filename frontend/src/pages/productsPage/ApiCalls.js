@@ -12,6 +12,16 @@ export async function getProducts() {
     return response.data;
 }
 
+export async function getRecipes() {
+    const response = await axios.get(`${API_URL}/Receitas`);
+    if (response.status !== 200) {
+        console.error("Erro ao buscar os usuários");
+        return;
+    }
+
+    return response.data;
+}
+
 export const addProduct = async ({ name, price, recipeId, cost }) => {
     try {
         const novoProduto = {

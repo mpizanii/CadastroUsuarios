@@ -9,6 +9,14 @@ const StyledFormInput = styled.input`
     padding: 5px;
 `;
 
+const StyledFormSelect = styled.select`
+    width: 80%;
+    height: 30px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    padding: 5px;
+`;
+
 const Message = styled.div`
   margin-top: 20px;
   color: ${(props) => (props.type === "success" ? "green" : "red")};
@@ -49,14 +57,30 @@ export default function ModalForm( { title, visible, setVisible, fields, onSubmi
                         {fields.map((field, index) => (
                             <div key={index} style={{ width: "100%", display: "flex", flexDirection: "column", alignItems: "center" }}>
                                 <label htmlFor="name">{field.label}</label>
-                                <StyledFormInput
-                                    id={field.id}
-                                    type={field.type || "text"} 
-                                    placeholder={field.placeholder || ""}
-                                    value={field.value}
-                                    onChange={(e) => field.onChange(e.target.value)}
-                                    required={field.required || false}
-                                />
+                                {field.type === "select" ? (
+                                    <StyledFormSelect
+                                        id={field.id}
+                                        value={field.value}
+                                        onChange={(e) => field.onChange(e.target.value)}
+                                        required={field.required || false}
+                                    >
+                                        <option value="">{field.placeholder || "Selecione..."}</option>
+                                        {field.options?.map((option) => (
+                                            <option key={option.value} value={option.value}>
+                                                {option.label}
+                                            </option>
+                                        ))}
+                                    </StyledFormSelect>
+                                ) : (
+                                    <StyledFormInput
+                                        id={field.id}
+                                        type={field.type || "text"} 
+                                        placeholder={field.placeholder || ""}
+                                        value={field.value}
+                                        onChange={(e) => field.onChange(e.target.value)}
+                                        required={field.required || false}
+                                    />
+                                )}
                             </div>
                         ))}
 
