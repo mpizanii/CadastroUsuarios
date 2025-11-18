@@ -40,13 +40,18 @@ export const addProduct = async ({ name, price, recipeId, cost }) => {
     }
 }
 
-export const editProduct = async ({ nome, preco, custo, id }) => {
+export const editProduct = async ({ nome, preco, custo, receita_id, id }) => {
     try {
+
+        console.log("Editando produto ID " + id + " com receita_id " + receita_id);
         const response = await axios.patch(`${API_URL}/Produtos/${id}`, {
             nome,
             preco,
             custo,
+            receita_id
         });
+
+        console.log(response);
 
         if (response.status === 200 || response.status === 201) {
             return response.data; 

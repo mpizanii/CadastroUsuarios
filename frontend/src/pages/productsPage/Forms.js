@@ -63,26 +63,43 @@ export const formEditProduct = ({ onSuccess, selectedProduct }) => {
     const [newName, setNewName] = useState("");
     const [newPrice, setNewPrice] = useState("");
     const [newCost, setNewCost] = useState("");
+    const [recipes, setRecipes] = useState([]);
+    const [newRecipeId, setNewRecipeId] = useState("");
     const [messageFormEditProduct, setMessageFormEditProduct] = useState("");
     const [messageTypeFormEditProduct, setMessageTypeFormEditProduct] = useState("success");
+
+    useEffect(() => {
+        const loadRecipes = async () => {
+            try {
+                const data = await getRecipes();
+                setRecipes(data);
+            } catch (error) {
+                setMessageTypeFormAddProduct("error");
+                setMessageFormAddProduct("Erro ao carregar receitas.");
+            }
+        };
+        loadRecipes();
+    }, []);
 
     const titleFormEditProduct = "Editar dados do produto";
     const fieldsFormEditProduct = [
         { id: "name", label: "Nome", placeholder: selectedProduct?.nome, value: newName, onChange: setNewName },
         { id: "price", label: "Preço", placeholder: selectedProduct?.preco, value: newPrice, onChange: setNewPrice },
         { id: "cost", label: "Custo Unitário", placeholder: selectedProduct?.custo, value: newCost, onChange: setNewCost },
+        { id: "recipeId", label: "Receita", type: "select", options: recipes.map(r => ({ value: r.id, label: r.nome })), value: newRecipeId, onChange: setNewRecipeId, placeholder: "Selecione uma receita" },
     ];
 
     async function handleSubmitFormEditProduct(e) {
         e.preventDefault();
 
         try{
-            await editProduct( { nome: newName || selectedProduct?.nome, preco: newPrice || selectedProduct?.preco, custo: newCost || selectedProduct?.custo, id: selectedProduct?.id } );
+            await editProduct( { nome: newName || selectedProduct?.nome, preco: newPrice || selectedProduct?.preco, custo: newCost || selectedProduct?.custo, receita_id: newRecipeId || selectedProduct?.receita_id, id: selectedProduct?.id } );
             setMessageTypeFormEditProduct("success");
             setMessageFormEditProduct("Dados do produto editados com sucesso.");
             setNewName("");
             setNewPrice("");
             setNewCost("");
+            setNewRecipeId("");
             if (onSuccess) onSuccess();
         } catch (error) {
             setMessageTypeFormEditProduct("error");
