@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { addProduct, editProduct, deleteProduct, getRecipes } from "./ApiCalls.js";
+import { addProduct, editProduct, deleteProduct, getRecipes, addRecipe } from "./ApiCalls.js";
 
 export const formAddProduct = ({ onSuccess }) => {
     const [name, setName] = useState("");
@@ -124,5 +124,77 @@ export const formDeleteProduct = ({ onSuccess, selectedProduct }) => {
         messageFormDeleteProduct,
         setMessageFormDeleteProduct,
         messageTypeFormDeleteProduct
+    }
+}
+
+export const formAddRecipe = ({ onSuccess }) => {
+    const [name, setName] = useState("");
+    const [method, setMethod] = useState("");
+    const [ingredients, setIngredients] = useState([ { nome: "", quantidade: "", unidade: "" } ]);
+    const [messageFormAddRecipe, setMessageFormAddRecipe] = useState("");
+    const [messageTypeFormAddRecipe, setMessageTypeFormAddRecipe] = useState("success");
+
+    const addIngredient = () => {
+        console.log("addIngredient chamado");
+        console.log("Ingredients antes:", ingredients);
+        setIngredients(prev => {
+            const newIngredients = [...prev, { nome: "", quantidade: 0, unidade: "" }];
+            console.log("Ingredients depois:", newIngredients);
+            return newIngredients;
+        });
+    };
+
+    const removeIngredient = (index) => {
+        const newIngredients = ingredients.filter((_, i) => i !== index);
+        setIngredients(newIngredients);
+    };
+
+    const updateIngredient = (index, field, value) => {
+        const newIngredients = [...ingredients];
+        newIngredients[index][field] = value;
+        setIngredients(newIngredients);
+    };
+
+    const titleFormAddRecipe = "Cadastrar Receita";
+    const fieldsFormAddRecipe = [
+        { id: "name", label: "Nome", placeholder: "Obrigatório", value: name, onChange: setName, required: true },
+        { id: "method", label: "Modo de Preparo", type: "textarea", rows: 5, placeholder: 'Adicione o modo de preparo separado por ";". Exemplo: passo1; passo2; passo3; ...', value: method, onChange: setMethod, required: true },
+        { id: "ingredients", label: "Ingredientes", type: "ingredients-list", value: ingredients, onAdd: addIngredient, onRemove: removeIngredient, onUpdate: updateIngredient, required: true },
+    ];
+
+    async function handleSubmitFormAddRecipe(e) {
+        e.preventDefault();
+
+        try {
+            const hasEmptyIngredient = ingredients.some(
+                ing => !ing.nome || !ing.quantidade || !ing.unidade
+            );
+
+            // if (hasEmptyIngredient) {
+            //     setMessageTypeFormAddRecipe("error");
+            //     setMessageFormAddRecipe("Preencha todos os campos dos ingredientes.");
+            //     return;
+            // }
+
+            await addRecipe({ name, modo_preparo: method, ingredientes: ingredients });
+            setMessageTypeFormAddRecipe("success");
+            setMessageFormAddRecipe("Receita adicionada com sucesso.");
+            setName("");
+            setMethod("");
+            setIngredients([{ nome: "", quantidade: 0, unidade: "" }]);
+            if (onSuccess) onSuccess();
+        } catch (error) {
+            setMessageTypeFormAddRecipe("error");
+            setMessageFormAddRecipe("Erro: " + (error.response?.data?.message || error.message));
+        }   
+    }
+
+    return {
+        titleFormAddRecipe,
+        fieldsFormAddRecipe,
+        handleSubmitFormAddRecipe,
+        messageFormAddRecipe,
+        setMessageFormAddRecipe,
+        messageTypeFormAddRecipe
     }
 }

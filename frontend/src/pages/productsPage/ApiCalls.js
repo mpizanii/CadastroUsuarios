@@ -69,3 +69,22 @@ export const deleteProduct = async (id) => {
         throw error;
     }
 }
+
+export const addRecipe = async ({ name, modo_preparo, ingredientes }) => {
+    try {
+        const novaReceita = {
+            nome: name,
+            modo_Preparo: modo_preparo,
+            ingredientes: ingredientes
+        };
+        console.log("Nova receita " + novaReceita);
+
+        const response = await axios.post(`${API_URL}/Receitas`, novaReceita);
+        
+        if (response.status === 200 || response.status === 201) {
+            return response.data; 
+        }
+    } catch (error) {
+        throw error;
+    }
+}

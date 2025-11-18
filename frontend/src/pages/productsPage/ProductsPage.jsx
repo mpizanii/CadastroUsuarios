@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import ModalForm from "../../components/menu/ModalForm.jsx";
 import { getProducts } from "./ApiCalls.js";
-import { formAddProduct, formEditProduct, formDeleteProduct } from "./Forms.js";
+import { formAddProduct, formEditProduct, formDeleteProduct, formAddRecipe } from "./Forms.js";
 import { Container, CardTable, SearchInput, TableActionButton, CardTableHeader, SearchButton } from "./StyledProductsPage";
 import { Button, Table, Spinner } from "react-bootstrap";
 
@@ -9,6 +9,7 @@ export default function OrdersPage() {
   const [menuAddProductAtivo, setMenuAddProductAtivo] = useState(false);
   const [menuEditProductAtivo, setMenuEditProductAtivo] = useState(false);
   const [menuDeleteProductAtivo, setMenuDeleteProductAtivo] = useState(false);
+  const [menuAddRecipeAtivo, setMenuAddRecipeAtivo] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [products, setProducts] = useState([]);
   const [busca, setBusca] = useState("");
@@ -36,6 +37,13 @@ export default function OrdersPage() {
     selectedProduct
   });
 
+  const { titleFormAddRecipe, fieldsFormAddRecipe, handleSubmitFormAddRecipe, messageFormAddRecipe, setMessageFormAddRecipe, messageTypeFormAddRecipe } = formAddRecipe({
+    onSuccess: () => {
+      setMenuAddRecipeAtivo(false);
+      setMessageFormAddRecipe("");
+    },
+  });  
+
   useEffect(() => {
     if (!menuAddProductAtivo && !menuEditProductAtivo && !menuDeleteProductAtivo){
       async function fetchProducts() {
@@ -56,14 +64,14 @@ export default function OrdersPage() {
     produto.nome.toLowerCase().includes(busca.toLowerCase())
   );
 
-  if (products.length === 0) {
-    return(
-      <div style={{ display: "flex", flexDirection: "column", gap: "5px", justifyContent: "center", alignItems: "center", height: "100vh" }}>
-        <Spinner animation="border" role="status" />
-        <span>Carregando dados dos produtos</span>
-      </div>
-    )
-  }
+  // if (products.length === 0) {
+  //   return(
+  //     <div style={{ display: "flex", flexDirection: "column", gap: "5px", justifyContent: "center", alignItems: "center", height: "100vh" }}>
+  //       <Spinner animation="border" role="status" />
+  //       <span>Carregando dados dos produtos</span>
+  //     </div>
+  //   )
+  // }
 
   return (
     <>
@@ -83,7 +91,7 @@ export default function OrdersPage() {
             </div>
 
             <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-              <Button variant="outline-danger" onClick={() => setMenuAddProductAtivo(true)}>
+              <Button variant="outline-danger" onClick={() => setMenuAddRecipeAtivo(true)}>
                 Adicionar receita
               </Button>
               <Button variant="outline-danger" onClick={() => setMenuAddProductAtivo(true)}>
@@ -173,6 +181,19 @@ export default function OrdersPage() {
           message={messageFormDeleteProduct}
           messageType={messageTypeFormDeleteProduct}
           action={"delete"}
+        />
+      )}
+      
+      {menuAddRecipeAtivo && (
+        <ModalForm
+          title={titleFormAddRecipe}
+          visible={menuAddRecipeAtivo}
+          setVisible={setMenuAddRecipeAtivo}
+          fields={fieldsFormAddRecipe}
+          onSubmit={handleSubmitFormAddRecipe}
+          message={messageFormAddRecipe}
+          messageType={messageTypeFormAddRecipe}
+          action={"add"}
         />
       )}
     </>

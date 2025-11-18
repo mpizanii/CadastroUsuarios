@@ -56,14 +56,14 @@ export default function UsersPage() {
     customer.nome.toLowerCase().includes(busca.toLowerCase())
   );
 
-  if (customers.length === 0) {
-    return(
-      <div style={{ display: "flex", flexDirection: "column", gap: "5px", justifyContent: "center", alignItems: "center", height: "100vh" }}>
-        <Spinner animation="border" role="status" />
-        <span>Carregando dados dos clientes</span>
-      </div>
-    )
-  }
+  // if (customers.length === 0) {
+  //   return(
+  //     <div style={{ display: "flex", flexDirection: "column", gap: "5px", justifyContent: "center", alignItems: "center", height: "100vh" }}>
+  //       <Spinner animation="border" role="status" />
+  //       <span>Carregando dados dos clientes</span>
+  //     </div>
+  //   )
+  // }
 
   return (
     <>
