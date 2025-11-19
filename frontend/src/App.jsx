@@ -7,8 +7,9 @@ import ProductsPage from './pages/productsPage/ProductsPage';
 import StockPage from './pages/stockPage/StockPage';
 import OrdersPage from './pages/ordersPage/OrdersPage'
 import DashboardPage from './pages/dashboardPage/DashboardPage';
+import RecipesPage from './pages/recipesPage/RecipesPage';
+import SupportPage from './pages/supportPage/SupportPage';
 import ProtectedRoutes from './services/protectedroutes';
-import NavbarSuperior from './components/menu/Navbar';
 import "bootstrap-icons/font/bootstrap-icons.css";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import SideBar from './components/menu/Sidebar';
@@ -63,6 +64,8 @@ function Layout() {
               <Route path='/estoque' element={<ProtectedRoutes><StockPage/></ProtectedRoutes>}/>
               <Route path='/pedidos' element={<ProtectedRoutes><OrdersPage/></ProtectedRoutes>}/>
               <Route path='/metricas' element={<ProtectedRoutes><DashboardPage/></ProtectedRoutes>}/>
+              <Route path='/receitas' element={<ProtectedRoutes><RecipesPage/></ProtectedRoutes>}/>
+              <Route path='/suporte' element={<ProtectedRoutes><SupportPage/></ProtectedRoutes>}/>
             </Routes>
           </div>
         </>

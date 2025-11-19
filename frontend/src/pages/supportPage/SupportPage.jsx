@@ -1,8 +1,8 @@
 import { Container, Row, Col, Card, Badge } from 'react-bootstrap';
 import { FiClock } from 'react-icons/fi';
-import { MdOutlineDashboard } from "react-icons/md";
+import { FiHelpCircle } from 'react-icons/fi';
 
-const DashboardPage = () => {
+const RecipesPage = () => {
   return (
     <div className="d-flex align-items-center justify-content-center" style={{ minHeight: '100vh', backgroundColor: '#f8f9fa' }}>
       <Container fluid className="p-4">
@@ -15,14 +15,14 @@ const DashboardPage = () => {
                     className="bg-danger bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
                     style={{ width: '80px', height: '80px' }}
                   >
-                    <MdOutlineDashboard size={40} className="text-danger" />
+                    <FiHelpCircle size={40} className="text-danger" />
                   </div>
                 </div>
                 
-                <h2 className="fw-bold text-dark mb-3">Dashboard</h2>
+                <h2 className="fw-bold text-dark mb-3">Suporte</h2>
                 
                 <p className="text-muted mb-4 lead">
-                  Esta página está em desenvolvimento. Em breve você poderá ver e acompanhar todas as métricas da empresa.
+                  Esta página está em desenvolvimento. Em breve você poderá tirar suas dúvidas sobre o sistema.
                 </p>
                 
                 <Badge bg="warning" className="px-3 py-2">
@@ -38,4 +38,4 @@ const DashboardPage = () => {
   );
 };
 
-export default DashboardPage;
+export default RecipesPage;
