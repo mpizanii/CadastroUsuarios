@@ -77,7 +77,7 @@ export default function UsersPage() {
   return (
     <>
       <Container className={menuAddUserAtivo || menuEditUserAtivo || menuDeleteUserAtivo ? "blur" : ""}>
-        <div style={{ padding: "40px 60px" }}>
+        <div style={{ padding: "35px 30px" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "30px" }}>
             <div>
               <h1 style={{ color: "#212121", marginBottom: "5px", fontWeight: "bold" }}>Clientes</h1>

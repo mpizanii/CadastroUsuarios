@@ -79,7 +79,7 @@ const SideBar = ({ activeItem, onItemClick, isCollapsed, onHideMobile }) => {
                 </div>
                 <div className="ms-3">
                     <h5 className="mb-0 fw-bold" style={{ color: '#8B0000' }}>KLG</h5>
-                    <small className="text-muted">Plataforma de Estoque</small>
+                    <small className="text-muted">Sistema de Gestão</small>
                 </div>
             </div>
         </div>
