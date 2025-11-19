@@ -3,7 +3,7 @@ import ModalForm from "../../components/menu/ModalForm.jsx";
 import { getCustomers } from "./ApiCalls.js";
 import { formAddUser, formEditUser, formDeleteUser } from "./Forms.js";
 import { Container, SearchInput } from "./StyledUsersPage";
-import { Button, Card, Badge } from "react-bootstrap";
+import { Button, Card, Badge, Spinner } from "react-bootstrap";
 import { CiSearch } from "react-icons/ci";
 import { SlPencil, SlTrash  } from "react-icons/sl";
 import { MdEmail, MdPhone, MdLocationOn } from "react-icons/md";
@@ -15,6 +15,7 @@ export default function UsersPage() {
   const [selectedUser, setSelectedUser] = useState(null);
   const [customers, setCustomers] = useState([]);
   const [busca, setBusca] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const { titleFormAddUser, fieldsFormAddUser, handleSubmitFormAddUser, messageFormAddUser, setMessageFormAddUser, messageTypeFormAddUser } = formAddUser({
     onSuccess: () => {
@@ -42,8 +43,13 @@ export default function UsersPage() {
   useEffect(() => {
     if (!menuAddUserAtivo && !menuEditUserAtivo && !menuDeleteUserAtivo){
       async function fetchCustomers() {
-        const data = await getCustomers(); 
-        setCustomers(data || []);
+        setLoading(true);
+        try {
+          const data = await getCustomers(); 
+          setCustomers(data || []);
+        } finally {
+          setLoading(false);
+        }
       }
 
       fetchCustomers();
@@ -59,14 +65,14 @@ export default function UsersPage() {
     customer.nome.toLowerCase().includes(busca.toLowerCase())
   );
 
-  // if (customers.length === 0) {
-  //   return(
-  //     <div style={{ display: "flex", flexDirection: "column", gap: "5px", justifyContent: "center", alignItems: "center", height: "100vh" }}>
-  //       <Spinner animation="border" role="status" />
-  //       <span>Carregando dados dos clientes</span>
-  //     </div>
-  //   )
-  // }
+  if (loading) {
+    return(
+      <div style={{ display: "flex", flexDirection: "column", gap: "5px", justifyContent: "center", alignItems: "center", height: "100vh" }}>
+        <Spinner animation="border" role="status" />
+        <span>Carregando dados dos clientes</span>
+      </div>
+    )
+  }
 
   return (
     <>
