@@ -19,10 +19,21 @@ export default function OrdersPage() {
   const [busca, setBusca] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const fetchProducts = async () => {
+    setLoading(true);
+    try {
+      const data = await getProducts(); 
+      setProducts(data || []);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   const { titleFormProduct, fieldsFormAddProduct, handleSubmitFormAddProduct, messageFormAddProduct, setMessageFormAddProduct, messageTypeFormAddProduct } = formAddProduct({
     onSuccess: () => {
       setMenuAddProductAtivo(false);
       setMessageFormAddProduct("");
+      fetchProducts();
     },
   });  
 
@@ -30,6 +41,7 @@ export default function OrdersPage() {
     onSuccess: () => {
       setMenuEditProductAtivo(false);
       setMessageFormEditProduct("");
+      fetchProducts();
     },
     selectedProduct
   });  
@@ -38,6 +50,7 @@ export default function OrdersPage() {
     onSuccess: () => {
       setMenuDeleteProductAtivo(false);
       setMessageFormDeleteProduct("");
+      fetchProducts();
     },
     selectedProduct
   });
@@ -47,23 +60,11 @@ export default function OrdersPage() {
       setMenuAddRecipeAtivo(false);
       setMessageFormAddRecipe("");
     },
-  });  
+  });
 
   useEffect(() => {
-    if (!menuAddProductAtivo && !menuEditProductAtivo && !menuDeleteProductAtivo){
-      async function fetchProducts() {
-        setLoading(true);
-        try {
-          const data = await getProducts(); 
-          setProducts(data || []);
-        } finally {
-          setLoading(false);
-        }
-      }
-
-      fetchProducts();
-    };
-  }, [menuAddProductAtivo, menuEditProductAtivo, menuDeleteProductAtivo]);
+    fetchProducts();
+  }, []);
 
   const produtosNumerados = products.map((produto, index) => ({
     ...produto,

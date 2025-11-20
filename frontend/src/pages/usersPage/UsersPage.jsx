@@ -17,10 +17,21 @@ export default function UsersPage() {
   const [busca, setBusca] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const fetchCustomers = async () => {
+    setLoading(true);
+    try {
+      const data = await getCustomers(); 
+      setCustomers(data || []);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   const { titleFormAddUser, fieldsFormAddUser, handleSubmitFormAddUser, messageFormAddUser, setMessageFormAddUser, messageTypeFormAddUser } = formAddUser({
     onSuccess: () => {
       setMenuAddUserAtivo(false);
       setMessageFormAddUser("");
+      fetchCustomers();
     },
   });  
 
@@ -28,6 +39,7 @@ export default function UsersPage() {
     onSuccess: () => {
       setMenuEditUserAtivo(false);
       setMessageFormEditUser("");
+      fetchCustomers();
     },
     selectedUser
   });  
@@ -36,25 +48,16 @@ export default function UsersPage() {
     onSuccess: () => {
       setMenuDeleteUserAtivo(false);
       setMessageFormDeleteUser("");
+      fetchCustomers();
     },
     selectedUser
   });
 
-  useEffect(() => {
-    if (!menuAddUserAtivo && !menuEditUserAtivo && !menuDeleteUserAtivo){
-      async function fetchCustomers() {
-        setLoading(true);
-        try {
-          const data = await getCustomers(); 
-          setCustomers(data || []);
-        } finally {
-          setLoading(false);
-        }
-      }
 
-      fetchCustomers();
-    };
-  }, [menuAddUserAtivo, menuEditUserAtivo, menuDeleteUserAtivo]);
+
+  useEffect(() => {
+    fetchCustomers();
+  }, []);
 
   const clientesNumerados = customers.map((cliente, index) => ({
     ...cliente,
