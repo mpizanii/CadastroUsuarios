@@ -2,13 +2,9 @@ import styled from "styled-components";
 
 export const Container = styled.div`
     width: 100%;
-    height: auto;
-    background-color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    min-height: 100vh;
+    background-color: #f8f9fa;
     font-family: Roboto, sans-serif;
-    flex-direction: column;
 `;
 
 export const CardTable = styled.div`

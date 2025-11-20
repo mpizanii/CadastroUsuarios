@@ -92,7 +92,7 @@ export default function UsersPage() {
             </Button>
           </div>
 
-          <div style={{ marginBottom: "30px", position: "relative", maxWidth: "500px" }}>
+          <div style={{ marginBottom: "30px", position: "relative", maxWidth: "300px" }}>
             <CiSearch size={20} style={{ position: "absolute", left: "15px", top: "50%", transform: "translateY(-50%)", color: "#999" }} />
             <SearchInput 
               type="text" 

@@ -2,8 +2,12 @@ import { useState, useEffect } from "react";
 import ModalForm from "../../components/menu/ModalForm.jsx";
 import { getProducts } from "./ApiCalls.js";
 import { formAddProduct, formEditProduct, formDeleteProduct, formAddRecipe } from "./Forms.js";
-import { Container, CardTable, SearchInput, TableActionButton, CardTableHeader, SearchButton } from "./StyledProductsPage";
-import { Button, Table, Spinner } from "react-bootstrap";
+import { Container, SearchInput } from "./StyledProductsPage";
+import { LuChefHat } from "react-icons/lu";
+import { Button, Card, Badge, Spinner } from "react-bootstrap";
+import { CiSearch } from "react-icons/ci";
+import { SlPencil, SlTrash } from "react-icons/sl";
+import { BiShow } from "react-icons/bi";
 
 export default function OrdersPage() {
   const [menuAddProductAtivo, setMenuAddProductAtivo] = useState(false);
@@ -13,6 +17,7 @@ export default function OrdersPage() {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [products, setProducts] = useState([]);
   const [busca, setBusca] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const { titleFormProduct, fieldsFormAddProduct, handleSubmitFormAddProduct, messageFormAddProduct, setMessageFormAddProduct, messageTypeFormAddProduct } = formAddProduct({
     onSuccess: () => {
@@ -47,8 +52,13 @@ export default function OrdersPage() {
   useEffect(() => {
     if (!menuAddProductAtivo && !menuEditProductAtivo && !menuDeleteProductAtivo){
       async function fetchProducts() {
-        const data = await getProducts(); 
-        setProducts(data || []);
+        setLoading(true);
+        try {
+          const data = await getProducts(); 
+          setProducts(data || []);
+        } finally {
+          setLoading(false);
+        }
       }
 
       fetchProducts();
@@ -64,86 +74,134 @@ export default function OrdersPage() {
     produto.nome.toLowerCase().includes(busca.toLowerCase())
   );
 
-  // if (products.length === 0) {
-  //   return(
-  //     <div style={{ display: "flex", flexDirection: "column", gap: "5px", justifyContent: "center", alignItems: "center", height: "100vh" }}>
-  //       <Spinner animation="border" role="status" />
-  //       <span>Carregando dados dos produtos</span>
-  //     </div>
-  //   )
-  // }
+  if (loading) {
+    return(
+      <div style={{ display: "flex", flexDirection: "column", gap: "5px", justifyContent: "center", alignItems: "center", height: "100vh" }}>
+        <Spinner animation="border" role="status" />
+        <span>Carregando dados dos produtos</span>
+      </div>
+    )
+  }
 
   return (
     <>
       <Container className={menuAddProductAtivo || menuEditProductAtivo || menuDeleteProductAtivo ? "blur" : ""}>
-        <h2 style={{ marginTop: "40px", color: "#212121" }}>Cadastro e monitoramento de produtos</h2>
-
-        <CardTable>
-          <CardTableHeader>
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <SearchInput 
-                type="text" 
-                placeholder="Buscar por nome..." 
-                value={busca}
-                onChange={(e) => setBusca(e.target.value)}
-              />
-              <SearchButton><i className="bi bi-search" /></SearchButton>
+        <div style={{ padding: "35px 30px" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "30px" }}>
+            <div>
+              <h1 style={{ color: "#212121", marginBottom: "5px", fontWeight: "bold" }}>Produtos</h1>
+              <p style={{ color: "#666", margin: 0 }}>Gerencie seus produtos e vincule receitas</p>
             </div>
-
-            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-              <Button variant="outline-danger" onClick={() => setMenuAddRecipeAtivo(true)}>
-                Adicionar receita
+            
+            <div className="d-flex align-items-center gap-3">
+              <Button 
+                style={{ padding: "10px 20px", borderRadius: "8px" }}
+                onClick={() => setMenuAddRecipeAtivo(true)}
+                variant="outline-success"
+              >
+                + Nova Receita
               </Button>
-              <Button variant="outline-danger" onClick={() => setMenuAddProductAtivo(true)}>
-                Adicionar produto
+              <Button 
+                style={{ padding: "10px 20px", borderRadius: "8px" }}
+                onClick={() => setMenuAddProductAtivo(true)}
+                variant="outline-success"
+              >
+                + Novo Produto
               </Button>
             </div>
-          </CardTableHeader>
+          </div>
 
-          <Table striped style={{ textAlign: "center", margin: 0 }}>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Nome</th>
-                <th>Preço</th>
-                <th>Custo Unitário</th>
-                <th>Ações</th>
-              </tr>
-            </thead>
+          <div style={{ marginBottom: "30px", position: "relative", maxWidth: "300px" }}>
+            <CiSearch size={20} style={{ position: "absolute", left: "15px", top: "50%", transform: "translateY(-50%)", color: "#999" }} />
+            <SearchInput 
+              type="text" 
+              placeholder="Buscar produtos..." 
+              value={busca}
+              onChange={(e) => setBusca(e.target.value)}
+              style={{ paddingLeft: "45px", width: "100%", borderRadius: "10px", border: "1px solid #ddd", padding: "12px 12px 12px 45px" }}
+            />
+          </div>
 
-            <tbody>
-              {produtosFiltrados.map((produto) => (
-                <tr key={produto.id}>
-                  <td>{produto.numero}</td>
-                  <td>{produto.nome}</td>
-                  <td>{produto.preco}</td>
-                  <td>{produto.custo}</td>
-                  <td>
-                    <TableActionButton
-                      onClick={() => {
-                        setSelectedProduct(produto);
-                        setMenuEditProductAtivo(true);
-                      }}
-                      title="Editar dados do produto"
-                    >
-                      <i className="bi bi-pencil-square"></i>
-                    </TableActionButton>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px" }}>
+            {produtosFiltrados.map((produto) => {
+              const precoNum = Number(produto.preco) || 0;
+              const custoNum = Number(produto.custo) || 0;
+              const margem = precoNum ? Math.round(((precoNum - custoNum) / precoNum) * 100) : 0;
 
-                    <TableActionButton
-                      onClick={() => {
-                        setSelectedProduct(produto);
-                        setMenuDeleteProductAtivo(true);
-                      }}
-                      title="Excluir produto"
-                    >
-                      <i className="bi bi-trash-fill"></i>
-                    </TableActionButton>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
-        </CardTable>
+              const formatCurrency = (value) => {
+                try {
+                  return Number(value).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                } catch { return value; }
+              }
+
+              const status = produto.ativo === false ? 'inativo' : 'ativo';
+
+              return (
+                <Card key={produto.id} className="h-100 border-0 p-2 shadow-sm" style={{ borderRadius: "16px", overflow: "hidden" }}>
+                  <Card.Body>
+                    <div className="d-flex align-items-start justify-content-between mb-3">
+                      <div>
+                        <Card.Title className="mb-1 h5">{produto.nome}</Card.Title>
+                        <small className="text-muted">{produto.descricao || produto.nome}</small>
+                      </div>
+                      <Badge bg={status === 'ativo' ? 'success' : 'secondary'} style={{ textTransform: 'lowercase' }}>{status}</Badge>
+                    </div>
+
+                    <div style={{ marginTop: 8 }}>
+                      <div style={{ display: 'flex', flexDirection: "column", marginBottom: 8, borderBottom: '1px solid #eee', gap: 5 }}>
+                        <div className="d-flex justify-content-between">
+                          <small className="text-muted">Preço de Venda:</small>
+                          <div style={{ color: '#2E8B57', fontWeight: 700 }}>{formatCurrency(precoNum)}</div>
+                        </div>
+
+                        <div className="d-flex justify-content-between">
+                          <small className="text-muted">Custo:</small>
+                          <div style={{ fontWeight: 700, color: '#4f4f4fff' }}>{formatCurrency(custoNum)}</div>
+                        </div>
+                      </div>
+
+                      <div className="d-flex align-items-center justify-content-between">
+                        <small className="text-muted">Margem de Lucro:</small>
+                        <div style={{ color: margem >= 50 ? '#2E8B57' : '#830101ff', fontWeight: 700 }}>{margem}%</div>
+                      </div>
+
+
+                      <div style={{ paddingTop: 10, display: 'flex', alignItems: 'center', gap: 10 }}>
+                        <Button variant="outline-secondary" size="sm" title="Ver receita" className="w-50">
+                          <LuChefHat /> Ver Receita
+                        </Button>
+                        <Button
+                          variant="outline-secondary"
+                          size="sm"
+                          onClick={() => { setSelectedProduct(produto); setMenuEditProductAtivo(true); }}
+                          title="Editar produto"
+                          className="w-50"
+                        >
+                          <SlPencil /> Editar
+                        </Button>
+                        <Button
+                          variant="outline-danger"
+                          size="sm"
+                          onClick={() => { setSelectedProduct(produto); setMenuDeleteProductAtivo(true); }}
+                          title="Excluir produto"
+                        >
+                          <SlTrash />
+                        </Button>
+                      </div>
+                    </div>
+                  </Card.Body>
+                </Card>
+              )
+            })}
+          </div>
+
+          {produtosFiltrados.length === 0 && (
+            <div style={{ textAlign: "center", padding: "60px 0", color: "#999" }}>
+              <i className="bi bi-box-seam" style={{ fontSize: "48px", marginBottom: "16px", display: "block" }} />
+              <p>Nenhum produto encontrado</p>
+            </div>
+          )}
+        </div>
       </Container>
 
       {menuAddProductAtivo && (
