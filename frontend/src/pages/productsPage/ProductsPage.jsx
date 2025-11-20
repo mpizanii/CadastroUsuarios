@@ -135,17 +135,31 @@ export default function OrdersPage() {
                 } catch { return value; }
               }
 
-              const status = produto.ativo === false ? 'inativo' : 'ativo';
+              const status = produto.ativo === false ? 'inativo' : 'Ativo';
 
               return (
                 <Card key={produto.id} className="h-100 border-0 p-2 shadow-sm" style={{ borderRadius: "16px", overflow: "hidden" }}>
                   <Card.Body>
-                    <div className="d-flex align-items-start justify-content-between mb-3">
-                      <div>
-                        <Card.Title className="mb-1 h5">{produto.nome}</Card.Title>
-                        <small className="text-muted">{produto.descricao || produto.nome}</small>
+                    <div className="d-flex align-items-center justify-content-between mb-3">
+                      <div className="d-flex gap-3">
+                        <div 
+                          className="rounded d-flex align-items-center justify-content-center"
+                          style={{
+                            width: "45px",
+                            height: "45px",
+                            backgroundColor: "#e76e501a ",
+                            fontSize: "20px",
+                            color: "#e76e50",
+                          }}
+                        >
+                          <LuChefHat />
+                        </div>
+                        <div>
+                          <Card.Title className="mb-0 h5">{produto.nome}</Card.Title>
+                          <small className="text-muted">{produto.descricao || produto.nome}</small>
+                        </div>
                       </div>
-                      <Badge bg={status === 'ativo' ? 'success' : 'secondary'} style={{ textTransform: 'lowercase' }}>{status}</Badge>
+                      <Badge bg={status === 'Ativo' ? 'success' : 'secondary'}>{status}</Badge>
                     </div>
 
                     <div style={{ marginTop: 8 }}>
