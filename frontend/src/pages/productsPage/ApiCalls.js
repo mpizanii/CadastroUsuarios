@@ -43,7 +43,8 @@ export const addProduct = async ({ name, price, recipeId, cost, ativo = true }) 
 
 export const editProduct = async ({ nome, preco, custo, receita_id, ativo, id }) => {
     try {
-        const response = await axios.patch(`${API_URL}/Produtos/${id}`, {
+        const response = await axios.put(`${API_URL}/Produtos/${id}`, {
+            id,
             nome,
             preco,
             custo,

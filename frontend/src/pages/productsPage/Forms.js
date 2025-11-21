@@ -142,7 +142,7 @@ export const formEditProduct = ({ onSuccess, selectedProduct }) => {
     const [newCost, setNewCost] = useState("");
     const [ativo, setAtivo] = useState(true);
     const [recipes, setRecipes] = useState([]);
-    const [newRecipeId, setNewRecipeId] = useState("");
+    const [newRecipeId, setNewRecipeId] = useState(0);
     const [messageFormEditProduct, setMessageFormEditProduct] = useState("");
     const [messageTypeFormEditProduct, setMessageTypeFormEditProduct] = useState("success");
 
@@ -152,8 +152,8 @@ export const formEditProduct = ({ onSuccess, selectedProduct }) => {
                 const data = await getRecipes();
                 setRecipes(data);
             } catch (error) {
-                setMessageTypeFormAddProduct("error");
-                setMessageFormAddProduct("Erro ao carregar receitas.");
+                setMessageTypeFormEditProduct("error");
+                setMessageFormEditProduct("Erro ao carregar receitas.");
             }
         };
         loadRecipes();
@@ -163,8 +163,14 @@ export const formEditProduct = ({ onSuccess, selectedProduct }) => {
         setNewName("");
         setNewPrice("");
         setNewCost("");
-        setNewRecipeId("");
+        setNewRecipeId(0);
         setAtivo(selectedProduct?.ativo ?? true);
+    }, [selectedProduct]);
+
+    useEffect(() => {
+        if (selectedProduct) {
+            console.log("Selected Product JSON:", JSON.stringify(selectedProduct, null, 2));
+        }
     }, [selectedProduct]);
 
     const titleFormEditProduct = "Editar dados do produto";
@@ -180,13 +186,14 @@ export const formEditProduct = ({ onSuccess, selectedProduct }) => {
         e.preventDefault();
 
         try{
-            await editProduct( { nome: newName || selectedProduct?.nome, preco: newPrice || selectedProduct?.preco, custo: newCost || selectedProduct?.custo, receita_id: newRecipeId || selectedProduct?.receita_id, ativo: ativo ?? selectedProduct?.ativo, id: selectedProduct?.id } );
+            const recipeChanged = newRecipeId == 0 ? selectedProduct?.receita_Id : newRecipeId;
+            await editProduct( { nome: newName || selectedProduct?.nome, preco: newPrice || selectedProduct?.preco, custo: newCost || selectedProduct?.custo, receita_id: recipeChanged, ativo: ativo ?? selectedProduct?.ativo, id: selectedProduct?.id } );
             setMessageTypeFormEditProduct("success");
             setMessageFormEditProduct("Dados do produto editados com sucesso.");
             setNewName("");
             setNewPrice("");
             setNewCost("");
-            setNewRecipeId("");
+            setNewRecipeId(0);
             setAtivo(true);
             if (onSuccess) onSuccess();
         } catch (error) {

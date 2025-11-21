@@ -137,7 +137,7 @@ export default function ModalForm( { title, visible, setVisible, fields, onSubmi
                                             onChange={(e) => field.onChange(e.target.value)}
                                             required={field.required || false}
                                         >
-                                            <option value="">{field.placeholder || "Selecione..."}</option>
+                                            <option value={0}>{field.placeholder || "Selecione..."}</option>
                                             {field.options?.map((option) => (
                                                 <option key={option.value} value={option.value}>
                                                     {option.label}

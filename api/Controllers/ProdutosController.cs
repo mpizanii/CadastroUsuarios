@@ -68,7 +68,7 @@ namespace api.Controllers
             }
         }
 
-        [HttpPatch("{id}")]
+        [HttpPut("{id}")]
         public async Task<IActionResult> EditarProduto(int id, [FromBody] ProdutosDTO produtoDto)
         {
             try
