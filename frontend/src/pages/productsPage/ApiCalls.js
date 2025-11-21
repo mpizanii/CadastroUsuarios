@@ -22,13 +22,14 @@ export async function getRecipes() {
     return response.data;
 }
 
-export const addProduct = async ({ name, price, recipeId, cost }) => {
+export const addProduct = async ({ name, price, recipeId, cost, ativo = true }) => {
     try {
         const novoProduto = {
             nome: name,
             preco: price,
             receita_id: recipeId,
-            custo: cost
+            custo: cost,
+            ativo: ativo
         };
         const response = await axios.post(`${API_URL}/Produtos`, novoProduto);
 
@@ -40,18 +41,15 @@ export const addProduct = async ({ name, price, recipeId, cost }) => {
     }
 }
 
-export const editProduct = async ({ nome, preco, custo, receita_id, id }) => {
+export const editProduct = async ({ nome, preco, custo, receita_id, ativo, id }) => {
     try {
-
-        console.log("Editando produto ID " + id + " com receita_id " + receita_id);
         const response = await axios.patch(`${API_URL}/Produtos/${id}`, {
             nome,
             preco,
             custo,
-            receita_id
+            receita_id,
+            ativo
         });
-
-        console.log(response);
 
         if (response.status === 200 || response.status === 201) {
             return response.data; 

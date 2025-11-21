@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import ModalForm from "../../components/menu/ModalForm.jsx";
 import { getProducts } from "./ApiCalls.js";
-import { formAddProduct, formEditProduct, formDeleteProduct, formAddRecipe } from "./Forms.js";
+import { formAddProduct, formEditProduct, formDeleteProduct } from "./Forms.js";
 import { Container, SearchInput } from "./StyledProductsPage";
 import { LuChefHat } from "react-icons/lu";
 import { Button, Card, Badge, Spinner } from "react-bootstrap";
@@ -13,7 +13,6 @@ export default function OrdersPage() {
   const [menuAddProductAtivo, setMenuAddProductAtivo] = useState(false);
   const [menuEditProductAtivo, setMenuEditProductAtivo] = useState(false);
   const [menuDeleteProductAtivo, setMenuDeleteProductAtivo] = useState(false);
-  const [menuAddRecipeAtivo, setMenuAddRecipeAtivo] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [products, setProducts] = useState([]);
   const [busca, setBusca] = useState("");
@@ -53,13 +52,6 @@ export default function OrdersPage() {
       fetchProducts();
     },
     selectedProduct
-  });
-
-  const { titleFormAddRecipe, fieldsFormAddRecipe, handleSubmitFormAddRecipe, messageFormAddRecipe, setMessageFormAddRecipe, messageTypeFormAddRecipe } = formAddRecipe({
-    onSuccess: () => {
-      setMenuAddRecipeAtivo(false);
-      setMessageFormAddRecipe("");
-    },
   });
 
   useEffect(() => {
@@ -167,7 +159,7 @@ export default function OrdersPage() {
 
                       <div className="d-flex align-items-center justify-content-between">
                         <small className="text-muted">Margem de Lucro:</small>
-                        <div style={{ color: margem >= 50 ? '#2E8B57' : '#830101ff', fontWeight: 700 }}>{margem}%</div>
+                        <div style={{ color: produto.margem >= 50 ? '#2E8B57' : '#830101ff', fontWeight: 700 }}>{Math.round(produto.margem)}%</div>
                       </div>
 
 
@@ -244,19 +236,6 @@ export default function OrdersPage() {
           message={messageFormDeleteProduct}
           messageType={messageTypeFormDeleteProduct}
           action={"delete"}
-        />
-      )}
-      
-      {menuAddRecipeAtivo && (
-        <ModalForm
-          title={titleFormAddRecipe}
-          visible={menuAddRecipeAtivo}
-          setVisible={setMenuAddRecipeAtivo}
-          fields={fieldsFormAddRecipe}
-          onSubmit={handleSubmitFormAddRecipe}
-          message={messageFormAddRecipe}
-          messageType={messageTypeFormAddRecipe}
-          action={"add"}
         />
       )}
     </>

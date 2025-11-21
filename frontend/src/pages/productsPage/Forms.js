@@ -4,6 +4,7 @@ import { addProduct, editProduct, deleteProduct, getRecipes, addRecipe } from ".
 export const formAddProduct = ({ onSuccess }) => {
     const [name, setName] = useState("");
     const [price, setPrice] = useState("");
+    const [ativo, setAtivo] = useState(true);
     const [recipes, setRecipes] = useState([]);
     const [recipeId, setRecipeId] = useState("");
     const [recipeMode, setRecipeMode] = useState("existing");
@@ -80,6 +81,8 @@ export const formAddProduct = ({ onSuccess }) => {
     } else {
         fieldsFormAddProduct.push(newRecipeNameField, newRecipeMethodField, newRecipeIngredientsField);
     }
+    const ativoField = { id: "ativo", label: "Produto Ativo", type: "checkbox", value: ativo, onChange: setAtivo };
+    fieldsFormAddProduct.push(ativoField);
 
     async function handleSubmitFormAddProduct(e) {
         e.preventDefault();
@@ -104,7 +107,7 @@ export const formAddProduct = ({ onSuccess }) => {
                 return;
             }
 
-            await addProduct({ name, price, recipeId: usedRecipeId, cost });
+            await addProduct({ name, price, recipeId: usedRecipeId, cost, ativo });
             setMessageTypeFormAddProduct("success");
             setMessageFormAddProduct("Produto adicionado com sucesso.");
             setName("");
@@ -114,6 +117,7 @@ export const formAddProduct = ({ onSuccess }) => {
             setNewRecipeName("");
             setNewRecipeMethod("");
             setNewIngredients([{ nome: "", quantidade: 0, unidade: "" }]);
+            setAtivo(true);
             setCost("");
             if (onSuccess) onSuccess();
         } catch (error) {
@@ -136,6 +140,7 @@ export const formEditProduct = ({ onSuccess, selectedProduct }) => {
     const [newName, setNewName] = useState("");
     const [newPrice, setNewPrice] = useState("");
     const [newCost, setNewCost] = useState("");
+    const [ativo, setAtivo] = useState(true);
     const [recipes, setRecipes] = useState([]);
     const [newRecipeId, setNewRecipeId] = useState("");
     const [messageFormEditProduct, setMessageFormEditProduct] = useState("");
@@ -154,25 +159,35 @@ export const formEditProduct = ({ onSuccess, selectedProduct }) => {
         loadRecipes();
     }, []);
 
+    useEffect(() => {
+        setNewName("");
+        setNewPrice("");
+        setNewCost("");
+        setNewRecipeId("");
+        setAtivo(selectedProduct?.ativo ?? true);
+    }, [selectedProduct]);
+
     const titleFormEditProduct = "Editar dados do produto";
     const fieldsFormEditProduct = [
         { id: "name", label: "Nome", placeholder: selectedProduct?.nome, value: newName, onChange: setNewName },
         { id: "price", label: "Preço", placeholder: selectedProduct?.preco, value: newPrice, onChange: setNewPrice },
         { id: "cost", label: "Custo Unitário", placeholder: selectedProduct?.custo, value: newCost, onChange: setNewCost },
         { id: "recipeId", label: "Receita", type: "select", options: recipes.map(r => ({ value: r.id, label: r.nome })), value: newRecipeId, onChange: setNewRecipeId, placeholder: "Selecione uma receita" },
+        { id: "ativo", label: "Produto Ativo", type: "checkbox", value: ativo, onChange: setAtivo },
     ];
 
     async function handleSubmitFormEditProduct(e) {
         e.preventDefault();
 
         try{
-            await editProduct( { nome: newName || selectedProduct?.nome, preco: newPrice || selectedProduct?.preco, custo: newCost || selectedProduct?.custo, receita_id: newRecipeId || selectedProduct?.receita_id, id: selectedProduct?.id } );
+            await editProduct( { nome: newName || selectedProduct?.nome, preco: newPrice || selectedProduct?.preco, custo: newCost || selectedProduct?.custo, receita_id: newRecipeId || selectedProduct?.receita_id, ativo: ativo ?? selectedProduct?.ativo, id: selectedProduct?.id } );
             setMessageTypeFormEditProduct("success");
             setMessageFormEditProduct("Dados do produto editados com sucesso.");
             setNewName("");
             setNewPrice("");
             setNewCost("");
             setNewRecipeId("");
+            setAtivo(true);
             if (onSuccess) onSuccess();
         } catch (error) {
             setMessageTypeFormEditProduct("error");
@@ -214,77 +229,5 @@ export const formDeleteProduct = ({ onSuccess, selectedProduct }) => {
         messageFormDeleteProduct,
         setMessageFormDeleteProduct,
         messageTypeFormDeleteProduct
-    }
-}
-
-export const formAddRecipe = ({ onSuccess }) => {
-    const [name, setName] = useState("");
-    const [method, setMethod] = useState("");
-    const [ingredients, setIngredients] = useState([ { nome: "", quantidade: "", unidade: "" } ]);
-    const [messageFormAddRecipe, setMessageFormAddRecipe] = useState("");
-    const [messageTypeFormAddRecipe, setMessageTypeFormAddRecipe] = useState("success");
-
-    const addIngredient = () => {
-        console.log("addIngredient chamado");
-        console.log("Ingredients antes:", ingredients);
-        setIngredients(prev => {
-            const newIngredients = [...prev, { nome: "", quantidade: 0, unidade: "" }];
-            console.log("Ingredients depois:", newIngredients);
-            return newIngredients;
-        });
-    };
-
-    const removeIngredient = (index) => {
-        const newIngredients = ingredients.filter((_, i) => i !== index);
-        setIngredients(newIngredients);
-    };
-
-    const updateIngredient = (index, field, value) => {
-        const newIngredients = [...ingredients];
-        newIngredients[index][field] = value;
-        setIngredients(newIngredients);
-    };
-
-    const titleFormAddRecipe = "Cadastrar Receita";
-    const fieldsFormAddRecipe = [
-        { id: "name", label: "Nome", placeholder: "Obrigatório", value: name, onChange: setName, required: true },
-        { id: "method", label: "Modo de Preparo", type: "textarea", rows: 5, placeholder: 'Adicione o modo de preparo separado por ";". Exemplo: passo1; passo2; passo3; ...', value: method, onChange: setMethod, required: true },
-        { id: "ingredients", label: "Ingredientes", type: "ingredients-list", value: ingredients, onAdd: addIngredient, onRemove: removeIngredient, onUpdate: updateIngredient, required: true },
-    ];
-
-    async function handleSubmitFormAddRecipe(e) {
-        e.preventDefault();
-
-        try {
-            const hasEmptyIngredient = ingredients.some(
-                ing => !ing.nome || !ing.quantidade || !ing.unidade
-            );
-
-            // if (hasEmptyIngredient) {
-            //     setMessageTypeFormAddRecipe("error");
-            //     setMessageFormAddRecipe("Preencha todos os campos dos ingredientes.");
-            //     return;
-            // }
-
-            await addRecipe({ name, modo_preparo: method, ingredientes: ingredients });
-            setMessageTypeFormAddRecipe("success");
-            setMessageFormAddRecipe("Receita adicionada com sucesso.");
-            setName("");
-            setMethod("");
-            setIngredients([{ nome: "", quantidade: 0, unidade: "" }]);
-            if (onSuccess) onSuccess();
-        } catch (error) {
-            setMessageTypeFormAddRecipe("error");
-            setMessageFormAddRecipe("Erro: " + (error.response?.data?.message || error.message));
-        }   
-    }
-
-    return {
-        titleFormAddRecipe,
-        fieldsFormAddRecipe,
-        handleSubmitFormAddRecipe,
-        messageFormAddRecipe,
-        setMessageFormAddRecipe,
-        messageTypeFormAddRecipe
     }
 }
