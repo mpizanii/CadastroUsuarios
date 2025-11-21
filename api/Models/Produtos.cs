@@ -29,5 +29,14 @@ namespace api.Models
         [Column("custo")]
         public double Custo { get; set; } = 0;
 
+        [Column("ativo")]
+        public bool Ativo { get; set; } = true;
+
+        [NotMapped]
+        public double Margem
+        {
+            get => Preco != 0 ? ((Preco - Custo) / Preco) * 100 : 0;
+        }
+
     }
 }

@@ -27,7 +27,8 @@ namespace api.Servicos
                     Nome = p.Nome,
                     Preco = p.Preco,
                     Custo = p.Custo,
-                    Receita_Id = p.Receita_id
+                    Ativo = p.Ativo,
+                    Receita_Id = p.Receita_id,
                 }).ToListAsync();
         }
 
@@ -41,7 +42,8 @@ namespace api.Servicos
                     Nome = p.Nome,
                     Preco = p.Preco,
                     Custo = p.Custo,
-                    Receita_Id = p.Receita_id
+                    Ativo = p.Ativo,
+                    Receita_Id = p.Receita_id,
                 }).FirstOrDefaultAsync();
 
             return produto;
@@ -67,6 +69,9 @@ namespace api.Servicos
 
             if (produtoDTO.Custo != 0)
                 produto.Custo = produtoDTO.Custo;
+
+            if (produtoDTO.Ativo != true)
+                produto.Ativo = produtoDTO.Ativo;
             
             if (produtoDTO.Receita_Id != 0)
                 produto.Receita_id = produtoDTO.Receita_Id;
