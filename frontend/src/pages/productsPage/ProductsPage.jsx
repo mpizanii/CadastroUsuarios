@@ -29,7 +29,7 @@ export default function OrdersPage() {
     }
   }
 
-  const { titleFormProduct, fieldsFormAddProduct, handleSubmitFormAddProduct, messageFormAddProduct, setMessageFormAddProduct, messageTypeFormAddProduct } = formAddProduct({
+  const { titleFormAddProduct, fieldsFormAddProduct, handleSubmitFormAddProduct, messageFormAddProduct, setMessageFormAddProduct, messageTypeFormAddProduct } = formAddProduct({
     onSuccess: () => {
       setMenuAddProductAtivo(false);
       setMessageFormAddProduct("");
@@ -93,23 +93,13 @@ export default function OrdersPage() {
               <h1 style={{ color: "#212121", marginBottom: "5px", fontWeight: "bold" }}>Produtos</h1>
               <p style={{ color: "#666", margin: 0 }}>Gerencie seus produtos e vincule receitas</p>
             </div>
-            
-            <div className="d-flex align-items-center gap-3">
-              <Button 
-                style={{ padding: "10px 20px", borderRadius: "8px" }}
-                onClick={() => setMenuAddRecipeAtivo(true)}
-                variant="outline-success"
-              >
-                + Nova Receita
-              </Button>
-              <Button 
-                style={{ padding: "10px 20px", borderRadius: "8px" }}
-                onClick={() => setMenuAddProductAtivo(true)}
-                variant="outline-success"
-              >
-                + Novo Produto
-              </Button>
-            </div>
+            <Button 
+              style={{ padding: "10px 20px", borderRadius: "8px" }}
+              onClick={() => setMenuAddProductAtivo(true)}
+              variant="outline-success"
+            >
+              + Novo Produto
+            </Button>
           </div>
 
           <div style={{ marginBottom: "30px", position: "relative", maxWidth: "300px" }}>
@@ -221,7 +211,7 @@ export default function OrdersPage() {
 
       {menuAddProductAtivo && (
         <ModalForm
-          title={titleFormProduct}
+          title={titleFormAddProduct}
           visible={menuAddProductAtivo}
           setVisible={setMenuAddProductAtivo}
           fields={fieldsFormAddProduct}

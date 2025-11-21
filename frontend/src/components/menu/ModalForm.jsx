@@ -2,7 +2,7 @@ import styled from "styled-components";
 import { Modal, Button, Form } from "react-bootstrap";
 
 const StyledFormInput = styled.input`
-    width: 80%;
+    width: 90%;
     height: 30px;
     border-radius: 10px;
     border: 1px solid #ccc;
@@ -10,15 +10,19 @@ const StyledFormInput = styled.input`
 `;
 
 const StyledFormSelect = styled.select`
-    width: 80%;
+    width: 90%;
     height: 30px;
+    line-height: 30px;
+    font-size: 14px;
     border-radius: 10px;
     border: 1px solid #ccc;
-    padding: 5px;
+    padding: 0 10px;
+    box-sizing: border-box;
+    cursor: pointer;
 `;
 
 const StyledFormTextarea = styled.textarea`
-    width: 80%;
+    width: 90%;
     min-height: 80px;
     border-radius: 10px;
     border: 1px solid #ccc;
@@ -29,20 +33,22 @@ const StyledFormTextarea = styled.textarea`
 
 const IngredientRow = styled.div`
     display: flex;
-    gap: 5px;
+    gap: 8px;
     margin-bottom: 10px;
     width: 100%;
     align-items: center;
     justify-content: space-between;
+    > input, > select {
+        box-sizing: border-box;
+    }
 `;
 
 const SmallInput = styled.input`
-    flex: 2;
     height: 30px;
-    width: 100%;
     border-radius: 10px;
     border: 1px solid #ccc;
     padding: 5px;
+    box-sizing: border-box;
 `;
 
 const AddButton = styled(Button)`
@@ -104,7 +110,25 @@ export default function ModalForm( { title, visible, setVisible, fields, onSubmi
                     <Form onSubmit={onSubmit} style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
                         {fields.map((field, index) => (
                             <div key={index} style={{ width: "100%", display: "flex", flexDirection: "column", alignItems: "center" }}>
-                                {field.type === "select" ? (
+                                {field.type === "radio" ? (
+                                    <>
+                                        <label style={{ alignSelf: 'flex-start', marginLeft: '5%' }}>{field.label}</label>
+                                        <div style={{ width: '90%', display: 'flex', flexDirection: 'column', gap: '8px', marginTop: 6 }}>
+                                            {field.options?.map((option) => (
+                                                <label key={option.value} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                                    <input
+                                                        type="radio"
+                                                        name={field.id}
+                                                        value={option.value}
+                                                        checked={String(field.value) === String(option.value)}
+                                                        onChange={() => field.onChange(option.value)}
+                                                    />
+                                                    <span>{option.label}</span>
+                                                </label>
+                                            ))}
+                                        </div>
+                                    </>
+                                ) : field.type === "select" ? (
                                     <>
                                         <label htmlFor={field.id}>{field.label}</label>
                                         <StyledFormSelect
@@ -135,7 +159,7 @@ export default function ModalForm( { title, visible, setVisible, fields, onSubmi
                                     </>
                                 ) : field.type === "ingredients-list" ? (
                                     <>
-                                        <div style={{ width: "80%", display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "5px" }}>
+                                        <div style={{ width: "90%", display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "5px" }}>
                                             <div></div>
                                             <label htmlFor={field.id}>{field.label}</label>
                                             <AddButton 
@@ -146,13 +170,14 @@ export default function ModalForm( { title, visible, setVisible, fields, onSubmi
                                                 <i className="bi bi-plus-circle" />
                                             </AddButton>
                                         </div>
-                                        <div style={{ width: "80%", display: "flex", flexDirection: "column", alignItems: "center" }}>
+                                        <div style={{ width: "90%", display: "flex", flexDirection: "column", alignItems: "center" }}>
                                             {field.value.map((ingredient, idx) => (
                                                 <IngredientRow key={idx}>
                                                     <SmallInput
-                                                        placeholder="Nome"
+                                                        placeholder="Nome do ingrediente"
                                                         value={ingredient.nome || ""}
                                                         onChange={(e) => field.onUpdate(idx, 'nome', e.target.value)}
+                                                        style={{ width:"70%" }}
                                                         required
                                                     />
                                                     <SmallInput
@@ -161,13 +186,18 @@ export default function ModalForm( { title, visible, setVisible, fields, onSubmi
                                                         placeholder="Qtd"
                                                         value={ingredient.quantidade || ""}
                                                         onChange={(e) => field.onUpdate(idx, 'quantidade', e.target.value)}
+                                                        style={{ width:"15%" }}
                                                         required
                                                     />
-                                                    <SmallInput
-                                                        placeholder="Un"
-                                                        value={ingredient.unidade || ""}
+                                                    <StyledFormSelect
+                                                        value={ingredient.unidade || "g"}
                                                         onChange={(e) => field.onUpdate(idx, 'unidade', e.target.value)}
-                                                    />
+                                                        style={{ width:"15%" }}
+                                                    >
+                                                        {field.unitOptions.map((u) => (
+                                                            <option key={u} value={u}>{u}</option>
+                                                        ))}
+                                                    </ StyledFormSelect>
                                                     {field.value.length > 1 && (
                                                         <RemoveButton 
                                                             variant="danger" 
