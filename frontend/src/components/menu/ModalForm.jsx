@@ -51,61 +51,6 @@ const SmallInput = styled.input`
     box-sizing: border-box;
 `;
 
-const SwitchWrapper = styled.div`
-    width: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-`;
-
-const SwitchLabel = styled.label`
-    position: relative;
-    display: inline-block;
-    width: 52px;
-    height: 28px;
-`;
-
-const SwitchInput = styled.input`
-    opacity: 0;
-    width: 0;
-    height: 0;
-    &:focus + span {
-        box-shadow: 0 0 0 3px rgba(231,110,80,0.12);
-    }
-    &:checked + span {
-        background-color: #e76e50; /* active orange */
-        border-color: #e76e50;
-    }
-    &:checked + span:before {
-        transform: translateX(24px);
-    }
-`;
-
-const SwitchSlider = styled.span`
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #f0f0f0;
-    border-radius: 999px;
-    border: 1px solid #e6e6e6;
-    transition: background-color .18s ease, border-color .18s ease;
-    &:before {
-        content: "";
-        position: absolute;
-        height: 22px;
-        width: 22px;
-        left: 3px;
-        top: 3px;
-        background: #fff;
-        border-radius: 50%;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.12);
-        transition: transform .18s ease;
-    }
-`;
-
 const AddButton = styled(Button)`
     border: none;
     background: none;
@@ -213,22 +158,15 @@ export default function ModalForm( { title, visible, setVisible, fields, onSubmi
                                         />
                                     </>
                                 ) : field.type === "checkbox" ? (
-                                    <>
-                                        <div style={{ width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-                                            <label style={{ margin: 0, fontWeight: "bold" }}>{field.label}</label>
-                                            <SwitchWrapper>
-                                                <SwitchLabel>
-                                                    <SwitchInput
-                                                        id={field.id}
-                                                        type="checkbox"
-                                                        checked={Boolean(field.value)}
-                                                        onChange={(e) => field.onChange(e.target.checked)}
-                                                    />
-                                                    <SwitchSlider />
-                                                </SwitchLabel>
-                                            </SwitchWrapper>
-                                        </div>
-                                    </>
+                                    <div style={{ width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                                        <label style={{ margin: 0, fontWeight: "bold" }}>{field.label}</label>
+                                        <Form.Check 
+                                            type="switch"
+                                            id={field.id}
+                                            checked={Boolean(field.value)}
+                                            onChange={(e) => field.onChange(e.target.checked)}
+                                        />
+                                    </div>
                                 ) : field.type === "ingredients-list" ? (
                                     <>
                                         <div style={{ width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "5px" }}>
