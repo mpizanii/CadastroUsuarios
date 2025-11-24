@@ -8,6 +8,7 @@ import StockPage from './pages/stockPage/StockPage';
 import OrdersPage from './pages/ordersPage/OrdersPage'
 import DashboardPage from './pages/dashboardPage/DashboardPage';
 import RecipesPage from './pages/recipesPage/RecipesPage';
+import RecipeDetailPage from './pages/recipesPage/RecipeDetailPage';
 import SupportPage from './pages/supportPage/SupportPage';
 import ProtectedRoutes from './services/protectedroutes';
 import "bootstrap-icons/font/bootstrap-icons.css";
@@ -65,6 +66,7 @@ function Layout() {
               <Route path='/pedidos' element={<ProtectedRoutes><OrdersPage/></ProtectedRoutes>}/>
               <Route path='/metricas' element={<ProtectedRoutes><DashboardPage/></ProtectedRoutes>}/>
               <Route path='/receitas' element={<ProtectedRoutes><RecipesPage/></ProtectedRoutes>}/>
+              <Route path='/receitas/:id' element={<ProtectedRoutes><RecipeDetailPage/></ProtectedRoutes>}/>
               <Route path='/suporte' element={<ProtectedRoutes><SupportPage/></ProtectedRoutes>}/>
             </Routes>
           </div>

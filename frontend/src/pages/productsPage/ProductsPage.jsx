@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import ModalForm from "../../components/menu/ModalForm.jsx";
 import { getProducts } from "./ApiCalls.js";
 import { formAddProduct, formEditProduct, formDeleteProduct } from "./Forms.js";
@@ -10,6 +11,7 @@ import { SlPencil, SlTrash } from "react-icons/sl";
 import { BiShow } from "react-icons/bi";
 
 export default function OrdersPage() {
+  const navigate = useNavigate();
   const [menuAddProductAtivo, setMenuAddProductAtivo] = useState(false);
   const [menuEditProductAtivo, setMenuEditProductAtivo] = useState(false);
   const [menuDeleteProductAtivo, setMenuDeleteProductAtivo] = useState(false);
@@ -164,7 +166,14 @@ export default function OrdersPage() {
 
 
                       <div style={{ paddingTop: 10, display: 'flex', alignItems: 'center', gap: 10 }}>
-                        <Button variant="outline-secondary" size="sm" title="Ver receita" className="w-50">
+                        <Button 
+                          variant="outline-secondary" 
+                          size="sm" 
+                          title="Ver receita" 
+                          className="w-50"
+                          onClick={() => produto.receita_Id ? navigate(`/receitas/${produto.receita_Id}`) : alert('Este produto não possui receita associada')}
+                          disabled={!produto.receita_Id}
+                        >
                           <LuChefHat /> Ver Receita
                         </Button>
                         <Button

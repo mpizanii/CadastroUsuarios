@@ -48,5 +48,16 @@ namespace api.Controllers
             }
             return Ok(receita);
         }
+
+        [HttpGet("/api/ingredientes/{id}")]
+        public async Task<IActionResult> ObterIngredientesReceita(int id)
+        {
+            var ingredientes = await _receitasServico.ObterIngredientesReceita(id);
+            if (ingredientes == null)
+            {
+                return NotFound();
+            }
+            return Ok(ingredientes);
+        }
     }
 }

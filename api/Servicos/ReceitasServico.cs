@@ -68,5 +68,12 @@ namespace api.Servicos
             return await _context.Receitas
                 .ToListAsync();
         }
+
+        public async Task<List<Ingrediente>?> ObterIngredientesReceita(int receitaId)
+        {
+            return await _context.Ingredientes
+                .Where(i => i.ReceitaId == receitaId)
+                .ToListAsync();
+        }
     }
 }
