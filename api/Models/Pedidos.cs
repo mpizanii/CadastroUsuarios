@@ -14,13 +14,10 @@ namespace api.Models
         [Column("cliente_id")]
         public int? ClienteId { get; set; }
 
-        [Column("cliente_nome")]
-        public string ClienteNome { get; set; } = string.Empty;
-
-        [Column("data_pedido")]
+        [Column("data")]
         public DateTime DataPedido { get; set; }
 
-        [Column("valor_total")]
+        [Column("valor")]
         public decimal ValorTotal { get; set; }
 
         [Column("status")]
@@ -28,8 +25,5 @@ namespace api.Models
 
         [Column("observacoes")]
         public string? Observacoes { get; set; }
-
-        [Column("created_at")]
-        public DateTime CreatedAt { get; set; }
     }
 }

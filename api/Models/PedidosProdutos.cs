@@ -18,8 +18,5 @@ namespace api.Models
 
         [Column("quantidade")]
         public int Quantidade { get; set; }
-
-        [Column("preco_unitario")]
-        public decimal PrecoUnitario { get; set; }
     }
 }

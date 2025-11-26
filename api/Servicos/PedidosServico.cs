@@ -38,7 +38,6 @@ namespace api.Servicos
                         ProdutoId = pp.ProdutoId,
                         ProdutoNome = produto?.Nome ?? "Produto não encontrado",
                         Quantidade = pp.Quantidade,
-                        PrecoUnitario = pp.PrecoUnitario
                     });
                 }
 
@@ -46,7 +45,6 @@ namespace api.Servicos
                 {
                     Id = pedido.Id,
                     ClienteId = pedido.ClienteId,
-                    ClienteNome = pedido.ClienteNome,
                     DataPedido = pedido.DataPedido,
                     ValorTotal = pedido.ValorTotal,
                     Status = pedido.Status,
@@ -76,7 +74,6 @@ namespace api.Servicos
                     ProdutoId = pp.ProdutoId,
                     ProdutoNome = produto?.Nome ?? "Produto não encontrado",
                     Quantidade = pp.Quantidade,
-                    PrecoUnitario = pp.PrecoUnitario
                 });
             }
 
@@ -84,7 +81,6 @@ namespace api.Servicos
             {
                 Id = pedido.Id,
                 ClienteId = pedido.ClienteId,
-                ClienteNome = pedido.ClienteNome,
                 DataPedido = pedido.DataPedido,
                 ValorTotal = pedido.ValorTotal,
                 Status = pedido.Status,
@@ -98,12 +94,10 @@ namespace api.Servicos
             var pedido = new Pedidos
             {
                 ClienteId = pedidoDTO.ClienteId,
-                ClienteNome = pedidoDTO.ClienteNome,
                 DataPedido = DateTime.UtcNow,
                 ValorTotal = pedidoDTO.Produtos.Sum(p => p.PrecoUnitario * p.Quantidade),
                 Status = "Pendente",
                 Observacoes = pedidoDTO.Observacoes,
-                CreatedAt = DateTime.UtcNow
             };
 
             _context.Pedidos.Add(pedido);
@@ -117,7 +111,6 @@ namespace api.Servicos
                     PedidoId = pedido.Id,
                     ProdutoId = produtoDTO.ProdutoId,
                     Quantidade = produtoDTO.Quantidade,
-                    PrecoUnitario = produtoDTO.PrecoUnitario
                 };
                 _context.PedidosProdutos.Add(pedidoProduto);
             }
