@@ -35,7 +35,7 @@ export const formAddProduct = ({ onSuccess }) => {
     const baseFields = [
         { id: "name", label: "Nome", placeholder: "Ex: Pão de Forma", value: name, onChange: setName, required: true },
         { id: "price", label: "Preço de Venda (R$)", type:"number", placeholder: "0.00", value: price, onChange: setPrice },
-        { id: "cost", label: "Custo de Fabricação (R$)", placeholder: "0.00", value: cost, onChange: setCost },
+        { id: "cost", label: "Custo de Fabricação (R$)", type:"number", placeholder: "0.00", value: cost, onChange: setCost },
     ];
 
     const recipeModeField = {
