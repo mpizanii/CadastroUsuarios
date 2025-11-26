@@ -22,6 +22,8 @@ builder.Services.AddCors(options =>
 builder.Services.AddScoped<IClientesServico, ClientesServico>();
 builder.Services.AddScoped<IProdutosServico, ProdutosServico>();
 builder.Services.AddScoped<IReceitasServico, ReceitasServico>();
+builder.Services.AddScoped<IInsumosServico, InsumosServico>();
+builder.Services.AddScoped<IMapeamentoServico, MapeamentoServico>();
 builder.Services.AddAuthorization();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
