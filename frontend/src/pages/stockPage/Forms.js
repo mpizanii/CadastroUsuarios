@@ -39,7 +39,7 @@ export const formAddInsumo = ({ onSuccess }) => {
             type: "select", 
             value: unidade, 
             onChange: setUnidade, 
-            options: UNIT_OPTIONS,
+            options: UNIT_OPTIONS.map((unit) => ({ value: unit, label: unit })),
             required: true 
         },
         { 
@@ -144,7 +144,7 @@ export const formEditInsumo = ({ insumo, onSuccess }) => {
             type: "select", 
             value: unidade, 
             onChange: setUnidade, 
-            options: UNIT_OPTIONS,
+            options: UNIT_OPTIONS.map((unit) => ({ value: unit, label: unit })),
             required: true 
         },
         { 
