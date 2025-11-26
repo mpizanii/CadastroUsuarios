@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Modal, Button, Form } from "react-bootstrap";
+import { Modal, Button, Form, Alert } from "react-bootstrap";
 import styled from "styled-components";
 
 const StyledFormSelect = styled.select`
@@ -28,6 +28,15 @@ const StyledFormInput = styled.input`
     }
 `;
 
+const CalculationBox = styled.div`
+    background: #e7f3ff;
+    border: 1px solid #b3d9ff;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 16px;
+    font-size: 14px;
+`;
+
 export default function MapeamentoModal({ 
     visible, 
     setVisible, 
@@ -40,14 +49,81 @@ export default function MapeamentoModal({
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState("");
     const [messageType, setMessageType] = useState("success");
+    const [calculoAutomatico, setCalculoAutomatico] = useState(null);
+
+    const converterParaBase = (quantidade, unidade) => {
+        const conversoes = {
+            'g': 1,
+            'kg': 1000,
+            'mg': 0.001,
+            
+            'ml': 1,
+            'l': 1000,
+            'litro': 1000,
+            'litros': 1000,
+            
+            'un': 1,
+            'unidade': 1,
+            'unidades': 1,
+            'und': 1,
+        };
+
+        const unidadeLower = unidade.toLowerCase().trim();
+        const fator = conversoes[unidadeLower] || 1;
+        return quantidade * fator;
+    };
+
+    const getTipoUnidade = (unidade) => {
+        const unidadeLower = unidade.toLowerCase().trim();
+        if (['g', 'kg', 'mg'].includes(unidadeLower)) return 'massa';
+        if (['ml', 'l', 'litro', 'litros'].includes(unidadeLower)) return 'volume';
+        if (['un', 'unidade', 'unidades', 'und'].includes(unidadeLower)) return 'unidade';
+        return 'outro';
+    };
+
+    const calcularFatorConversao = (ingrediente, insumo) => {
+        const ingredienteBase = converterParaBase(ingrediente.quantidade, ingrediente.unidade);
+        const insumoBase = converterParaBase(1, insumo.unidade);
+        
+        const tipoIngrediente = getTipoUnidade(ingrediente.unidade);
+        const tipoInsumo = getTipoUnidade(insumo.unidade);
+        
+        if (tipoIngrediente === tipoInsumo) {
+            const fator = ingredienteBase / insumoBase;
+            return {
+                fator: fator,
+                automatico: true,
+                explicacao: `${ingrediente.quantidade}${ingrediente.unidade} = ${fator.toFixed(4)} ${insumo.unidade}`
+            };
+        }
+        
+        return {
+            fator: 1.0,
+            automatico: false,
+            explicacao: "Conversão manual necessária (unidades incompatíveis)"
+        };
+    };
 
     useEffect(() => {
         if (ingrediente && visible) {
             setSelectedInsumoId(ingrediente.insumoId || "");
-            setFatorConversao(ingrediente.fatorConversao || 1.0);
             setMessage("");
         }
     }, [ingrediente, visible]);
+
+    useEffect(() => {
+        if (selectedInsumoId && ingrediente) {
+            const insumoSelecionado = insumos.find(i => i.id === parseInt(selectedInsumoId));
+            if (insumoSelecionado) {
+                const calculo = calcularFatorConversao(ingrediente, insumoSelecionado);
+                setCalculoAutomatico(calculo);
+                setFatorConversao(calculo.fator);
+            }
+        } else {
+            setCalculoAutomatico(null);
+            setFatorConversao(1.0);
+        }
+    }, [selectedInsumoId, ingrediente, insumos]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -106,37 +182,60 @@ export default function MapeamentoModal({
                             <option value="">Selecione um insumo...</option>
                             {insumos.map((insumo) => (
                                 <option key={insumo.id} value={insumo.id}>
-                                    {insumo.nome} ({insumo.quantidade} {insumo.unidade})
+                                    {insumo.nome} (disponível: {insumo.quantidade} {insumo.unidade})
                                 </option>
                             ))}
                         </StyledFormSelect>
-                        <Form.Text className="text-muted">
-                            Selecione o insumo do estoque que corresponde a este ingrediente
-                        </Form.Text>
                     </Form.Group>
 
+                    {calculoAutomatico && (
+                        <CalculationBox>
+                            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
+                                <span style={{ fontSize: "18px" }}>
+                                    {calculoAutomatico.automatico ? "🎯" : "⚠️"}
+                                </span>
+                                <strong>
+                                    {calculoAutomatico.automatico ? "Cálculo Automático" : "Conversão Manual"}
+                                </strong>
+                            </div>
+                            <div style={{ color: "#0056b3" }}>
+                                {calculoAutomatico.explicacao}
+                            </div>
+                        </CalculationBox>
+                    )}
+
                     <Form.Group className="mb-3">
-                        <Form.Label>Fator de Conversão</Form.Label>
+                        <Form.Label>
+                            Fator de Conversão
+                            {calculoAutomatico?.automatico && (
+                                <span style={{ color: "#28a745", marginLeft: "8px", fontSize: "12px" }}>
+                                    ✓ Calculado automaticamente
+                                </span>
+                            )}
+                        </Form.Label>
                         <StyledFormInput
                             type="number"
-                            step="0.01"
-                            min="0.01"
+                            step="0.0001"
+                            min="0.0001"
                             value={fatorConversao}
                             onChange={(e) => setFatorConversao(e.target.value)}
                             required
                         />
                         <Form.Text className="text-muted">
-                            Quantidade do ingrediente que equivale a 1 unidade do insumo (ex: 1.5 significa que 1.5 {ingrediente?.unidade} do ingrediente = 1 {insumos.find(i => i.id === parseInt(selectedInsumoId))?.unidade || 'un'} do insumo)
+                            {calculoAutomatico?.automatico 
+                                ? "Valor calculado automaticamente. Você pode ajustar se necessário."
+                                : "Informe quanto do ingrediente consome 1 unidade do insumo"
+                            }
                         </Form.Text>
                     </Form.Group>
 
                     {message && (
-                        <div 
-                            className={`alert ${messageType === 'success' ? 'alert-success' : 'alert-danger'} mb-3`}
-                            style={{ padding: "10px", fontSize: "14px" }}
+                        <Alert 
+                            variant={messageType === 'success' ? 'success' : 'danger'}
+                            className="mb-3"
                         >
                             {message}
-                        </div>
+                        </Alert>
                     )}
 
                     <div className="d-flex justify-content-end gap-2">
