@@ -23,6 +23,13 @@ namespace api.Controllers
             return Ok(insumos);
         }
 
+        [HttpGet("alertas")]
+        public async Task<ActionResult<IEnumerable<InsumosDTO>>> GetInsumosComAlertas()
+        {
+            var insumos = await _insumosServico.ObterInsumosComAlertas();
+            return Ok(insumos);
+        }
+
         [HttpGet("{id}")]
         public async Task<ActionResult<InsumosDTO>> GetInsumo(int id)
         {

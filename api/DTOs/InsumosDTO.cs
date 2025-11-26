@@ -11,5 +11,6 @@ namespace api.DTOs
         public DateTime? Validade { get; set; }
         public double EstoqueMinimo { get; set; } = 0;
         public string Status { get; set; } = "ativo";
+        public string StatusEstoque { get; set; } = "OK"; // OK, Baixo, Crítico
     }
 }

@@ -15,37 +15,65 @@ namespace api.Servicos
             _context = context;
         }
 
+        private string CalcularStatusEstoque(double quantidade, double estoqueMinimo, DateTime? validade)
+        {
+            var hoje = DateTime.UtcNow;
+            var umaSemana = hoje.AddDays(7);
+            
+            // Crítico: abaixo do estoque mínimo OU validade vencida
+            if (quantidade < estoqueMinimo)
+                return "Crítico";
+            
+            if (validade.HasValue && validade.Value <= hoje)
+                return "Crítico";
+            
+            // Baixo: próximo do estoque mínimo (até 20% acima) OU validade em até 1 semana
+            var margemEstoque = estoqueMinimo * 1.2;
+            if (quantidade <= margemEstoque)
+                return "Baixo";
+            
+            if (validade.HasValue && validade.Value <= umaSemana)
+                return "Baixo";
+            
+            // OK: estoque bom e validade OK
+            return "OK";
+        }
+
         public async Task<IEnumerable<InsumosDTO>> ObterTodosInsumos()
         {
-            return await _context.Insumos
-                .Select(i => new InsumosDTO
-                {
-                    Id = i.Id,
-                    Nome = i.Nome,
-                    Quantidade = i.Quantidade,
-                    Unidade = i.Unidade,
-                    Validade = i.Validade,
-                    EstoqueMinimo = i.EstoqueMinimo,
-                    Status = i.Status
-                }).ToListAsync();
+            var insumos = await _context.Insumos.ToListAsync();
+            
+            return insumos.Select(i => new InsumosDTO
+            {
+                Id = i.Id,
+                Nome = i.Nome,
+                Quantidade = i.Quantidade,
+                Unidade = i.Unidade,
+                Validade = i.Validade,
+                EstoqueMinimo = i.EstoqueMinimo,
+                Status = i.Status,
+                StatusEstoque = CalcularStatusEstoque(i.Quantidade, i.EstoqueMinimo, i.Validade)
+            }).ToList();
         }
 
         public async Task<InsumosDTO> ObterInsumoPorId(int id)
         {
-            var insumo = await _context.Insumos
-                .Where(i => i.Id == id)
-                .Select(i => new InsumosDTO
-                {
-                    Id = i.Id,
-                    Nome = i.Nome,
-                    Quantidade = i.Quantidade,
-                    Unidade = i.Unidade,
-                    Validade = i.Validade,
-                    EstoqueMinimo = i.EstoqueMinimo,
-                    Status = i.Status
-                }).FirstOrDefaultAsync();
-
-            return insumo;
+            var insumo = await _context.Insumos.FindAsync(id);
+            
+            if (insumo == null)
+                return null;
+            
+            return new InsumosDTO
+            {
+                Id = insumo.Id,
+                Nome = insumo.Nome,
+                Quantidade = insumo.Quantidade,
+                Unidade = insumo.Unidade,
+                Validade = insumo.Validade,
+                EstoqueMinimo = insumo.EstoqueMinimo,
+                Status = insumo.Status,
+                StatusEstoque = CalcularStatusEstoque(insumo.Quantidade, insumo.EstoqueMinimo, insumo.Validade)
+            };
         }
 
         public async Task<Insumos> AdicionarInsumo(Insumos insumo)
@@ -91,6 +119,12 @@ namespace api.Servicos
             _context.Insumos.Remove(insumo);
             await _context.SaveChangesAsync();
             return true;
+        }
+
+        public async Task<IEnumerable<InsumosDTO>> ObterInsumosComAlertas()
+        {
+            var insumos = await ObterTodosInsumos();
+            return insumos.Where(i => i.StatusEstoque == "Baixo" || i.StatusEstoque == "Crítico").ToList();
         }
     }
 }
