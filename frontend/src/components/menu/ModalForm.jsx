@@ -221,6 +221,74 @@ export default function ModalForm( { title, visible, setVisible, fields, onSubmi
                                             
                                         </div>
                                     </>
+                                ) : field.type === "produtos-list" ? (
+                                    <>
+                                        <div style={{ width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "5px" }}>
+                                            <label htmlFor={field.id} style={{ fontWeight: "bold" }}>{field.label}</label>
+                                            <AddButton 
+                                                variant="outline-success" 
+                                                type="button"
+                                                onClick={field.onAddProduto}
+                                            >
+                                                <i className="bi bi-plus-circle" />
+                                            </AddButton>
+                                        </div>
+                                        <div style={{ width: "100%", display: "flex", flexDirection: "column", alignItems: "center", gap: "8px" }}>
+                                            {field.value.map((produto, idx) => (
+                                                <div key={idx} style={{ display: "flex", gap: "8px", width: "100%", alignItems: "center" }}>
+                                                    <StyledFormSelect
+                                                        value={produto.produtoId || ""}
+                                                        onChange={(e) => field.onProdutoChange(idx, 'produtoId', e.target.value)}
+                                                        style={{ flex: 2 }}
+                                                        required
+                                                    >
+                                                        <option value="">Selecione um produto...</option>
+                                                        {field.produtosDisponiveis.map((p) => (
+                                                            <option key={p.id} value={p.id}>{p.nome}</option>
+                                                        ))}
+                                                    </StyledFormSelect>
+                                                    <SmallInput
+                                                        type="number"
+                                                        min="1"
+                                                        placeholder="Qtd"
+                                                        value={produto.quantidade || ""}
+                                                        onChange={(e) => field.onProdutoChange(idx, 'quantidade', e.target.value)}
+                                                        style={{ width: "80px" }}
+                                                        required
+                                                    />
+                                                    <SmallInput
+                                                        type="number"
+                                                        step="0.01"
+                                                        placeholder="Preço"
+                                                        value={produto.precoUnitario || ""}
+                                                        onChange={(e) => field.onProdutoChange(idx, 'precoUnitario', e.target.value)}
+                                                        style={{ width: "100px" }}
+                                                        required
+                                                    />
+                                                    {field.value.length > 1 && (
+                                                        <RemoveButton 
+                                                            variant="danger" 
+                                                            type="button"
+                                                            onClick={() => field.onRemoveProduto(idx)}
+                                                        >
+                                                            <i className="bi bi-x-lg"></i>
+                                                        </RemoveButton>
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </>
+                                ) : field.disabled ? (
+                                    <>
+                                        <label htmlFor={field.id} style={{ fontWeight: "bold" }}>{field.label}</label>
+                                        <StyledFormInput
+                                            id={field.id}
+                                            type={field.type || "text"} 
+                                            value={field.value}
+                                            disabled
+                                            style={{ backgroundColor: '#e9ecef', cursor: 'not-allowed' }}
+                                        />
+                                    </>
                                 ) : (
                                     <>
                                         <label htmlFor={field.id} style={{ fontWeight: "bold" }}>{field.label}</label>
@@ -231,6 +299,7 @@ export default function ModalForm( { title, visible, setVisible, fields, onSubmi
                                             value={field.value}
                                             onChange={(e) => field.onChange(e.target.value)}
                                             required={field.required || false}
+                                            step={field.step}
                                         />
                                     </>
                                 )}

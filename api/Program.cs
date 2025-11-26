@@ -24,6 +24,7 @@ builder.Services.AddScoped<IProdutosServico, ProdutosServico>();
 builder.Services.AddScoped<IReceitasServico, ReceitasServico>();
 builder.Services.AddScoped<IInsumosServico, InsumosServico>();
 builder.Services.AddScoped<IMapeamentoServico, MapeamentoServico>();
+builder.Services.AddScoped<IPedidosServico, PedidosServico>();
 builder.Services.AddAuthorization();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

@@ -17,6 +17,8 @@ namespace api.Data
         public DbSet<ReceitaIngredientes> ReceitaIngredientes { get; set; }
         public DbSet<Insumos> Insumos { get; set; }
         public DbSet<IngredientesInsumo> IngredientesInsumo { get; set; }
+        public DbSet<Pedidos> Pedidos { get; set; }
+        public DbSet<PedidosProdutos> PedidosProdutos { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -25,6 +27,8 @@ namespace api.Data
             modelBuilder.Entity<ReceitaIngredientes>().ToTable("receitaIngredientes");
             modelBuilder.Entity<Insumos>().ToTable("insumos");
             modelBuilder.Entity<IngredientesInsumo>().ToTable("ingredientes_insumo");
+            modelBuilder.Entity<Pedidos>().ToTable("pedidos");
+            modelBuilder.Entity<PedidosProdutos>().ToTable("pedidoprodutos");
         }
     }
 }
