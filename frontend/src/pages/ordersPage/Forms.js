@@ -3,7 +3,7 @@ import { addPedido, updatePedidoStatus, deletePedido } from "./ApiCalls.js";
 import { getProducts } from "../productsPage/ApiCalls.js";
 import { getCustomers } from "../usersPage/ApiCalls.js";
 
-const STATUS_OPTIONS = ["Pendente", "Em Preparo", "Em Rota de Entrega", "Entregue"];
+const STATUS_OPTIONS = {"Pendente": "Pendente", "Em Preparo": "Em Preparo", "Em Rota de Entrega": "Em Rota de Entrega", "Entregue": "Entregue"};
 
 export const formAddPedido = ({ onSuccess, onVerificarMapeamento }) => {
     const [clienteId, setClienteId] = useState("");
@@ -76,13 +76,6 @@ export const formAddPedido = ({ onSuccess, onVerificarMapeamento }) => {
             onChange: handleClienteChange,
             options: clientesDisponiveis.map(c => ({ value: c.id, label: c.nome })),
             placeholder: "Selecione um cliente"
-        },
-        {
-            id: "clienteNome",
-            label: "Ou digite o nome do cliente",
-            placeholder: "Nome do cliente avulso",
-            value: clienteNome,
-            onChange: setClienteNome
         },
         {
             id: "produtos",
@@ -169,6 +162,24 @@ export const formEditStatus = ({ pedido, onSuccess }) => {
     const [status, setStatus] = useState(pedido?.status || "Pendente");
     const [messageFormEditStatus, setMessageFormEditStatus] = useState("");
     const [messageTypeFormEditStatus, setMessageTypeFormEditStatus] = useState("success");
+    const [clienteNome, setClienteNome] = useState("");
+
+    useEffect(() => {
+        const loadClienteNome = async () => {
+            if (pedido?.clienteId) {
+                try {
+                    const clientes = await getCustomers();
+                    const cliente = clientes.find(c => c.id === pedido.clienteId);
+                    if (cliente) {
+                        setClienteNome(cliente.nome);
+                    }
+                } catch (error) {
+                    console.error("Erro ao buscar nome do cliente:", error);
+                }
+            }
+        }
+        loadClienteNome();
+    }, [pedido]);
 
     const titleFormEditStatus = "Atualizar Status do Pedido";
 
@@ -182,7 +193,7 @@ export const formEditStatus = ({ pedido, onSuccess }) => {
         {
             id: "cliente",
             label: "Cliente",
-            value: pedido?.clienteNome || "",
+            value: clienteNome || "",
             disabled: true
         },
         {
@@ -191,7 +202,7 @@ export const formEditStatus = ({ pedido, onSuccess }) => {
             type: "select",
             value: status,
             onChange: setStatus,
-            options: STATUS_OPTIONS,
+            options: Object.values(STATUS_OPTIONS).map(s => ({ value: s, label: s })),
             required: true
         }
     ];

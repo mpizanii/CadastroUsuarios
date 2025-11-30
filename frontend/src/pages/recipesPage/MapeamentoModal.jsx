@@ -15,26 +15,24 @@ const StyledFormSelect = styled.select`
     }
 `;
 
-const StyledFormInput = styled.input`
-    width: 100%;
-    height: 40px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    padding: 0 12px;
-    font-size: 14px;
-    &:focus {
-        outline: none;
-        border-color: #0d6efd;
-    }
-`;
-
-const CalculationBox = styled.div`
-    background: #e7f3ff;
-    border: 1px solid #b3d9ff;
+const WarningBox = styled.div`
+    background: #fff3cd;
+    border: 1px solid #ffc107;
     border-radius: 8px;
     padding: 12px;
     margin-bottom: 16px;
     font-size: 14px;
+    color: #856404;
+`;
+
+const SuccessBox = styled.div`
+    background: #d1e7dd;
+    border: 1px solid #28a745;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 16px;
+    font-size: 14px;
+    color: #0f5132;
 `;
 
 export default function MapeamentoModal({ 
@@ -45,64 +43,10 @@ export default function MapeamentoModal({
     onMapear 
 }) {
     const [selectedInsumoId, setSelectedInsumoId] = useState("");
-    const [fatorConversao, setFatorConversao] = useState(1.0);
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState("");
     const [messageType, setMessageType] = useState("success");
-    const [calculoAutomatico, setCalculoAutomatico] = useState(null);
-
-    const converterParaBase = (quantidade, unidade) => {
-        const conversoes = {
-            'g': 1,
-            'kg': 1000,
-            'mg': 0.001,
-            
-            'ml': 1,
-            'l': 1000,
-            'litro': 1000,
-            'litros': 1000,
-            
-            'un': 1,
-            'unidade': 1,
-            'unidades': 1,
-            'und': 1,
-        };
-
-        const unidadeLower = unidade.toLowerCase().trim();
-        const fator = conversoes[unidadeLower] || 1;
-        return quantidade * fator;
-    };
-
-    const getTipoUnidade = (unidade) => {
-        const unidadeLower = unidade.toLowerCase().trim();
-        if (['g', 'kg', 'mg'].includes(unidadeLower)) return 'massa';
-        if (['ml', 'l', 'litro', 'litros'].includes(unidadeLower)) return 'volume';
-        if (['un', 'unidade', 'unidades', 'und'].includes(unidadeLower)) return 'unidade';
-        return 'outro';
-    };
-
-    const calcularFatorConversao = (ingrediente, insumo) => {
-        const ingredienteBase = converterParaBase(ingrediente.quantidade, ingrediente.unidade);
-        const insumoBase = converterParaBase(1, insumo.unidade);
-        
-        const tipoIngrediente = getTipoUnidade(ingrediente.unidade);
-        const tipoInsumo = getTipoUnidade(insumo.unidade);
-        
-        if (tipoIngrediente === tipoInsumo) {
-            const fator = ingredienteBase / insumoBase;
-            return {
-                fator: fator,
-                automatico: true,
-                explicacao: `${ingrediente.quantidade}${ingrediente.unidade} = ${fator.toFixed(4)} ${insumo.unidade}`
-            };
-        }
-        
-        return {
-            fator: 1.0,
-            automatico: false,
-            explicacao: "Conversão manual necessária (unidades incompatíveis)"
-        };
-    };
+    const [unidadesCompativeis, setUnidadesCompativeis] = useState(true);
 
     useEffect(() => {
         if (ingrediente && visible) {
@@ -115,13 +59,13 @@ export default function MapeamentoModal({
         if (selectedInsumoId && ingrediente) {
             const insumoSelecionado = insumos.find(i => i.id === parseInt(selectedInsumoId));
             if (insumoSelecionado) {
-                const calculo = calcularFatorConversao(ingrediente, insumoSelecionado);
-                setCalculoAutomatico(calculo);
-                setFatorConversao(calculo.fator);
+                // Verifica se as unidades são iguais
+                const unidadeIngrediente = ingrediente.unidade?.toLowerCase().trim();
+                const unidadeInsumo = insumoSelecionado.unidade?.toLowerCase().trim();
+                setUnidadesCompativeis(unidadeIngrediente === unidadeInsumo);
             }
         } else {
-            setCalculoAutomatico(null);
-            setFatorConversao(1.0);
+            setUnidadesCompativeis(true);
         }
     }, [selectedInsumoId, ingrediente, insumos]);
 
@@ -134,9 +78,16 @@ export default function MapeamentoModal({
             return;
         }
 
+        if (!unidadesCompativeis) {
+            setMessageType("error");
+            setMessage("As unidades devem ser iguais para mapear");
+            return;
+        }
+
         setLoading(true);
         try {
-            await onMapear(ingrediente.id, parseInt(selectedInsumoId), parseFloat(fatorConversao));
+            // Agora sempre passa fator de conversão 1.0 (não é mais usado)
+            await onMapear(ingrediente.id, parseInt(selectedInsumoId), 1.0);
             setMessageType("success");
             setMessage("Ingrediente mapeado com sucesso!");
             setTimeout(() => {
@@ -151,6 +102,8 @@ export default function MapeamentoModal({
         }
     };
 
+    const insumoSelecionado = insumos.find(i => i.id === parseInt(selectedInsumoId));
+
     return (
         <Modal
             show={visible}
@@ -164,10 +117,10 @@ export default function MapeamentoModal({
 
             <Modal.Body>
                 <div style={{ marginBottom: "20px", padding: "12px", backgroundColor: "#f8f9fa", borderRadius: "8px" }}>
-                    <div style={{ fontSize: "12px", color: "#6c757d", marginBottom: "4px" }}>Ingrediente</div>
+                    <div style={{ fontSize: "12px", color: "#6c757d", marginBottom: "4px" }}>Ingrediente da Receita</div>
                     <div style={{ fontSize: "16px", fontWeight: "600" }}>{ingrediente?.nome}</div>
                     <div style={{ fontSize: "14px", color: "#6c757d", marginTop: "4px" }}>
-                        {ingrediente?.quantidade} {ingrediente?.unidade}
+                        Quantidade necessária: {ingrediente?.quantidade} {ingrediente?.unidade}
                     </div>
                 </div>
 
@@ -182,52 +135,44 @@ export default function MapeamentoModal({
                             <option value="">Selecione um insumo...</option>
                             {insumos.map((insumo) => (
                                 <option key={insumo.id} value={insumo.id}>
-                                    {insumo.nome} (disponível: {insumo.quantidade} {insumo.unidade})
+                                    {insumo.nome} ({insumo.quantidade} {insumo.unidade} disponível)
                                 </option>
                             ))}
                         </StyledFormSelect>
                     </Form.Group>
 
-                    {calculoAutomatico && (
-                        <CalculationBox>
-                            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
-                                <span style={{ fontSize: "18px" }}>
-                                    {calculoAutomatico.automatico ? "🎯" : "⚠️"}
-                                </span>
-                                <strong>
-                                    {calculoAutomatico.automatico ? "Cálculo Automático" : "Conversão Manual"}
-                                </strong>
-                            </div>
-                            <div style={{ color: "#0056b3" }}>
-                                {calculoAutomatico.explicacao}
-                            </div>
-                        </CalculationBox>
-                    )}
-
-                    <Form.Group className="mb-3">
-                        <Form.Label>
-                            Fator de Conversão
-                            {calculoAutomatico?.automatico && (
-                                <span style={{ color: "#28a745", marginLeft: "8px", fontSize: "12px" }}>
-                                    ✓ Calculado automaticamente
-                                </span>
+                    {insumoSelecionado && (
+                        <>
+                            {unidadesCompativeis ? (
+                                <SuccessBox>
+                                    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
+                                        <strong>Unidades compatíveis!</strong>
+                                    </div>
+                                    <div>
+                                        Ingrediente: {ingrediente?.quantidade} {ingrediente?.unidade}<br/>
+                                        Insumo: {insumoSelecionado.quantidade} {insumoSelecionado.unidade} disponível
+                                    </div>
+                                    <div style={{ marginTop: "8px", fontSize: "13px", fontStyle: "italic" }}>
+                                        Ao criar um pedido, será descontado automaticamente do estoque.
+                                    </div>
+                                </SuccessBox>
+                            ) : (
+                                <WarningBox>
+                                    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
+                                        <span style={{ fontSize: "18px" }}>⚠️</span>
+                                        <strong>Unidades incompatíveis!</strong>
+                                    </div>
+                                    <div>
+                                        Ingrediente usa: <strong>{ingrediente?.unidade}</strong><br/>
+                                        Insumo usa: <strong>{insumoSelecionado.unidade}</strong>
+                                    </div>
+                                    <div style={{ marginTop: "8px", fontSize: "13px" }}>
+                                        Você precisa ajustar as unidades para serem iguais antes de mapear.
+                                    </div>
+                                </WarningBox>
                             )}
-                        </Form.Label>
-                        <StyledFormInput
-                            type="number"
-                            step="0.0001"
-                            min="0.0001"
-                            value={fatorConversao}
-                            onChange={(e) => setFatorConversao(e.target.value)}
-                            required
-                        />
-                        <Form.Text className="text-muted">
-                            {calculoAutomatico?.automatico 
-                                ? "Valor calculado automaticamente. Você pode ajustar se necessário."
-                                : "Informe quanto do ingrediente consome 1 unidade do insumo"
-                            }
-                        </Form.Text>
-                    </Form.Group>
+                        </>
+                    )}
 
                     {message && (
                         <Alert 
@@ -249,7 +194,7 @@ export default function MapeamentoModal({
                         <Button 
                             variant="primary" 
                             type="submit"
-                            disabled={loading}
+                            disabled={loading || !unidadesCompativeis}
                         >
                             {loading ? "Mapeando..." : "Mapear"}
                         </Button>

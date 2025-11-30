@@ -15,7 +15,7 @@ export const formAddProduct = ({ onSuccess }) => {
     const [messageFormAddProduct, setMessageFormAddProduct] = useState("");
     const [messageTypeFormAddProduct, setMessageTypeFormAddProduct] = useState("success");
 
-    const UNIT_OPTIONS = ["g", "kg", "ml", "l", "un", "colher", "xícara"];
+    const UNIT_OPTIONS = ["g", "ml", "un", "colher", "xícara"];
 
     useEffect(() => {
         const loadRecipes = async () => {

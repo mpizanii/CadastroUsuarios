@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { addInsumo, editInsumo, deleteInsumo } from "./ApiCalls.js";
 
-const UNIT_OPTIONS = ["g", "kg", "ml", "l", "un", "colher", "xícara"];
+const UNIT_OPTIONS = ["g", "ml", "un", "colher", "xícara"];
 
 export const formAddInsumo = ({ onSuccess }) => {
     const [nome, setNome] = useState("");
