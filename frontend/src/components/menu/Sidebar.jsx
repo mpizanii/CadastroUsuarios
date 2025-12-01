@@ -37,12 +37,6 @@ const SideBar = ({ activeItem, onItemClick, isCollapsed, onHideMobile }) => {
         path: '/produtos' 
         },
         { 
-        id: 'receitas', 
-        label: 'Receitas', 
-        icon: LuChefHat, 
-        path: '/receitas' 
-        },
-        { 
         id: 'estoque', 
         label: 'Estoque', 
         icon: LuMilk, 
