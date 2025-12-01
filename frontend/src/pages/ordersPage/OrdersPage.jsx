@@ -1,4 +1,4 @@
-import { Container, Row, Col, Card, Badge, Button, Form, Modal, Alert } from 'react-bootstrap';
+import { Container, Row, Col, Card, Badge, Button, Spinner, Modal, Alert } from 'react-bootstrap';
 import { FiPlus, FiEye, FiEdit2, FiTrash2 } from 'react-icons/fi';
 import { MdOutlineShoppingCart } from "react-icons/md";
 import { useState, useEffect } from 'react';
@@ -52,13 +52,17 @@ const OrdersPage = () => {
   const [showMapeamentoModal, setShowMapeamentoModal] = useState(false);
   const [ingredientesNaoMapeados, setIngredientesNaoMapeados] = useState([]);
   const [pedidoPendente, setPedidoPendente] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const loadPedidos = async () => {
+    setLoading(true);
     try {
       const data = await getPedidos();
       setPedidos(data);
     } catch (error) {
       console.error('Erro ao carregar pedidos:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -150,6 +154,15 @@ const OrdersPage = () => {
       minute: '2-digit'
     });
   };
+
+  if (loading) {
+    return(
+      <div style={{ display: "flex", flexDirection: "column", gap: "5px", justifyContent: "center", alignItems: "center", height: "100vh" }}>
+        <Spinner animation="border" role="status" />
+        <span>Carregando pedidos</span>
+      </div>
+    )
+  }
 
   return (
     <div style={{ backgroundColor: '#f8f9fa', minHeight: '100vh', paddingTop: '24px' }}>

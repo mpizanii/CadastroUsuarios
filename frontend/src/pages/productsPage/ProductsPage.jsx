@@ -73,7 +73,7 @@ export default function OrdersPage() {
     return(
       <div style={{ display: "flex", flexDirection: "column", gap: "5px", justifyContent: "center", alignItems: "center", height: "100vh" }}>
         <Spinner animation="border" role="status" />
-        <span>Carregando dados dos produtos</span>
+        <span>Carregando produtos</span>
       </div>
     )
   }

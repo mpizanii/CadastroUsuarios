@@ -1,4 +1,4 @@
-import { Container, Row, Col, Card, Badge, Button, Form, InputGroup, Modal } from 'react-bootstrap';
+import { Container, Row, Col, Card, Badge, Button, Form, InputGroup, Modal, Spinner } from 'react-bootstrap';
 import { FiSearch, FiPackage, FiEdit2, FiTrash2, FiPlus } from 'react-icons/fi';
 import { LuPackagePlus } from 'react-icons/lu';
 import { useState, useEffect } from 'react';
@@ -129,14 +129,18 @@ const StockPage = () => {
   const [selectedInsumo, setSelectedInsumo] = useState(null);
   const [showAlertModal, setShowAlertModal] = useState(false);
   const [alertas, setAlertas] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const loadInsumos = async () => {
+    setLoading(true);
     try {
       const data = await getInsumos();
       setInsumos(data);
       setFilteredInsumos(data);
     } catch (error) {
       console.error('Erro ao carregar insumos:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -220,6 +224,15 @@ const StockPage = () => {
     const date = new Date(dateString);
     return date.toLocaleDateString('pt-BR');
   };
+
+  if (loading) {
+    return(
+      <div style={{ display: "flex", flexDirection: "column", gap: "5px", justifyContent: "center", alignItems: "center", height: "100vh" }}>
+        <Spinner animation="border" role="status" />
+        <span>Carregando insumos</span>
+      </div>
+    )
+  }
 
   return (
     <div style={{ backgroundColor: '#f8f9fa', minHeight: '100vh', paddingTop: '24px' }}>
