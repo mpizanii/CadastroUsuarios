@@ -9,12 +9,12 @@ Sistema web completo para empresa do ramo alimentício (KLG), desenvolvida com *
 - Acompanhamento de receitas de produtos;
 - Baixa automática no estoque;
 - Insights/alertas de estoque;
-- 
+
 ---
 
 ## Preview
 
-![Image]("https://github.com/user-attachments/assets/559c1a72-8a37-42ce-9544-5db75f1a6396")
+![Image](https://github.com/user-attachments/assets/559c1a72-8a37-42ce-9544-5db75f1a6396)
 
 
 ---
