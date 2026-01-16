@@ -11,5 +11,11 @@ namespace api.DTOs
         public string Nome { get; set; } = string.Empty;
         public double Preco { get; set; } = 0;
         public double Custo { get; set; } = 0;
+        public bool Ativo { get; set; } = true;
+        public double Margem
+        {
+            get => Preco != 0 ? (Preco - Custo) / Preco * 100 : 0;
+        }
+        public int Receita_Id { get; set; } = 0;
     }
 }

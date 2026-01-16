@@ -43,7 +43,7 @@ namespace api.Servicos
 
             foreach (var ingredienteDto in ingredientes)
             {
-                var ingrediente = new Ingrediente
+                var ingrediente = new ReceitaIngredientes
                 {
                     ReceitaId = receitaId,
                     Nome = ingredienteDto.Nome,
@@ -51,7 +51,7 @@ namespace api.Servicos
                     Unidade = ingredienteDto.Unidade
                 };
 
-                _context.Ingredientes.Add(ingrediente);
+                _context.ReceitaIngredientes.Add(ingrediente);
             }
 
             await _context.SaveChangesAsync();
@@ -61,6 +61,19 @@ namespace api.Servicos
         {
             return await _context.Receitas
                 .FirstOrDefaultAsync(r => r.Id == id);
+        }
+
+        public async Task<List<Receitas?>> ObterReceitas()
+        {
+            return await _context.Receitas
+                .ToListAsync();
+        }
+
+        public async Task<List<ReceitaIngredientes>?> ObterIngredientesReceita(int receitaId)
+        {
+            return await _context.ReceitaIngredientes
+                .Where(i => i.ReceitaId == receitaId)
+                .ToListAsync();
         }
     }
 }

@@ -12,13 +12,24 @@ export async function getProducts() {
     return response.data;
 }
 
-export const addProduct = async ({ name, price, recipeId, cost }) => {
+export async function getRecipes() {
+    const response = await axios.get(`${API_URL}/Receitas`);
+    if (response.status !== 200) {
+        console.error("Erro ao buscar os usuários");
+        return;
+    }
+
+    return response.data;
+}
+
+export const addProduct = async ({ name, price, recipeId, cost, ativo = true }) => {
     try {
         const novoProduto = {
             nome: name,
             preco: price,
             receita_id: recipeId,
-            custo: cost
+            custo: cost,
+            ativo: ativo
         };
         const response = await axios.post(`${API_URL}/Produtos`, novoProduto);
 
@@ -30,12 +41,15 @@ export const addProduct = async ({ name, price, recipeId, cost }) => {
     }
 }
 
-export const editProduct = async ({ nome, preco, custo, id }) => {
+export const editProduct = async ({ nome, preco, custo, receita_id, ativo, id }) => {
     try {
-        const response = await axios.patch(`${API_URL}/Produtos/${id}`, {
+        const response = await axios.put(`${API_URL}/Produtos/${id}`, {
+            id,
             nome,
             preco,
             custo,
+            receita_id,
+            ativo
         });
 
         if (response.status === 200 || response.status === 201) {
@@ -56,6 +70,25 @@ export const deleteProduct = async (id) => {
         }
     }
     catch (error) {
+        throw error;
+    }
+}
+
+export const addRecipe = async ({ name, modo_preparo, ingredientes }) => {
+    try {
+        const novaReceita = {
+            nome: name,
+            modo_Preparo: modo_preparo,
+            ingredientes: ingredientes
+        };
+        console.log("Nova receita " + novaReceita);
+
+        const response = await axios.post(`${API_URL}/Receitas`, novaReceita);
+        
+        if (response.status === 200 || response.status === 201) {
+            return response.data; 
+        }
+    } catch (error) {
         throw error;
     }
 }

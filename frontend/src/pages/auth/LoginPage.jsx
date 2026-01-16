@@ -30,7 +30,7 @@ export default function LoginPage() {
       return;
     }
     if (session) {
-      navigate("/clientes");
+      navigate("/metricas");
     }
   }
 

@@ -27,6 +27,8 @@ namespace api.Servicos
                     Nome = p.Nome,
                     Preco = p.Preco,
                     Custo = p.Custo,
+                    Ativo = p.Ativo,
+                    Receita_Id = p.Receita_id,
                 }).ToListAsync();
         }
 
@@ -40,6 +42,8 @@ namespace api.Servicos
                     Nome = p.Nome,
                     Preco = p.Preco,
                     Custo = p.Custo,
+                    Ativo = p.Ativo,
+                    Receita_Id = p.Receita_id,
                 }).FirstOrDefaultAsync();
 
             return produto;
@@ -57,14 +61,35 @@ namespace api.Servicos
             var produto = await _context.Produtos.FindAsync(id);
             if (produto == null) return false;
 
-            if (!string.IsNullOrWhiteSpace(produtoDTO.Nome) && produtoDTO.Nome != "string")
-                produto.Nome = produtoDTO.Nome;
+            if (string.IsNullOrWhiteSpace(produtoDTO.Nome))
+            {
+                throw new ArgumentException("Nome do produto não pode ser vazio.");
+            }
 
-            if (produtoDTO.Preco != 0)
-                produto.Preco = produtoDTO.Preco;
+            if (produtoDTO.Preco < 0)
+            {
+                throw new ArgumentException("Preço não pode ser negativo.");
+            }
 
-            if (produtoDTO.Custo != 0)
-                produto.Custo = produtoDTO.Custo;
+            if (produtoDTO.Custo < 0)
+            {
+                throw new ArgumentException("Custo não pode ser negativo.");
+            }
+
+            if (produtoDTO.Receita_Id != produto.Receita_id)
+            {
+                var receitaExiste = await _context.Receitas.AnyAsync(r => r.Id == produtoDTO.Receita_Id);
+                if (!receitaExiste)
+                {
+                    throw new InvalidOperationException($"Receita com ID {produtoDTO.Receita_Id} não existe.");
+                }
+            }
+
+            produto.Nome = produtoDTO.Nome;
+            produto.Preco = produtoDTO.Preco;
+            produto.Custo = produtoDTO.Custo;
+            produto.Ativo = produtoDTO.Ativo;
+            produto.Receita_id = produtoDTO.Receita_Id;
 
             await _context.SaveChangesAsync();
             return true;
