@@ -1,23 +1,24 @@
-# 📋 Cadastro de Clientes - Em desenvolvimento
+# Gestão de Estoque - Em desenvolvimento
 
-Aplicação web para **cadastro de clientes e controle de estoque de uma empresa**, desenvolvida com **React.js**, **Supabase**, **PostgreSQL** e **Asp.Net Core**.
+Sistema web completo para empresa do ramo alimentício (KLG), desenvolvida com **React.js**, **Supabase**, **PostgreSQL** e **Asp.Net Core**.
 
-## ✨ Funcionalidades até o momento
+## Funcionalidades até o momento
 
-- ✅ Cadastro de novos clientes
-- 🔍 Listagem de clientes cadastrados
-- 📝 Edição de informações
-- ❌ Exclusão de clientes
-- 🔎 Busca por clientes
-- 🔒 Autenticação com Supabase
-
----
-
-## 🖼️ Preview
-
-![Image](https://github.com/user-attachments/assets/0d6d42ae-c98f-42a4-b5e3-4f780f094d62)
+- Login seguro com autenticação supabase;
+- Cadastro de pedidos, produtos, estoque e clientes;
+- Acompanhamento de receitas de produtos;
+- Baixa automática no estoque;
+- Insights/alertas de estoque;
 
 ---
 
-## 🚀 O projeto ainda está em desenvolvimento
-Ainda pretendo adicionar funcionalidades para controle de estoque e controle de faturamento da empresa.
+## Preview
+
+![Image](https://github.com/user-attachments/assets/559c1a72-8a37-42ce-9544-5db75f1a6396)
+
+
+---
+
+## O projeto ainda está em desenvolvimento
+Funcionalidades futuras estão sendo desenvolvidas
+
