@@ -21,4 +21,3 @@ Sistema web completo para empresa do ramo alimentício (KLG), desenvolvida com *
 
 ## O projeto ainda está em desenvolvimento
 Funcionalidades futuras estão sendo desenvolvidas
-
