@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import ModalForm from "../../components/menu/ModalForm.jsx";
-import { getCustomers } from "./ApiCalls.js";
 import { formAddUser, formEditUser, formDeleteUser } from "./Forms.js";
 import { Container, SearchInput } from "./StyledUsersPage";
 import { Button, Card, Badge, Spinner } from "react-bootstrap";

@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useCallback } from "react";
-import { getProducts } from "../pages/productsPage/ApiCalls";
+import { getProducts } from "../services/productsService";
 
 const ProductsContext = createContext();
 

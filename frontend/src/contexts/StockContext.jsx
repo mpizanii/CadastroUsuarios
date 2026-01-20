@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useCallback } from "react";
-import { getInsumos } from "../pages/stockPage/ApiCalls";
+import { getInsumos } from "../services/stockService";
 
 const StockContext = createContext();
 

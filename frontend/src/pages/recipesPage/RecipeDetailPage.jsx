@@ -6,7 +6,7 @@ import { SlPencil } from "react-icons/sl";
 import { MdOutlineMap } from "react-icons/md";
 import axios from "axios";
 import MapeamentoModal from "./MapeamentoModal";
-import { getIngredientesComMapeamento, getInsumos, mapearIngrediente } from "./MapeamentoApi";
+import { getIngredientesComMapeamento, getInsumos, mapearIngrediente } from "../../services/recipesService";
 
 const API_URL = import.meta.env.VITE_API_URL;
 

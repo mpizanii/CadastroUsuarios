@@ -4,7 +4,7 @@ import { MdOutlineShoppingCart } from "react-icons/md";
 import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import ModalForm from '../../components/menu/ModalForm';
-import { addPedido, verificarMapeamentoProdutos } from './ApiCalls';
+import { addPedido, verificarMapeamentoProdutos } from '../../services/ordersService';
 import { formAddPedido, formEditStatus, formDeletePedido } from './Forms';
 import { useNavigate } from 'react-router-dom';
 import { useOrders } from '../../contexts';

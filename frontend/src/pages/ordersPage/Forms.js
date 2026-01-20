@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { addPedido, updatePedidoStatus, deletePedido } from "./ApiCalls.js";
-import { getProducts } from "../productsPage/ApiCalls.js";
-import { getCustomers } from "../usersPage/ApiCalls.js";
+import { addPedido, updatePedidoStatus, deletePedido } from "../../services/ordersService";
+import { getProducts } from "../../services/productsService";
+import { getCustomers } from "../../services/customerService";
 
 const STATUS_OPTIONS = {"Pendente": "Pendente", "Em Preparo": "Em Preparo", "Em Rota de Entrega": "Em Rota de Entrega", "Entregue": "Entregue"};
 

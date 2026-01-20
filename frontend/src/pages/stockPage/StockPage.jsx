@@ -4,7 +4,7 @@ import { LuPackagePlus } from 'react-icons/lu';
 import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import ModalForm from '../../components/menu/ModalForm';
-import { getInsumosComAlertas } from './ApiCalls';
+import { getInsumosComAlertas } from '../../services/stockService';
 import { formAddInsumo, formEditInsumo, formDeleteInsumo, formAdicionar } from './Forms';
 import { useStock } from '../../contexts/StockContext';
 

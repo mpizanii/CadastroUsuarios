@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { addInsumo, editInsumo, deleteInsumo } from "./ApiCalls.js";
+import { addInsumo, editInsumo, deleteInsumo } from "../../services/stockService";
 
 const UNIT_OPTIONS = ["g", "ml", "un", "colher", "xícara"];
 

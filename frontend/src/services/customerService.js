@@ -1,23 +1,22 @@
-import { supabase } from "../../utils/supabase";
+import { supabase } from "../utils/supabase";
 import axios from "axios";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 export async function getCustomers() {
-    const { data: { user } } = await supabase.auth.getUser();
-    const response = await axios.get(`${API_URL}/Clientes/usuario/${user.id}`);
-    if (response.status !== 200) {
-        console.error("Erro ao buscar os usuários");
-        return;
+    try {
+        const { data: { user } } = await supabase.auth.getUser();
+        const response = await axios.get(`${API_URL}/Clientes/usuario/${user.id}`);
+        return response.data;
+    } catch (error) {
+        console.error("Erro ao buscar os clientes:", error);
+        throw new Error("Erro ao carregar clientes");
     }
-
-    return response.data;
 }
 
 export const addUser = async ({ name, email, phone, address }) => {
     try {
         const { data: { user } } = await supabase.auth.getUser();
-
         const novoCliente = {
             nome: name,
             email: email,
@@ -25,16 +24,11 @@ export const addUser = async ({ name, email, phone, address }) => {
             endereco: address,
             user_id: user.id
         };
-
-        console.log(novoCliente);
-
         const response = await axios.post(`${API_URL}/Clientes`, novoCliente);
-
-        if (response.status === 200 || response.status === 201) {
-            return response.data; 
-        }
+        return response.data; 
     } catch (error) {
-        throw error;
+        console.error("Erro ao adicionar cliente:", error);
+        throw new Error("Erro ao adicionar cliente");
     }
 }
 
@@ -47,24 +41,21 @@ export const editUser = async ({ nome, email, telefone, endereco, id }) => {
             endereco
         });
 
-        if (response.status === 200 || response.status === 201) {
-            return response.data; 
-        }
+        return response.data; 
     }
     catch (error) { 
-        throw error;  
+        console.error("Erro ao editar cliente:", error);
+        throw new Error("Erro ao editar cliente");
     }
 }
 
 export const deleteUser = async (id) => {
     try {
         const response = await axios.delete(`${API_URL}/Clientes/${id}`);
-
-        if (response.status === 200 || response.status === 201) {
-            return response.data; 
-        }
+        return response.data; 
     }
     catch (error) {
-        throw error;
+        console.error("Erro ao deletar cliente:", error);
+        throw new Error("Erro ao deletar cliente");
     }
 }

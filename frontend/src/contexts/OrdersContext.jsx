@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useCallback } from "react";
-import { getPedidos } from "../pages/ordersPage/ApiCalls";
+import { getPedidos } from "../services/ordersService";
 
 const OrdersContext = createContext();
 
