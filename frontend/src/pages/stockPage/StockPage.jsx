@@ -4,8 +4,9 @@ import { LuPackagePlus } from 'react-icons/lu';
 import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import ModalForm from '../../components/menu/ModalForm';
-import { getInsumos, getInsumosComAlertas } from './ApiCalls';
+import { getInsumosComAlertas } from './ApiCalls';
 import { formAddInsumo, formEditInsumo, formDeleteInsumo, formAdicionar } from './Forms';
+import { useStock } from '../../contexts/StockContext';
 
 const StyledCard = styled(Card)`
   border-radius: 12px;
@@ -119,7 +120,7 @@ const AlertItem = styled.div`
 `;
 
 const StockPage = () => {
-  const [insumos, setInsumos] = useState([]);
+  const { insumos, loading, error, fetchInsumos } = useStock();
   const [filteredInsumos, setFilteredInsumos] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [menuAddInsumoAtivo, setMenuAddInsumoAtivo] = useState(false);
@@ -129,25 +130,11 @@ const StockPage = () => {
   const [selectedInsumo, setSelectedInsumo] = useState(null);
   const [showAlertModal, setShowAlertModal] = useState(false);
   const [alertas, setAlertas] = useState([]);
-  const [loading, setLoading] = useState(false);
-
-  const loadInsumos = async () => {
-    setLoading(true);
-    try {
-      const data = await getInsumos();
-      setInsumos(data);
-      setFilteredInsumos(data);
-    } catch (error) {
-      console.error('Erro ao carregar insumos:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const { titleFormAddInsumo, fieldsFormAddInsumo, handleSubmitFormAddInsumo, messageFormAddInsumo, messageTypeFormAddInsumo } = formAddInsumo({
     onSuccess: () => {
       setMenuAddInsumoAtivo(false);
-      loadInsumos();
+      fetchInsumos();
     },
   });
 
@@ -155,7 +142,7 @@ const StockPage = () => {
     insumo: selectedInsumo,
     onSuccess: () => {
       setMenuEditInsumoAtivo(false);
-      loadInsumos();
+      fetchInsumos();
     },
   });
 
@@ -163,7 +150,7 @@ const StockPage = () => {
     insumo: selectedInsumo,
     onSuccess: () => {
       setMenuDeleteInsumoAtivo(false);
-      loadInsumos();
+      fetchInsumos();
     },
   });
 
@@ -171,12 +158,14 @@ const StockPage = () => {
     insumo: selectedInsumo,
     onSuccess: () => {
       setMenuAdicionarAtivo(false);
-      loadInsumos();
+      fetchInsumos();
     },
   });
 
   useEffect(() => {
-    loadInsumos();
+    if (insumos.length === 0) {
+      fetchInsumos();
+    }
   }, []);
 
   useEffect(() => {
@@ -225,11 +214,23 @@ const StockPage = () => {
     return date.toLocaleDateString('pt-BR');
   };
 
-  if (loading) {
+  if (loading && insumos.length === 0) {
     return(
       <div style={{ display: "flex", flexDirection: "column", gap: "5px", justifyContent: "center", alignItems: "center", height: "100vh" }}>
         <Spinner animation="border" role="status" />
         <span>Carregando insumos</span>
+      </div>
+    )
+  }
+
+  if (error && insumos.length === 0) {
+    return(
+      <div style={{ display: "flex", flexDirection: "column", gap: "15px", justifyContent: "center", alignItems: "center", height: "100vh" }}>
+        <i className="bi bi-exclamation-triangle" style={{ fontSize: "48px", color: "#dc3545" }} />
+        <span style={{ color: "#666" }}>{error}</span>
+        <Button onClick={fetchInsumos} variant="outline-primary">
+          Tentar Novamente
+        </Button>
       </div>
     )
   }

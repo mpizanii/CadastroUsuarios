@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import ModalForm from "../../components/menu/ModalForm.jsx";
-import { getProducts } from "./ApiCalls.js";
 import { formAddProduct, formEditProduct, formDeleteProduct } from "./Forms.js";
 import { Container, SearchInput } from "./StyledProductsPage";
 import { LuChefHat } from "react-icons/lu";

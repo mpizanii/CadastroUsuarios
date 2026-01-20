@@ -4,9 +4,10 @@ import { MdOutlineShoppingCart } from "react-icons/md";
 import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import ModalForm from '../../components/menu/ModalForm';
-import { getPedidos, addPedido, verificarMapeamentoProdutos } from './ApiCalls';
+import { addPedido, verificarMapeamentoProdutos } from './ApiCalls';
 import { formAddPedido, formEditStatus, formDeletePedido } from './Forms';
 import { useNavigate } from 'react-router-dom';
+import { useOrders } from '../../contexts';
 
 const StyledCard = styled(Card)`
   border-radius: 12px;
@@ -44,7 +45,7 @@ const StatusBadge = styled(Badge)`
 
 const OrdersPage = () => {
   const navigate = useNavigate();
-  const [pedidos, setPedidos] = useState([]);
+  const { orders, loading, error, fetchOrders } = useOrders();
   const [menuAddPedidoAtivo, setMenuAddPedidoAtivo] = useState(false);
   const [menuEditStatusAtivo, setMenuEditStatusAtivo] = useState(false);
   const [menuDeletePedidoAtivo, setMenuDeletePedidoAtivo] = useState(false);
@@ -52,19 +53,6 @@ const OrdersPage = () => {
   const [showMapeamentoModal, setShowMapeamentoModal] = useState(false);
   const [ingredientesNaoMapeados, setIngredientesNaoMapeados] = useState([]);
   const [pedidoPendente, setPedidoPendente] = useState(null);
-  const [loading, setLoading] = useState(false);
-
-  const loadPedidos = async () => {
-    setLoading(true);
-    try {
-      const data = await getPedidos();
-      setPedidos(data);
-    } catch (error) {
-      console.error('Erro ao carregar pedidos:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleVerificarMapeamento = async (pedidoData) => {
     try {
@@ -77,7 +65,7 @@ const OrdersPage = () => {
       } else {
         await addPedido(pedidoData);
         setMenuAddPedidoAtivo(false);
-        loadPedidos();
+        fetchOrders();
       }
     } catch (error) {
       console.error('Erro ao verificar mapeamento:', error);
@@ -92,7 +80,7 @@ const OrdersPage = () => {
       setMenuAddPedidoAtivo(false);
       setPedidoPendente(null);
       setIngredientesNaoMapeados([]);
-      loadPedidos();
+      fetchOrders();
     } catch (error) {
       console.error('Erro ao criar pedido:', error);
     }
@@ -105,7 +93,7 @@ const OrdersPage = () => {
   };
 
   const { titleFormAddPedido, fieldsFormAddPedido, handleSubmitFormAddPedido, messageFormAddPedido, messageTypeFormAddPedido } = formAddPedido({
-    onSuccess: loadPedidos,
+    onSuccess: fetchOrders,
     onVerificarMapeamento: handleVerificarMapeamento
   });
 
@@ -113,7 +101,7 @@ const OrdersPage = () => {
     pedido: selectedPedido,
     onSuccess: () => {
       setMenuEditStatusAtivo(false);
-      loadPedidos();
+      fetchOrders();
     },
   });
 
@@ -121,12 +109,14 @@ const OrdersPage = () => {
     pedido: selectedPedido,
     onSuccess: () => {
       setMenuDeletePedidoAtivo(false);
-      loadPedidos();
+      fetchOrders();
     },
   });
 
   useEffect(() => {
-    loadPedidos();
+    if (orders.length === 0) {
+      fetchOrders();
+    }
   }, []);
 
   const getStatusColor = (status) => {
@@ -155,11 +145,23 @@ const OrdersPage = () => {
     });
   };
 
-  if (loading) {
+  if (loading && orders.length === 0) {
     return(
       <div style={{ display: "flex", flexDirection: "column", gap: "5px", justifyContent: "center", alignItems: "center", height: "100vh" }}>
         <Spinner animation="border" role="status" />
         <span>Carregando pedidos</span>
+      </div>
+    )
+  }
+
+  if (error && orders.length === 0) {
+    return(
+      <div style={{ display: "flex", flexDirection: "column", gap: "15px", justifyContent: "center", alignItems: "center", height: "100vh" }}>
+        <i className="bi bi-exclamation-triangle" style={{ fontSize: "48px", color: "#dc3545" }} />
+        <span style={{ color: "#666" }}>{error}</span>
+        <Button onClick={fetchOrders} variant="outline-primary">
+          Tentar Novamente
+        </Button>
       </div>
     )
   }
@@ -187,7 +189,7 @@ const OrdersPage = () => {
 
         {/* Cards Grid */}
         <Row>
-          {pedidos.map((pedido) => (
+          {orders.map((pedido) => (
             <Col key={pedido.id} xs={12} md={6} lg={4} className="mb-4">
               <StyledCard>
                 <Card.Body>
@@ -240,7 +242,7 @@ const OrdersPage = () => {
           ))}
         </Row>
 
-        {pedidos.length === 0 && (
+        {orders.length === 0 && (
           <Row>
             <Col>
               <Card className="text-center py-5">
