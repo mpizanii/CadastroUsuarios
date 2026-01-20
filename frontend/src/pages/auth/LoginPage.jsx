@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { supabase } from "../../services/supabase";
+import { supabase } from "../../utils/supabase";
 import { CustomContainer, LeftSectionLogin, RightSectionLogin, Message } from "./StyledAuthPages.js";
 import svgAnimado from "../../assets/svgAnimado.svg";
 import { Link, useNavigate } from "react-router-dom";

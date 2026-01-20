@@ -11,7 +11,7 @@ import RecipesPage from './pages/recipesPage/RecipesPage';
 import RecipeDetailPage from './pages/recipesPage/RecipeDetailPage';
 import SupportPage from './pages/supportPage/SupportPage';
 import { ProductsProvider, OrdersProvider, StockProvider, CustomersProvider } from './contexts';
-import ProtectedRoutes from './services/protectedroutes';
+import ProtectedRoutes from './utils/protectedroutes';
 import "bootstrap-icons/font/bootstrap-icons.css";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import SideBar from './components/menu/Sidebar';

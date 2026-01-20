@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { supabase } from "../../services/supabase";
+import { supabase } from "../../utils/supabase";
 import { CustomContainer, LeftSectionLogin, RightSectionLogin, Message } from "./StyledAuthPages";
 import svgAnimadoRedefinirSenha from "../../assets/svgAnimadoRedefinirSenha.svg";
 import { Row, Col, Card, Form, Button } from "react-bootstrap";
