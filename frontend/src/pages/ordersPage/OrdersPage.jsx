@@ -1,12 +1,14 @@
-import { Container, Row, Col, Card, Badge, Button, Spinner, Modal, Alert } from 'react-bootstrap';
+import { Row, Col, Card, Badge, Button, Spinner } from 'react-bootstrap';
 import { FiPlus, FiEdit2, FiTrash2 } from 'react-icons/fi';
 import { MdOutlineShoppingCart } from "react-icons/md";
 import { useState, useEffect } from 'react';
 import ModalForm from '../../components/menu/ModalForm';
+import IngredientesNaoMapeados from '../../components/mapeamento/IngredientesNãoMapeados';
 import { addPedido, verificarMapeamentoProdutos } from '../../services/ordersService';
 import { formAddPedido, formEditStatus, formDeletePedido } from '../../forms/ordersForms';
 import { useNavigate } from 'react-router-dom';
 import { useOrders } from '../../contexts';
+import { useOrderActions } from '../../hooks/useOrderActions';
 
 const OrdersPage = () => {
   const navigate = useNavigate();
@@ -15,67 +17,43 @@ const OrdersPage = () => {
   const [menuEditStatusAtivo, setMenuEditStatusAtivo] = useState(false);
   const [menuDeletePedidoAtivo, setMenuDeletePedidoAtivo] = useState(false);
   const [selectedPedido, setSelectedPedido] = useState(null);
-  const [showMapeamentoModal, setShowMapeamentoModal] = useState(false);
-  const [ingredientesNaoMapeados, setIngredientesNaoMapeados] = useState([]);
-  const [pedidoPendente, setPedidoPendente] = useState(null);
 
-  const handleVerificarMapeamento = async (pedidoData) => {
-    try {
-      const resultado = await verificarMapeamentoProdutos(pedidoData.produtos);
-      
-      if (!resultado.todosMapeados && resultado.ingredientesNaoMapeados.length > 0) {
-        setIngredientesNaoMapeados(resultado.ingredientesNaoMapeados);
-        setPedidoPendente(pedidoData);
-        setShowMapeamentoModal(true);
-      } else {
-        await addPedido(pedidoData);
-        setMenuAddPedidoAtivo(false);
-        fetchOrders();
-      }
-    } catch (error) {
-      console.error('Erro ao verificar mapeamento:', error);
-    }
-  };
+  const {
+    showMapeamentoModal,
+    setShowMapeamentoModal,
+    ingredientesNaoMapeados,
+    handleVerificarMapeamento,
+    handleConfirmarPedidoSemBaixa,
+    handleIrParaMapeamento,
+    resetMapeamentoState
+  } = useOrderActions({ fetchOrders });
 
-  const handleConfirmarPedidoSemBaixa = async () => {
-    try {
-      const pedidoSemBaixa = { ...pedidoPendente, darBaixaEstoque: false };
-      await addPedido(pedidoSemBaixa);
-      setShowMapeamentoModal(false);
-      setMenuAddPedidoAtivo(false);
-      setPedidoPendente(null);
-      setIngredientesNaoMapeados([]);
-      fetchOrders();
-    } catch (error) {
-      console.error('Erro ao criar pedido:', error);
-    }
-  };
-
-  const handleIrParaMapeamento = (ingrediente) => {
-    setShowMapeamentoModal(false);
-    setMenuAddPedidoAtivo(false);
-    navigate(`/receitas/${ingrediente.receitaId}`);
-  };
 
   const { titleFormAddPedido, fieldsFormAddPedido, handleSubmitFormAddPedido, messageFormAddPedido, messageTypeFormAddPedido } = formAddPedido({
-    onSuccess: fetchOrders,
+    onSuccess: () => {
+      fetchOrders();
+      setMenuAddPedidoAtivo(false);
+      resetMapeamentoState();
+    },
     onVerificarMapeamento: handleVerificarMapeamento
   });
 
   const { titleFormEditStatus, fieldsFormEditStatus, handleSubmitFormEditStatus, messageFormEditStatus, messageTypeFormEditStatus } = formEditStatus({
-    pedido: selectedPedido,
     onSuccess: () => {
       setMenuEditStatusAtivo(false);
       fetchOrders();
+      resetMapeamentoState();
     },
+    pedido: selectedPedido
   });
 
   const { titleFormDeletePedido, textFormDeletePedido, handleSubmitFormDeletePedido, messageFormDeletePedido, messageTypeFormDeletePedido } = formDeletePedido({
-    pedido: selectedPedido,
     onSuccess: () => {
       setMenuDeletePedidoAtivo(false);
       fetchOrders();
+      resetMapeamentoState();
     },
+    pedido: selectedPedido
   });
 
   useEffect(() => {
@@ -132,15 +110,14 @@ const OrdersPage = () => {
   }
 
   return (
-    <div style={{ backgroundColor: '#f8f9fa', minHeight: '100vh', paddingTop: '24px' }}>
-      <Container fluid className="px-4">
-        {/* Header */}
-        <Row className="mb-4">
-          <Col>
-            <h1 className="fw-bold mb-1">Pedidos</h1>
-            <p className="text-muted mb-0">Gerencie todos os pedidos</p>
-          </Col>
-          <Col xs="auto">
+    <>
+      <div className={`w-100 min-vh-100 bg-light ${menuAddPedidoAtivo || menuEditStatusAtivo || menuDeletePedidoAtivo ? "opacity-50" : ""}`} style={{ fontFamily: "Roboto, sans-serif" }}>
+        <div style={{ padding: "35px 30px" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "30px" }}>
+            <div>
+              <h1 style={{ color: "#212121", marginBottom: "5px", fontWeight: "bold" }}>Pedidos</h1>
+              <p style={{ color: "#666", margin: 0 }}>Gerencie todos os seus pedidos</p>
+            </div>
             <Button 
               variant="primary"
               onClick={() => setMenuAddPedidoAtivo(true)}
@@ -150,98 +127,96 @@ const OrdersPage = () => {
               <FiPlus size={18} />
               Novo Pedido
             </Button>
-          </Col>
-        </Row>
+          </div>
 
-        {/* Cards Grid */}
-        <Row>
-          {orders.map((pedido) => (
-            <Col key={pedido.id} xs={12} md={6} lg={4} className="mb-4">
-              <Card 
-                style={{ 
-                  borderRadius: '12px', 
-                  border: 'none', 
-                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)', 
-                  transition: 'transform 0.2s, box-shadow 0.2s' 
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-2px)';
-                  e.currentTarget.style.boxShadow = '0 4px 16px rgba(0, 0, 0, 0.12)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.08)';
-                }}
-              >
-                <Card.Body>
-                  <div className="d-flex justify-content-between align-items-start mb-3">
-                    <div>
-                      <h6 className="text-muted mb-1">Pedido</h6>
-                      <h4 className="fw-bold mb-0">#{String(pedido.id).padStart(4, '0')}</h4>
-                    </div>
-                    <Badge 
-                      bg={getStatusColor(pedido.status)}
-                      style={{ padding: '6px 12px', borderRadius: '6px', fontWeight: '500', fontSize: '0.85rem' }}
-                    >
-                      {pedido.status}
-                    </Badge>
-                  </div>
-
-                  <div className="mb-3">
-                    <h5 className="fw-bold mb-2">{pedido.clienteNome}</h5>
-                    <p className="text-muted small mb-1">
-                      {formatDate(pedido.dataPedido)} • {pedido.produtos?.length || 0} produtos
-                    </p>
-                  </div>
-
-                  <div className="mb-3 pb-3" style={{ borderBottom: '1px solid #eee' }}>
-                    <div className="d-flex justify-content-between">
-                      <span className="text-muted">Valor Total:</span>
-                      <span className="fw-bold" style={{ color: '#2E8B57', fontSize: '1.1rem' }}>
-                        {formatCurrency(pedido.valorTotal)}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="d-flex gap-2">
-                    <Button
-                      variant="outline-primary"
-                      size="sm"
-                      className="flex-fill"
-                      onClick={() => { setSelectedPedido(pedido); setMenuEditStatusAtivo(true); }}
-                    >
-                      <FiEdit2 className="me-1" /> Status
-                    </Button>
-                    <Button
-                      variant="outline-danger"
-                      size="sm"
-                      onClick={() => { setSelectedPedido(pedido); setMenuDeletePedidoAtivo(true); }}
-                    >
-                      <FiTrash2 />
-                    </Button>
-                  </div>
-                </Card.Body>
-              </Card>
-            </Col>
-          ))}
-        </Row>
-
-        {orders.length === 0 && (
           <Row>
-            <Col>
-              <Card className="text-center py-5">
-                <Card.Body>
-                  <MdOutlineShoppingCart size={64} className="text-muted mb-3" />
-                  <h5 className="text-muted">Nenhum pedido encontrado</h5>
-                  <p className="text-muted">Cadastre seu primeiro pedido</p>
-                </Card.Body>
-              </Card>
-            </Col>
-          </Row>
-        )}
-      </Container>
+            {orders.map((pedido) => (
+              <Col key={pedido.id} xs={12} md={6} lg={4} className="mb-4">
+                <Card 
+                  style={{ 
+                    borderRadius: '12px', 
+                    border: 'none', 
+                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)', 
+                    transition: 'transform 0.2s, box-shadow 0.2s' 
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 4px 16px rgba(0, 0, 0, 0.12)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.08)';
+                  }}
+                >
+                  <Card.Body>
+                    <div className="d-flex justify-content-between align-items-start mb-3">
+                      <div>
+                        <h6 className="text-muted mb-1">Pedido</h6>
+                        <h4 className="fw-bold mb-0">#{String(pedido.id).padStart(4, '0')}</h4>
+                      </div>
+                      <Badge 
+                        bg={getStatusColor(pedido.status)}
+                        style={{ padding: '6px 12px', borderRadius: '6px', fontWeight: '500', fontSize: '0.85rem' }}
+                      >
+                        {pedido.status}
+                      </Badge>
+                    </div>
 
-      {/* Modal de Adicionar Pedido */}
+                    <div className="mb-3">
+                      <h5 className="fw-bold mb-2">{pedido.clienteNome}</h5>
+                      <p className="text-muted small mb-1">
+                        {formatDate(pedido.dataPedido)} • {pedido.produtos?.length || 0} produtos
+                      </p>
+                    </div>
+
+                    <div className="mb-3 pb-3" style={{ borderBottom: '1px solid #eee' }}>
+                      <div className="d-flex justify-content-between">
+                        <span className="text-muted">Valor Total:</span>
+                        <span className="fw-bold" style={{ color: '#2E8B57', fontSize: '1.1rem' }}>
+                          {formatCurrency(pedido.valorTotal)}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="d-flex gap-2">
+                      <Button
+                        variant="outline-primary"
+                        size="sm"
+                        className="flex-fill"
+                        onClick={() => { setSelectedPedido(pedido); setMenuEditStatusAtivo(true); }}
+                      >
+                        <FiEdit2 className="me-1" /> Status
+                      </Button>
+                      <Button
+                        variant="outline-danger"
+                        size="sm"
+                        onClick={() => { setSelectedPedido(pedido); setMenuDeletePedidoAtivo(true); }}
+                      >
+                        <FiTrash2 />
+                      </Button>
+                    </div>
+                  </Card.Body>
+                </Card>
+              </Col>
+            ))}
+          </Row>
+
+          {orders.length === 0 && (
+            <Row>
+              <Col>
+                <Card className="text-center py-5">
+                  <Card.Body>
+                    <MdOutlineShoppingCart size={64} className="text-muted mb-3" />
+                    <h5 className="text-muted">Nenhum pedido encontrado</h5>
+                    <p className="text-muted">Cadastre seu primeiro pedido</p>
+                  </Card.Body>
+                </Card>
+              </Col>
+            </Row>
+          )}
+        </div>
+      </div>
+
       {menuAddPedidoAtivo && (
         <ModalForm
           title={titleFormAddPedido}
@@ -255,7 +230,6 @@ const OrdersPage = () => {
         />
       )}
 
-      {/* Modal de Editar Status */}
       {selectedPedido && menuEditStatusAtivo && (
         <ModalForm
           title={titleFormEditStatus}
@@ -269,7 +243,6 @@ const OrdersPage = () => {
         />
       )}
 
-      {/* Modal de Deletar Pedido */}
       {selectedPedido && menuDeletePedidoAtivo && (
         <ModalForm
           title={titleFormDeletePedido}
@@ -283,54 +256,16 @@ const OrdersPage = () => {
         />
       )}
 
-      {/* Modal de Ingredientes Não Mapeados */}
-      <Modal show={showMapeamentoModal} onHide={() => setShowMapeamentoModal(false)} centered size="lg">
-        <Modal.Header closeButton>
-          <Modal.Title className="fw-bold">⚠️ Ingredientes Não Mapeados</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Alert variant="warning">
-            <strong>Atenção!</strong> Alguns ingredientes não estão mapeados com insumos do estoque. 
-            Sem o mapeamento, não será possível dar baixa automática no estoque.
-          </Alert>
-
-          <div className="mb-3">
-            <h6 className="fw-bold mb-3">Ingredientes sem mapeamento:</h6>
-            {ingredientesNaoMapeados.map((ing, index) => (
-              <div key={index} className="d-flex justify-content-between align-items-center mb-2 p-3" style={{ backgroundColor: '#f8f9fa', borderRadius: '8px' }}>
-                <div>
-                  <div className="fw-bold">{ing.ingredienteNome}</div>
-                  <small className="text-muted">Produto: {ing.produtoNome}</small>
-                </div>
-                <Button 
-                  variant="outline-primary" 
-                  size="sm"
-                  onClick={() => handleIrParaMapeamento(ing)}
-                >
-                  Mapear Agora
-                </Button>
-              </div>
-            ))}
-          </div>
-
-          <p className="text-muted mb-0">
-            <strong>Opções:</strong>
-          </p>
-          <ul className="text-muted small">
-            <li>Clique em "Mapear Agora" para mapear os ingredientes</li>
-            <li>Ou continue sem dar baixa no estoque</li>
-          </ul>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowMapeamentoModal(false)}>
-            Cancelar
-          </Button>
-          <Button variant="warning" onClick={handleConfirmarPedidoSemBaixa}>
-            Continuar Sem Baixa
-          </Button>
-        </Modal.Footer>
-      </Modal>
-    </div>
+      {ingredientesNaoMapeados.length > 0 && (
+        <IngredientesNaoMapeados
+          ingredientesNaoMapeados={ingredientesNaoMapeados}
+          showMapeamentoModal={showMapeamentoModal}
+          setShowMapeamentoModal={setShowMapeamentoModal}
+          handleIrParaMapeamento={handleIrParaMapeamento}
+          handleConfirmarPedidoSemBaixa={handleConfirmarPedidoSemBaixa}
+        />
+      )}
+    </>
   );
 };
 
