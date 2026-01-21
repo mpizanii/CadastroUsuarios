@@ -10,7 +10,7 @@ export const formAddProduct = ({ onSuccess }) => {
     const [recipeMode, setRecipeMode] = useState("existing");
     const [newRecipeName, setNewRecipeName] = useState("");
     const [newRecipeMethod, setNewRecipeMethod] = useState("");
-    const [newIngredients, setNewIngredients] = useState([{ nome: "", quantidade: 0, unidade: "" }]);
+    const [newIngredients, setNewIngredients] = useState([{ nome: "", quantidade: 0, unidade: "g" }]);
     const [cost, setCost] = useState("");
     const [messageFormAddProduct, setMessageFormAddProduct] = useState("");
     const [messageTypeFormAddProduct, setMessageTypeFormAddProduct] = useState("success");
