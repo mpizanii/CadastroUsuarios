@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { supabase } from "../../utils/supabase";
-import { CustomContainer, LeftSectionLogin, RightSectionLogin, Message } from "./StyledAuthPages.js";
 import svgAnimado from "../../assets/svgAnimado.svg";
-import { Link, useNavigate } from "react-router-dom";
-import { Row, Col, Card, Form, Button } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
+import { Container, Row, Col, Card, Form, Button } from "react-bootstrap";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -55,24 +54,24 @@ export default function LoginPage() {
   }
 
   return (
-    <CustomContainer fluid>
+    <Container fluid style={{ width: "100vw", height: "100vh", backgroundColor: "#e9ecef" }}>
       <Row className="justify-content-center align-items-center h-100">
         <Col md={8}>
           <Card className="shadow-lg" style={{ borderRadius: "10px", overflow: "hidden" }}>
             <Row className="g-0">
               <Col md={6}>
-                <LeftSectionLogin>
+                <div className="bg-white h-100 d-flex flex-column justify-content-center align-items-center text-dark" style={{ padding: "2rem" }}>
                   <h1>Bem-vindo novamente!</h1>
                   <p>Faça login com o seu e-mail.</p>
                   <img src={svgAnimado} alt="svg" style={{ width: "300px" }} />
                   <a href="https://storyset.com/business" style={{ fontSize: "12px" }}>
                     Business illustrations by Storyset
                   </a>
-                </LeftSectionLogin>
+                </div>
               </Col>
 
               <Col md={6}>
-                <RightSectionLogin>
+                <div className="h-100 d-flex w-100 flex-column justify-content-center text-white text-center" style={{ backgroundColor: "#8B0000", padding: "2rem" }}>
                   <h1>Login</h1>
                   <Form className="mt-3 d-flex justify-content-center align-items-center flex-column text-start w-100" onSubmit={(e) => e.preventDefault()}>
                     <Form.Group className="mb-3" controlId="formEmail" style={{ width: "70%" }}>
@@ -113,13 +112,13 @@ export default function LoginPage() {
                     Esqueceu a senha?
                   </a>
 
-                  {message && <Message type={messageType}>{message}</Message>}
-                </RightSectionLogin>
+                  {message && <div className="mt-3" style={{ color: messageType === "success" ? "green" : "red" }}>{message}</div>}
+                </div>
               </Col>
             </Row>
           </Card>
         </Col>
       </Row>
-    </CustomContainer>
+    </Container>
   );
 }

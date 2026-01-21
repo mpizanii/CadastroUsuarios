@@ -2,46 +2,11 @@ import { Container, Row, Col, Card, Badge, Button, Spinner, Modal, Alert } from 
 import { FiPlus, FiEye, FiEdit2, FiTrash2 } from 'react-icons/fi';
 import { MdOutlineShoppingCart } from "react-icons/md";
 import { useState, useEffect } from 'react';
-import styled from 'styled-components';
 import ModalForm from '../../components/menu/ModalForm';
 import { addPedido, verificarMapeamentoProdutos } from '../../services/ordersService';
 import { formAddPedido, formEditStatus, formDeletePedido } from './Forms';
 import { useNavigate } from 'react-router-dom';
 import { useOrders } from '../../contexts';
-
-const StyledCard = styled(Card)`
-  border-radius: 12px;
-  border: none;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  transition: transform 0.2s, box-shadow 0.2s;
-  
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-  }
-`;
-
-const StyledButton = styled(Button)`
-  border-radius: 8px;
-  padding: 8px 16px;
-  font-weight: 500;
-  border: none;
-  
-  &.btn-primary {
-    background-color: #e76e50;
-    
-    &:hover {
-      background-color: #d45a3c;
-    }
-  }
-`;
-
-const StatusBadge = styled(Badge)`
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-weight: 500;
-  font-size: 0.85rem;
-`;
 
 const OrdersPage = () => {
   const navigate = useNavigate();
@@ -176,14 +141,15 @@ const OrdersPage = () => {
             <p className="text-muted mb-0">Gerencie todos os pedidos</p>
           </Col>
           <Col xs="auto">
-            <StyledButton 
-              variant="primary" 
+            <Button 
+              variant="primary"
               onClick={() => setMenuAddPedidoAtivo(true)}
               className="d-flex align-items-center gap-2"
+              style={{ borderRadius: '8px', padding: '8px 16px', fontWeight: '500', border: 'none', backgroundColor: '#e76e50' }}
             >
               <FiPlus size={18} />
               Novo Pedido
-            </StyledButton>
+            </Button>
           </Col>
         </Row>
 
@@ -191,16 +157,34 @@ const OrdersPage = () => {
         <Row>
           {orders.map((pedido) => (
             <Col key={pedido.id} xs={12} md={6} lg={4} className="mb-4">
-              <StyledCard>
+              <Card 
+                style={{ 
+                  borderRadius: '12px', 
+                  border: 'none', 
+                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)', 
+                  transition: 'transform 0.2s, box-shadow 0.2s' 
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 4px 16px rgba(0, 0, 0, 0.12)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.08)';
+                }}
+              >
                 <Card.Body>
                   <div className="d-flex justify-content-between align-items-start mb-3">
                     <div>
                       <h6 className="text-muted mb-1">Pedido</h6>
                       <h4 className="fw-bold mb-0">#{String(pedido.id).padStart(4, '0')}</h4>
                     </div>
-                    <StatusBadge bg={getStatusColor(pedido.status)}>
+                    <Badge 
+                      bg={getStatusColor(pedido.status)}
+                      style={{ padding: '6px 12px', borderRadius: '6px', fontWeight: '500', fontSize: '0.85rem' }}
+                    >
                       {pedido.status}
-                    </StatusBadge>
+                    </Badge>
                   </div>
 
                   <div className="mb-3">
@@ -237,7 +221,7 @@ const OrdersPage = () => {
                     </Button>
                   </div>
                 </Card.Body>
-              </StyledCard>
+              </Card>
             </Col>
           ))}
         </Row>

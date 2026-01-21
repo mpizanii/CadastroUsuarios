@@ -2,9 +2,8 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import ModalForm from "../../components/menu/ModalForm.jsx";
 import { formAddProduct, formEditProduct, formDeleteProduct } from "./Forms.js";
-import { Container, SearchInput } from "./StyledProductsPage";
 import { LuChefHat } from "react-icons/lu";
-import { Button, Card, Badge, Spinner } from "react-bootstrap";
+import { Button, Card, Badge, Spinner, Form } from "react-bootstrap";
 import { CiSearch } from "react-icons/ci";
 import { SlPencil, SlTrash } from "react-icons/sl";
 import { useProducts } from "../../contexts";
@@ -82,7 +81,7 @@ export default function ProductsPage() {
 
   return (
     <>
-      <Container className={menuAddProductAtivo || menuEditProductAtivo || menuDeleteProductAtivo ? "blur" : ""}>
+      <div className={`w-100 min-vh-100 bg-light ${menuAddProductAtivo || menuEditProductAtivo || menuDeleteProductAtivo ? "opacity-50" : ""}`} style={{ fontFamily: "Roboto, sans-serif" }}>
         <div style={{ padding: "35px 30px" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "30px" }}>
             <div>
@@ -100,7 +99,7 @@ export default function ProductsPage() {
 
           <div style={{ marginBottom: "30px", position: "relative", maxWidth: "300px" }}>
             <CiSearch size={20} style={{ position: "absolute", left: "15px", top: "50%", transform: "translateY(-50%)", color: "#999" }} />
-            <SearchInput 
+            <Form.Control
               type="text" 
               placeholder="Buscar produtos..." 
               value={busca}
@@ -210,7 +209,7 @@ export default function ProductsPage() {
             </div>
           )}
         </div>
-      </Container>
+      </div>
 
       {menuAddProductAtivo && (
         <ModalForm
