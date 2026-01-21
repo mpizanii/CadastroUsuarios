@@ -7,6 +7,7 @@ import { Button, Card, Badge, Spinner, Form } from "react-bootstrap";
 import { CiSearch } from "react-icons/ci";
 import { SlPencil, SlTrash } from "react-icons/sl";
 import { useProducts } from "../../contexts";
+import { FiPlus, FiEdit2, FiTrash2 } from 'react-icons/fi';
 
 export default function ProductsPage() {
   const navigate = useNavigate();
@@ -89,11 +90,13 @@ export default function ProductsPage() {
               <p style={{ color: "#666", margin: 0 }}>Gerencie seus produtos e vincule receitas</p>
             </div>
             <Button 
-              style={{ padding: "10px 20px", borderRadius: "8px" }}
+              variant="primary"
               onClick={() => setMenuAddProductAtivo(true)}
-              variant="outline-success"
+              className="d-flex align-items-center gap-2"
+              style={{ borderRadius: '8px', padding: '8px 16px', fontWeight: '500', border: 'none', backgroundColor: '#e76e50' }}
             >
-              + Novo Produto
+              <FiPlus size={18} />
+              Novo Produto
             </Button>
           </div>
 
@@ -123,7 +126,24 @@ export default function ProductsPage() {
               const status = produto.ativo === false ? 'inativo' : 'Ativo';
 
               return (
-                <Card key={produto.id} className="h-100 border-0 p-2 shadow-sm" style={{ borderRadius: "16px", overflow: "hidden" }}>
+                <Card 
+                  key={produto.id} 
+                  className="h-100 border-0 p-2 shadow-sm" 
+                  style={{ 
+                    borderRadius: '12px', 
+                    border: 'none', 
+                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)', 
+                    transition: 'transform 0.2s, box-shadow 0.2s' 
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 4px 16px rgba(0, 0, 0, 0.12)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.08)';
+                  }}
+                >
                   <Card.Body>
                     <div className="d-flex align-items-center justify-content-between mb-3">
                       <div className="d-flex gap-3">
@@ -168,7 +188,7 @@ export default function ProductsPage() {
 
                       <div style={{ paddingTop: 10, display: 'flex', alignItems: 'center', gap: 10 }}>
                         <Button 
-                          variant="outline-secondary" 
+                          variant="outline-primary" 
                           size="sm" 
                           title="Ver receita" 
                           className="w-50"
@@ -178,7 +198,7 @@ export default function ProductsPage() {
                           <LuChefHat /> Ver Receita
                         </Button>
                         <Button
-                          variant="outline-secondary"
+                          variant="outline-primary"
                           size="sm"
                           onClick={() => { setSelectedProduct(produto); setMenuEditProductAtivo(true); }}
                           title="Editar produto"
