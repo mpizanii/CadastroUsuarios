@@ -113,9 +113,6 @@ export default function RecipeDetailPage() {
             </div>
           </div>
           <div className="d-flex gap-2">
-            <Button variant="outline-secondary" onClick={() => console.log("Recipe: ", recipe)} className="d-flex align-items-center gap-2">
-              <MdOutlineMap size={18} /> Mapear Insumos
-            </Button>
             <Button variant="outline-primary" onClick={() => console.log("Ingrediente: ", ingredients)} className="d-flex align-items-center gap-2">
               <SlPencil size={16} /> Editar
             </Button>
