@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { addUser, editUser, deleteUser } from "../../services/customerService";
+import { addUser, editUser, deleteUser } from "../services/customerService";
 
 export const formAddUser = ({ onSuccess }) => {
     const [name, setName] = useState("");

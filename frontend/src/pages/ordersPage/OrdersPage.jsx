@@ -1,10 +1,10 @@
 import { Container, Row, Col, Card, Badge, Button, Spinner, Modal, Alert } from 'react-bootstrap';
-import { FiPlus, FiEye, FiEdit2, FiTrash2 } from 'react-icons/fi';
+import { FiPlus, FiEdit2, FiTrash2 } from 'react-icons/fi';
 import { MdOutlineShoppingCart } from "react-icons/md";
 import { useState, useEffect } from 'react';
 import ModalForm from '../../components/menu/ModalForm';
 import { addPedido, verificarMapeamentoProdutos } from '../../services/ordersService';
-import { formAddPedido, formEditStatus, formDeletePedido } from './Forms';
+import { formAddPedido, formEditStatus, formDeletePedido } from '../../forms/ordersForms';
 import { useNavigate } from 'react-router-dom';
 import { useOrders } from '../../contexts';
 

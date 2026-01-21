@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import ModalForm from "../../components/menu/ModalForm.jsx";
-import { formAddProduct, formEditProduct, formDeleteProduct } from "./Forms.js";
+import { formAddProduct, formEditProduct, formDeleteProduct } from "../../forms/productsForms";
 import { LuChefHat } from "react-icons/lu";
 import { Button, Card, Badge, Spinner, Form } from "react-bootstrap";
 import { CiSearch } from "react-icons/ci";

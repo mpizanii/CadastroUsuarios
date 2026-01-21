@@ -4,7 +4,7 @@ import { Container, Card, Table, Badge, Button, Spinner } from "react-bootstrap"
 import { FiArrowLeft } from "react-icons/fi";
 import { SlPencil } from "react-icons/sl";
 import { MdOutlineMap } from "react-icons/md";
-import MapeamentoModal from "./MapeamentoModal";
+import MapeamentoModal from "../../components/mapeamento/MapeamentoModal";
 import { getIngredientesComMapeamento,  mapearIngrediente, getRecipeDetails } from "../../services/recipesService";
 
 export default function RecipeDetailPage() {

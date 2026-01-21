@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import ModalForm from "../../components/menu/ModalForm.jsx";
-import { formAddUser, formEditUser, formDeleteUser } from "./Forms.js";
+import { formAddUser, formEditUser, formDeleteUser } from "../../forms/customersForms";
 import { Button, Card, Badge, Spinner, Form } from "react-bootstrap";
 import { CiSearch } from "react-icons/ci";
 import { SlPencil, SlTrash  } from "react-icons/sl";
