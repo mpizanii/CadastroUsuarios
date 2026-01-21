@@ -1,117 +1,117 @@
 import { useState } from "react";
-import { addUser, editUser, deleteUser } from "../services/customerService";
+import { addCustomer, editCustomer, deleteCustomer } from "../services/customerService";
 
-export const formAddUser = ({ onSuccess }) => {
+export const formAddCustomer = ({ onSuccess }) => {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [phone, setPhone] = useState("");
     const [address, setAddress] = useState("");
-    const [messageFormAddUser, setMessageFormAddUser] = useState("");
-    const [messageTypeFormAddUser, setMessageTypeFormAddUser] = useState("success");
+    const [messageFormAddCustomer, setMessageFormAddCustomer] = useState("");
+    const [messageTypeFormAddCustomer, setMessageTypeFormAddCustomer] = useState("success");
 
-    const titleFormAddUser = "Cadastrar Cliente";
-    const fieldsFormAddUser = [
+    const titleFormAddCustomer = "Cadastrar Cliente";
+    const fieldsFormAddCustomer = [
         { id: "name", label: "Nome", placeholder: "Obrigatório", value: name, onChange: setName, required: true },
         { id: "email", label: "E-mail", type: "email", placeholder: "Opcional", value: email, onChange: setEmail },
         { id: "phone", label: "Telefone", placeholder: "Opcional", value: phone, onChange: setPhone },
         { id: "address", label: "Endereço", placeholder: "Opcional", value: address, onChange: setAddress },
     ];
 
-    async function handleSubmitFormAddUser(e) {
+    async function handleSubmitFormAddCustomer(e) {
         e.preventDefault();
 
         try{
-            await addUser({ name, email, phone, address });
-            setMessageTypeFormAddUser("success");
-            setMessageFormAddUser("Cliente adicionado com sucesso.");
+            await addCustomer({ name, email, phone, address });
+            setMessageTypeFormAddCustomer("success");
+            setMessageFormAddCustomer("Cliente adicionado com sucesso.");
             setName("");
             setEmail("");
             setPhone("");
             setAddress("");
             if (onSuccess) onSuccess();
         } catch (error) {
-            setMessageTypeFormAddUser("error");
-            setMessageFormAddUser("Erro: " + (error.response?.data?.message || error.message));
+            setMessageTypeFormAddCustomer("error");
+            setMessageFormAddCustomer("Erro: " + (error.response?.data?.message || error.message));
         }   
     }
 
     return {
-        titleFormAddUser,
-        fieldsFormAddUser,
-        handleSubmitFormAddUser,
-        messageFormAddUser,
-        setMessageFormAddUser,
-        messageTypeFormAddUser
+        titleFormAddCustomer,
+        fieldsFormAddCustomer,
+        handleSubmitFormAddCustomer,
+        messageFormAddCustomer,
+        setMessageFormAddCustomer,
+        messageTypeFormAddCustomer
     }
 }
 
-export const formEditUser = ({ onSuccess, selectedUser }) => {
+export const formEditCustomer = ({ onSuccess, selectedCustomer }) => {
     const [newName, setNewName] = useState("");
     const [newEmail, setNewEmail] = useState("");
     const [newPhone, setNewPhone] = useState("");
     const [newAddress, setNewAddress] = useState("");
-    const [messageFormEditUser, setMessageFormEditUser] = useState("");
-    const [messageTypeFormEditUser, setMessageTypeFormEditUser] = useState("success");
+    const [messageFormEditCustomer, setMessageFormEditCustomer] = useState("");
+    const [messageTypeFormEditCustomer, setMessageTypeFormEditCustomer] = useState("success");
 
-    const titleFormEditUser = "Editar dados do cliente";
-    const fieldsFormEditUser = [
-        { id: "name", label: "Nome", placeholder: selectedUser?.nome, value: newName, onChange: setNewName },
-        { id: "email", label: "E-mail", type: "email", placeholder: selectedUser?.email, value: newEmail, onChange: setNewEmail },
-        { id: "phone", label: "Telefone", placeholder: selectedUser?.telefone, value: newPhone, onChange: setNewPhone },
-        { id: "address", label: "Endereço", placeholder: selectedUser?.endereco, value: newAddress, onChange: setNewAddress },
+    const titleFormEditCustomer = "Editar dados do cliente";
+    const fieldsFormEditCustomer = [
+        { id: "name", label: "Nome", placeholder: selectedCustomer?.nome, value: newName, onChange: setNewName },
+        { id: "email", label: "E-mail", type: "email", placeholder: selectedCustomer?.email, value: newEmail, onChange: setNewEmail },
+        { id: "phone", label: "Telefone", placeholder: selectedCustomer?.telefone, value: newPhone, onChange: setNewPhone },
+        { id: "address", label: "Endereço", placeholder: selectedCustomer?.endereco, value: newAddress, onChange: setNewAddress },
     ];
 
-    async function handleSubmitFormEditUser(e) {
+    async function handleSubmitFormEditCustomer(e) {
         e.preventDefault();
 
         try{
-            await editUser( { nome: newName || selectedUser?.nome, email: newEmail || selectedUser?.email, telefone: newPhone || selectedUser?.telefone, endereco: newAddress || selectedUser?.endereco, id: selectedUser?.id } );
-            setMessageTypeFormEditUser("success");
-            setMessageFormEditUser("Dados do cliente editados com sucesso.");
+            await editCustomer( { nome: newName || selectedCustomer?.nome, email: newEmail || selectedCustomer?.email, telefone: newPhone || selectedCustomer?.telefone, endereco: newAddress || selectedCustomer?.endereco, id: selectedCustomer?.id } );
+            setMessageTypeFormEditCustomer("success");
+            setMessageFormEditCustomer("Dados do cliente editados com sucesso.");
             setNewName("");
             setNewEmail("");
             setNewPhone("");
             setNewAddress("");
             if (onSuccess) onSuccess();
         } catch (error) {
-            setMessageTypeFormEditUser("error");
-            setMessageFormEditUser("Erro: " + (error.response?.data?.message || error.message));
+            setMessageTypeFormEditCustomer("error");
+            setMessageFormEditCustomer("Erro: " + (error.response?.data?.message || error.message));
         }   
     }
 
     return {
-        titleFormEditUser,
-        fieldsFormEditUser,
-        handleSubmitFormEditUser,
-        messageFormEditUser,
-        setMessageFormEditUser,
-        messageTypeFormEditUser
+        titleFormEditCustomer,
+        fieldsFormEditCustomer,
+        handleSubmitFormEditCustomer,
+        messageFormEditCustomer,
+        setMessageFormEditCustomer,
+        messageTypeFormEditCustomer
     }
 }
 
-export const formDeleteUser = ({ onSuccess, selectedUser }) => {
-    const [messageFormDeleteUser, setMessageFormDeleteUser] = useState("");
-    const [messageTypeFormDeleteUser, setMessageTypeFormDeleteUser] = useState("success");
+export const formDeleteCustomer = ({ onSuccess, selectedCustomer }) => {
+    const [messageFormDeleteCustomer, setMessageFormDeleteCustomer] = useState("");
+    const [messageTypeFormDeleteCustomer, setMessageTypeFormDeleteCustomer] = useState("success");
 
-    const titleFormDeleteUser = "Deletar Cliente";
+    const titleFormDeleteCustomer = "Deletar Cliente";
 
-    async function handleSubmitFormDeleteUser(e) {
+    async function handleSubmitFormDeleteCustomer(e) {
         e.preventDefault();
         try{
-            await deleteUser(selectedUser?.id);
-            setMessageTypeFormDeleteUser("success");
-            setMessageFormDeleteUser("Cliente deletado com sucesso.");
+            await deleteCustomer(selectedCustomer?.id);
+            setMessageTypeFormDeleteCustomer("success");
+            setMessageFormDeleteCustomer("Cliente deletado com sucesso.");
             if (onSuccess) onSuccess();
         } catch (error) {
-            setMessageTypeFormDeleteUser("error");
-            setMessageFormDeleteUser("Erro: " + (error.response?.data?.message || error.message));
+            setMessageTypeFormDeleteCustomer("error");
+            setMessageFormDeleteCustomer("Erro: " + (error.response?.data?.message || error.message));
         }
     }
     return {
-        titleFormDeleteUser,
-        handleSubmitFormDeleteUser,
-        messageFormDeleteUser,
-        setMessageFormDeleteUser,
-        messageTypeFormDeleteUser
+        titleFormDeleteCustomer,
+        handleSubmitFormDeleteCustomer,
+        messageFormDeleteCustomer,
+        setMessageFormDeleteCustomer,
+        messageTypeFormDeleteCustomer
     }
 }

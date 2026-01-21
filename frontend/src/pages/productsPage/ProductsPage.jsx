@@ -7,7 +7,7 @@ import { Button, Card, Badge, Spinner, Form } from "react-bootstrap";
 import { CiSearch } from "react-icons/ci";
 import { SlPencil, SlTrash } from "react-icons/sl";
 import { useProducts } from "../../contexts";
-import { FiPlus, FiEdit2, FiTrash2 } from 'react-icons/fi';
+import { FiPlus } from 'react-icons/fi';
 
 export default function ProductsPage() {
   const navigate = useNavigate();
