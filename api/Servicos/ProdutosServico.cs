@@ -79,20 +79,10 @@ namespace api.Servicos
                 throw new ArgumentException("Custo não pode ser negativo.");
             }
 
-            if (produtoDTO.Receita_Id != produto.Receita_id)
-            {
-                var receitaExiste = await _context.Receitas.AnyAsync(r => r.Id == produtoDTO.Receita_Id);
-                if (!receitaExiste)
-                {
-                    throw new InvalidOperationException($"Receita com ID {produtoDTO.Receita_Id} não existe.");
-                }
-            }
-
             produto.Nome = produtoDTO.Nome;
             produto.Preco = produtoDTO.Preco;
             produto.Custo = produtoDTO.Custo;
             produto.Ativo = produtoDTO.Ativo;
-            produto.Receita_id = produtoDTO.Receita_Id;
 
             await _context.SaveChangesAsync();
             return true;

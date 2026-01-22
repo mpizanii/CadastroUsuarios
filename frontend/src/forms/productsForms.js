@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { addProduct, editProduct, deleteProduct, getRecipes } from "../services/productsService";
+import { addProduct, editProduct, deleteProduct } from "../services/productsService";
 import { addRecipe } from "../services/recipesService";
 
 export const formAddProduct = ({ onSuccess }) => {
@@ -106,29 +106,13 @@ export const formEditProduct = ({ onSuccess, selectedProduct }) => {
     const [newPrice, setNewPrice] = useState("");
     const [newCost, setNewCost] = useState("");
     const [ativo, setAtivo] = useState(true);
-    const [recipes, setRecipes] = useState([]);
-    const [newRecipeId, setNewRecipeId] = useState(0);
     const [messageFormEditProduct, setMessageFormEditProduct] = useState("");
     const [messageTypeFormEditProduct, setMessageTypeFormEditProduct] = useState("success");
-
-    useEffect(() => {
-        const loadRecipes = async () => {
-            try {
-                const data = await getRecipes();
-                setRecipes(data);
-            } catch (error) {
-                setMessageTypeFormEditProduct("error");
-                setMessageFormEditProduct("Erro ao carregar receitas.");
-            }
-        };
-        loadRecipes();
-    }, []);
 
     useEffect(() => {
         setNewName("");
         setNewPrice("");
         setNewCost("");
-        setNewRecipeId(0);
         setAtivo(selectedProduct?.ativo ?? true);
     }, [selectedProduct]);
 
@@ -143,7 +127,6 @@ export const formEditProduct = ({ onSuccess, selectedProduct }) => {
         { id: "name", label: "Nome", placeholder: selectedProduct?.nome, value: newName, onChange: setNewName },
         { id: "price", label: "Preço", placeholder: selectedProduct?.preco, value: newPrice, onChange: setNewPrice },
         { id: "cost", label: "Custo Unitário", placeholder: selectedProduct?.custo, value: newCost, onChange: setNewCost },
-        { id: "recipeId", label: "Receita", type: "select", options: recipes.map(r => ({ value: r.id, label: r.nome })), value: newRecipeId, onChange: setNewRecipeId, placeholder: "Selecione uma receita" },
         { id: "ativo", label: "Produto Ativo", type: "checkbox", value: ativo, onChange: setAtivo },
     ];
 
@@ -151,14 +134,12 @@ export const formEditProduct = ({ onSuccess, selectedProduct }) => {
         e.preventDefault();
 
         try{
-            const recipeChanged = newRecipeId == 0 ? selectedProduct?.receita_Id : newRecipeId;
-            await editProduct( { nome: newName || selectedProduct?.nome, preco: newPrice || selectedProduct?.preco, custo: newCost || selectedProduct?.custo, receita_id: recipeChanged, ativo: ativo ?? selectedProduct?.ativo, id: selectedProduct?.id } );
+            await editProduct( { nome: newName || selectedProduct?.nome, preco: newPrice || selectedProduct?.preco, custo: newCost || selectedProduct?.custo, ativo: ativo ?? selectedProduct?.ativo, id: selectedProduct?.id } );
             setMessageTypeFormEditProduct("success");
             setMessageFormEditProduct("Dados do produto editados com sucesso.");
             setNewName("");
             setNewPrice("");
             setNewCost("");
-            setNewRecipeId(0);
             setAtivo(true);
             if (onSuccess) onSuccess();
         } catch (error) {
