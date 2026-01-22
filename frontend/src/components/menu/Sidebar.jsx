@@ -4,7 +4,7 @@ import { MdOutlineDashboard, MdOutlineShoppingCart  } from "react-icons/md";
 import { BsBoxSeam } from "react-icons/bs";
 import { LuChefHat, LuMilk, LuUsers } from "react-icons/lu";
 import { CiLogout } from "react-icons/ci";
-import { supabase } from '../../services/supabase';
+import { supabase } from '../../utils/supabase';
 
 const SideBar = ({ activeItem, onItemClick, isCollapsed, onHideMobile }) => {
 

@@ -1,50 +1,16 @@
 import { Container, Row, Col, Card, Badge, Button, Spinner, Modal, Alert } from 'react-bootstrap';
-import { FiPlus, FiEye, FiEdit2, FiTrash2 } from 'react-icons/fi';
+import { FiPlus, FiEdit2, FiTrash2 } from 'react-icons/fi';
 import { MdOutlineShoppingCart } from "react-icons/md";
 import { useState, useEffect } from 'react';
-import styled from 'styled-components';
 import ModalForm from '../../components/menu/ModalForm';
-import { getPedidos, addPedido, verificarMapeamentoProdutos } from './ApiCalls';
-import { formAddPedido, formEditStatus, formDeletePedido } from './Forms';
+import { addPedido, verificarMapeamentoProdutos } from '../../services/ordersService';
+import { formAddPedido, formEditStatus, formDeletePedido } from '../../forms/ordersForms';
 import { useNavigate } from 'react-router-dom';
-
-const StyledCard = styled(Card)`
-  border-radius: 12px;
-  border: none;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  transition: transform 0.2s, box-shadow 0.2s;
-  
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-  }
-`;
-
-const StyledButton = styled(Button)`
-  border-radius: 8px;
-  padding: 8px 16px;
-  font-weight: 500;
-  border: none;
-  
-  &.btn-primary {
-    background-color: #e76e50;
-    
-    &:hover {
-      background-color: #d45a3c;
-    }
-  }
-`;
-
-const StatusBadge = styled(Badge)`
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-weight: 500;
-  font-size: 0.85rem;
-`;
+import { useOrders } from '../../contexts';
 
 const OrdersPage = () => {
   const navigate = useNavigate();
-  const [pedidos, setPedidos] = useState([]);
+  const { orders, loading, error, fetchOrders } = useOrders();
   const [menuAddPedidoAtivo, setMenuAddPedidoAtivo] = useState(false);
   const [menuEditStatusAtivo, setMenuEditStatusAtivo] = useState(false);
   const [menuDeletePedidoAtivo, setMenuDeletePedidoAtivo] = useState(false);
@@ -52,19 +18,6 @@ const OrdersPage = () => {
   const [showMapeamentoModal, setShowMapeamentoModal] = useState(false);
   const [ingredientesNaoMapeados, setIngredientesNaoMapeados] = useState([]);
   const [pedidoPendente, setPedidoPendente] = useState(null);
-  const [loading, setLoading] = useState(false);
-
-  const loadPedidos = async () => {
-    setLoading(true);
-    try {
-      const data = await getPedidos();
-      setPedidos(data);
-    } catch (error) {
-      console.error('Erro ao carregar pedidos:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleVerificarMapeamento = async (pedidoData) => {
     try {
@@ -77,7 +30,7 @@ const OrdersPage = () => {
       } else {
         await addPedido(pedidoData);
         setMenuAddPedidoAtivo(false);
-        loadPedidos();
+        fetchOrders();
       }
     } catch (error) {
       console.error('Erro ao verificar mapeamento:', error);
@@ -92,7 +45,7 @@ const OrdersPage = () => {
       setMenuAddPedidoAtivo(false);
       setPedidoPendente(null);
       setIngredientesNaoMapeados([]);
-      loadPedidos();
+      fetchOrders();
     } catch (error) {
       console.error('Erro ao criar pedido:', error);
     }
@@ -105,7 +58,7 @@ const OrdersPage = () => {
   };
 
   const { titleFormAddPedido, fieldsFormAddPedido, handleSubmitFormAddPedido, messageFormAddPedido, messageTypeFormAddPedido } = formAddPedido({
-    onSuccess: loadPedidos,
+    onSuccess: fetchOrders,
     onVerificarMapeamento: handleVerificarMapeamento
   });
 
@@ -113,7 +66,7 @@ const OrdersPage = () => {
     pedido: selectedPedido,
     onSuccess: () => {
       setMenuEditStatusAtivo(false);
-      loadPedidos();
+      fetchOrders();
     },
   });
 
@@ -121,12 +74,14 @@ const OrdersPage = () => {
     pedido: selectedPedido,
     onSuccess: () => {
       setMenuDeletePedidoAtivo(false);
-      loadPedidos();
+      fetchOrders();
     },
   });
 
   useEffect(() => {
-    loadPedidos();
+    if (orders.length === 0) {
+      fetchOrders();
+    }
   }, []);
 
   const getStatusColor = (status) => {
@@ -155,11 +110,23 @@ const OrdersPage = () => {
     });
   };
 
-  if (loading) {
+  if (loading && orders.length === 0) {
     return(
       <div style={{ display: "flex", flexDirection: "column", gap: "5px", justifyContent: "center", alignItems: "center", height: "100vh" }}>
         <Spinner animation="border" role="status" />
         <span>Carregando pedidos</span>
+      </div>
+    )
+  }
+
+  if (error && orders.length === 0) {
+    return(
+      <div style={{ display: "flex", flexDirection: "column", gap: "15px", justifyContent: "center", alignItems: "center", height: "100vh" }}>
+        <i className="bi bi-exclamation-triangle" style={{ fontSize: "48px", color: "#dc3545" }} />
+        <span style={{ color: "#666" }}>{error}</span>
+        <Button onClick={fetchOrders} variant="outline-primary">
+          Tentar Novamente
+        </Button>
       </div>
     )
   }
@@ -174,31 +141,50 @@ const OrdersPage = () => {
             <p className="text-muted mb-0">Gerencie todos os pedidos</p>
           </Col>
           <Col xs="auto">
-            <StyledButton 
-              variant="primary" 
+            <Button 
+              variant="primary"
               onClick={() => setMenuAddPedidoAtivo(true)}
               className="d-flex align-items-center gap-2"
+              style={{ borderRadius: '8px', padding: '8px 16px', fontWeight: '500', border: 'none', backgroundColor: '#e76e50' }}
             >
               <FiPlus size={18} />
               Novo Pedido
-            </StyledButton>
+            </Button>
           </Col>
         </Row>
 
         {/* Cards Grid */}
         <Row>
-          {pedidos.map((pedido) => (
+          {orders.map((pedido) => (
             <Col key={pedido.id} xs={12} md={6} lg={4} className="mb-4">
-              <StyledCard>
+              <Card 
+                style={{ 
+                  borderRadius: '12px', 
+                  border: 'none', 
+                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)', 
+                  transition: 'transform 0.2s, box-shadow 0.2s' 
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 4px 16px rgba(0, 0, 0, 0.12)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.08)';
+                }}
+              >
                 <Card.Body>
                   <div className="d-flex justify-content-between align-items-start mb-3">
                     <div>
                       <h6 className="text-muted mb-1">Pedido</h6>
                       <h4 className="fw-bold mb-0">#{String(pedido.id).padStart(4, '0')}</h4>
                     </div>
-                    <StatusBadge bg={getStatusColor(pedido.status)}>
+                    <Badge 
+                      bg={getStatusColor(pedido.status)}
+                      style={{ padding: '6px 12px', borderRadius: '6px', fontWeight: '500', fontSize: '0.85rem' }}
+                    >
                       {pedido.status}
-                    </StatusBadge>
+                    </Badge>
                   </div>
 
                   <div className="mb-3">
@@ -235,12 +221,12 @@ const OrdersPage = () => {
                     </Button>
                   </div>
                 </Card.Body>
-              </StyledCard>
+              </Card>
             </Col>
           ))}
         </Row>
 
-        {pedidos.length === 0 && (
+        {orders.length === 0 && (
           <Row>
             <Col>
               <Card className="text-center py-5">
