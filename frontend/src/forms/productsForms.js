@@ -69,7 +69,7 @@ export const formAddProduct = ({ onSuccess }) => {
         type: "ingredients-list", 
         value: newIngredients,
         unitOptions: UNIT_OPTIONS,
-        onAdd: () => setNewIngredients(prev => [...prev, { nome: "", quantidade: 0, unidade: "" }]), 
+        onAdd: () => setNewIngredients(prev => [...prev, { nome: "", quantidade: 0, unidade: "g" }]), 
         onRemove: (i) => setNewIngredients(prev => prev.filter((_, idx) => idx !== i)), 
         onUpdate: (i, field, val) => { const copy = [...newIngredients]; copy[i][field] = val; setNewIngredients(copy); }, 
         required: recipeMode === "new" };
@@ -116,7 +116,7 @@ export const formAddProduct = ({ onSuccess }) => {
             setRecipeMode("existing");
             setNewRecipeName("");
             setNewRecipeMethod("");
-            setNewIngredients([{ nome: "", quantidade: 0, unidade: "" }]);
+            setNewIngredients([{ nome: "", quantidade: 0, unidade: "g" }]);
             setAtivo(true);
             setCost("");
             if (onSuccess) onSuccess();
