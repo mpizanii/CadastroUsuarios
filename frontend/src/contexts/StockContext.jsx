@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useCallback } from "react";
-import { getInsumos } from "../services/stockService";
+import { getInsumos, getInsumosComAlertas } from "../services/stockService";
 
 const StockContext = createContext();
 
@@ -7,6 +7,8 @@ export function StockProvider({ children }) {
     const [insumos, setInsumos] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [alertas, setAlertas] = useState([]);
+    const [loadingAlertas, setLoadingAlertas] = useState(false);
 
     const fetchInsumos = useCallback(async () => {
         console.log("Buscando insumos da API");
@@ -28,6 +30,18 @@ export function StockProvider({ children }) {
         }
     }, []);
 
+    const fetchAlertas = async () => {
+        setLoadingAlertas(true);
+        try {
+            const data = await getInsumosComAlertas();
+            setAlertas(data || []);
+        } catch (error) {
+            console.error("Erro ao buscar alertas:", error);
+        } finally {
+            setLoadingAlertas(false);
+        }
+    }
+
     const addInsumo = useCallback((newInsumo) => {
         setInsumos((prevInsumos) => [...prevInsumos, newInsumo]);
         console.log("Insumo adicionado localmente: ", newInsumo);
@@ -47,7 +61,10 @@ export function StockProvider({ children }) {
         insumos,
         loading,
         error,
+        alertas,
+        loadingAlertas,
         fetchInsumos,
+        fetchAlertas,
         setInsumos,
         addInsumo,
         updateInsumo,
