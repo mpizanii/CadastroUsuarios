@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { addProduct, editProduct, deleteProduct, getRecipes, addRecipe } from "../services/productsService";
+import { addProduct, editProduct, deleteProduct, getRecipes } from "../services/productsService";
+import { addRecipe } from "../services/recipesService";
 
 export const formAddProduct = ({ onSuccess }) => {
     const [name, setName] = useState("");

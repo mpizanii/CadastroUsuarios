@@ -68,18 +68,3 @@ export const deleteProduct = async (id) => {
         throw new Error('Erro ao deletar produto');
     }
 }
-
-export const addRecipe = async ({ name, modo_preparo, ingredientes }) => {
-    try {
-        const novaReceita = {
-            nome: name,
-            modo_Preparo: modo_preparo,
-            ingredientes: ingredientes
-        };
-        const response = await axios.post(`${API_URL}/Receitas`, novaReceita);
-        return response.data; 
-    } catch (error) {
-        console.error('Erro ao adicionar receita:', error);
-        throw new Error('Erro ao adicionar receita');
-    }
-}
