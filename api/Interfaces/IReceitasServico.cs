@@ -14,5 +14,6 @@ namespace api.Interfaces
         Task<Receitas?> ObterPorId(int id);
         Task<List<Receitas?>> ObterReceitas();
         Task<List<ReceitaIngredientes>?> ObterIngredientesReceita(int receitaId);
+        Task<bool> DeletarReceita(int id);
     }
 }

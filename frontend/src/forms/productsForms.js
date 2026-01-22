@@ -6,118 +6,82 @@ export const formAddProduct = ({ onSuccess }) => {
     const [name, setName] = useState("");
     const [price, setPrice] = useState("");
     const [ativo, setAtivo] = useState(true);
-    const [recipes, setRecipes] = useState([]);
-    const [recipeId, setRecipeId] = useState("");
-    const [recipeMode, setRecipeMode] = useState("existing");
-    const [newRecipeName, setNewRecipeName] = useState("");
-    const [newRecipeMethod, setNewRecipeMethod] = useState("");
-    const [newIngredients, setNewIngredients] = useState([{ nome: "", quantidade: 0, unidade: "g" }]);
+    const [recipeMethod, setRecipeMethod] = useState("");
+    const [ingredients, setIngredients] = useState([{ nome: "", quantidade: 0, unidade: "g" }]);
     const [cost, setCost] = useState("");
     const [messageFormAddProduct, setMessageFormAddProduct] = useState("");
     const [messageTypeFormAddProduct, setMessageTypeFormAddProduct] = useState("success");
 
     const UNIT_OPTIONS = ["g", "ml", "un", "colher", "xícara"];
 
-    useEffect(() => {
-        const loadRecipes = async () => {
-            try {
-                const data = await getRecipes();
-                setRecipes(data);
-            } catch (error) {
-                setMessageTypeFormAddProduct("error");
-                setMessageFormAddProduct("Erro ao carregar receitas.");
-            }
-        };
-        loadRecipes();
-    }, []);
-
     const titleFormAddProduct = "Cadastrar Produto";
 
-    const baseFields = [
-        { id: "name", label: "Nome", placeholder: "Ex: Pão de Forma", value: name, onChange: setName, required: true },
-        { id: "price", label: "Preço de Venda (R$)", type:"number", placeholder: "0.00", value: price, onChange: setPrice },
-        { id: "cost", label: "Custo de Fabricação (R$)", type:"number", placeholder: "0.00", value: cost, onChange: setCost },
+    const fieldsFormAddProduct = [
+        { 
+            id: "name", 
+            label: "Nome", 
+            placeholder: "Ex: Pão de Forma", 
+            value: name, 
+            onChange: setName, 
+            required: true 
+        },
+        { 
+            id: "price", 
+            label: "Preço de Venda (R$)", 
+            type:"number", 
+            placeholder: "0.00", 
+            value: price, 
+            onChange: setPrice 
+        },
+        { 
+            id: "cost", 
+            label: "Custo de Fabricação (R$)", 
+            type: "number", 
+            placeholder: "0.00", 
+            value: cost, 
+            onChange: setCost 
+        },
+        { 
+            id: "recipeMethod", 
+            label: "Modo de Preparo da Receita", 
+            type: "textarea", 
+            rows: 4, 
+            placeholder: 'Descreva o modo de preparo separado por ";". \nEx: passo1; passo2; passo3; ...', 
+            value: recipeMethod, 
+            onChange: setRecipeMethod 
+        },
+        { 
+            id: "ingredients", 
+            label: "Ingredientes da Receita", 
+            type: "ingredients-list", 
+            value: ingredients,
+            unitOptions: UNIT_OPTIONS,
+            onAdd: () => setIngredients(prev => [...prev, { nome: "", quantidade: 0, unidade: "g" }]), 
+            onRemove: (i) => setIngredients(prev => prev.filter((_, idx) => idx !== i)), 
+            onUpdate: (i, field, val) => { const copy = [...ingredients]; copy[i][field] = val; setIngredients(copy); }, 
+        }
     ];
-
-    const recipeModeField = {
-        id: "recipeMode",
-        label: "Receita",
-        type: "radio",
-        options: [
-            { value: "existing", label: "Associar a uma receita existente" },
-            { value: "new", label: "Criar nova receita" }
-        ],
-        value: recipeMode,
-        onChange: setRecipeMode
-    };
-
-    const existingRecipeField = {
-        id: "recipeId",
-        label: "Selecione a Receita",
-        type: "select",
-        options: recipes.map(r => ({ value: r.id, label: r.nome })),
-        value: recipeId,
-        onChange: setRecipeId,
-        placeholder: "Escolha uma receita",
-        required: recipeMode === "existing"
-    };
-
-    const newRecipeNameField = { id: "newRecipeName", label: "Nome da Receita", placeholder: "Ex: Bolo de Chocolate Tradicional", value: newRecipeName, onChange: setNewRecipeName, required: recipeMode === "new" };
-    const newRecipeMethodField = { id: "newRecipeMethod", label: "Modo de Preparo", type: "textarea", rows: 4, placeholder: 'Descreva o modo de preparo separado por ";". \nEx: passo1; passo2; passo3; ...', value: newRecipeMethod, onChange: setNewRecipeMethod, required: recipeMode === "new" };
-    const newRecipeIngredientsField = { 
-        id: "newIngredients", 
-        label: "Ingredientes", 
-        type: "ingredients-list", 
-        value: newIngredients,
-        unitOptions: UNIT_OPTIONS,
-        onAdd: () => setNewIngredients(prev => [...prev, { nome: "", quantidade: 0, unidade: "g" }]), 
-        onRemove: (i) => setNewIngredients(prev => prev.filter((_, idx) => idx !== i)), 
-        onUpdate: (i, field, val) => { const copy = [...newIngredients]; copy[i][field] = val; setNewIngredients(copy); }, 
-        required: recipeMode === "new" };
-
-
-    let fieldsFormAddProduct = [...baseFields, recipeModeField];
-    if (recipeMode === "existing") {
-        fieldsFormAddProduct.push(existingRecipeField);
-    } else {
-        fieldsFormAddProduct.push(newRecipeNameField, newRecipeMethodField, newRecipeIngredientsField);
-    }
-    const ativoField = { id: "ativo", label: "Produto Ativo", type: "checkbox", value: ativo, onChange: setAtivo };
-    fieldsFormAddProduct.push(ativoField);
 
     async function handleSubmitFormAddProduct(e) {
         e.preventDefault();
 
         try{
-            let usedRecipeId = recipeId;
-
-            if (recipeMode === "new") {
-                if (!newRecipeName || !newRecipeMethod || !newIngredients || newIngredients.length === 0) {
-                    setMessageTypeFormAddProduct("error");
-                    setMessageFormAddProduct("Preencha os dados da nova receita.");
-                    return;
-                }
-
-                const created = await addRecipe({ name: newRecipeName, modo_preparo: newRecipeMethod, ingredientes: newIngredients });
-                usedRecipeId = created?.id;
-            }
-
-            if (recipeMode === "existing" && !usedRecipeId) {
+            if (!recipeMethod || !ingredients || ingredients.length === 0) {
                 setMessageTypeFormAddProduct("error");
-                setMessageFormAddProduct("Selecione uma receita existente ou crie uma nova.");
+                setMessageFormAddProduct("Preencha os dados da nova receita.");
                 return;
             }
 
-            await addProduct({ name, price, recipeId: usedRecipeId, cost, ativo });
+            const created = await addRecipe({ name: name, modo_preparo: recipeMethod, ingredientes: ingredients });
+            const recipeId = created?.id;
+
+            await addProduct({ name, price, recipeId: recipeId, cost, ativo });
             setMessageTypeFormAddProduct("success");
             setMessageFormAddProduct("Produto adicionado com sucesso.");
             setName("");
             setPrice("");
-            setRecipeId("");
-            setRecipeMode("existing");
-            setNewRecipeName("");
-            setNewRecipeMethod("");
-            setNewIngredients([{ nome: "", quantidade: 0, unidade: "g" }]);
+            setRecipeMethod("");
+            setIngredients([{ nome: "", quantidade: 0, unidade: "g" }]);
             setAtivo(true);
             setCost("");
             if (onSuccess) onSuccess();
@@ -135,7 +99,7 @@ export const formAddProduct = ({ onSuccess }) => {
         setMessageFormAddProduct,
         messageTypeFormAddProduct
     }
-}
+};
 
 export const formEditProduct = ({ onSuccess, selectedProduct }) => {
     const [newName, setNewName] = useState("");
