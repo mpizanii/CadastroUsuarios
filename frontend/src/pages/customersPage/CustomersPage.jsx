@@ -1,62 +1,51 @@
 import { useState, useEffect } from "react";
 import ModalForm from "../../components/menu/ModalForm.jsx";
-import { getCustomers } from "./ApiCalls.js";
-import { formAddUser, formEditUser, formDeleteUser } from "./Forms.js";
-import { Container, SearchInput } from "./StyledUsersPage";
-import { Button, Card, Badge, Spinner } from "react-bootstrap";
+import { formAddCustomer, formEditCustomer, formDeleteCustomer } from "../../forms/customersForms.js";
+import { Button, Card, Badge, Spinner, Form } from "react-bootstrap";
 import { CiSearch } from "react-icons/ci";
 import { SlPencil, SlTrash  } from "react-icons/sl";
 import { MdEmail, MdPhone, MdLocationOn } from "react-icons/md";
+import { useCustomers } from "../../contexts/index.js";
+import { FiPlus } from 'react-icons/fi';
 
-export default function UsersPage() {
-  const [menuAddUserAtivo, setMenuAddUserAtivo] = useState(false);
-  const [menuEditUserAtivo, setMenuEditUserAtivo] = useState(false);
-  const [menuDeleteUserAtivo, setMenuDeleteUserAtivo] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [customers, setCustomers] = useState([]);
+export default function CustomersPage() {
+  const { customers, loading, error, fetchCustomers } = useCustomers();
+  const [menuAddCustomerAtivo, setMenuAddCustomerAtivo] = useState(false);
+  const [menuEditCustomerAtivo, setMenuEditCustomerAtivo] = useState(false);
+  const [menuDeleteCustomerAtivo, setMenuDeleteCustomerAtivo] = useState(false);
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [busca, setBusca] = useState("");
-  const [loading, setLoading] = useState(false);
 
-  const fetchCustomers = async () => {
-    setLoading(true);
-    try {
-      const data = await getCustomers(); 
-      setCustomers(data || []);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  const { titleFormAddUser, fieldsFormAddUser, handleSubmitFormAddUser, messageFormAddUser, setMessageFormAddUser, messageTypeFormAddUser } = formAddUser({
+  const { titleFormAddCustomer, fieldsFormAddCustomer, handleSubmitFormAddCustomer, messageFormAddCustomer, setMessageFormAddCustomer, messageTypeFormAddCustomer } = formAddCustomer({
     onSuccess: () => {
-      setMenuAddUserAtivo(false);
-      setMessageFormAddUser("");
+      setMenuAddCustomerAtivo(false);
+      setMessageFormAddCustomer("");
       fetchCustomers();
     },
   });  
 
-  const { titleFormEditUser, fieldsFormEditUser, handleSubmitFormEditUser, messageFormEditUser, setMessageFormEditUser, messageTypeFormEditUser } = formEditUser({
+  const { titleFormEditCustomer, fieldsFormEditCustomer, handleSubmitFormEditCustomer, messageFormEditCustomer, setMessageFormEditCustomer, messageTypeFormEditCustomer } = formEditCustomer({
     onSuccess: () => {
-      setMenuEditUserAtivo(false);
-      setMessageFormEditUser("");
+      setMenuEditCustomerAtivo(false);
+      setMessageFormEditCustomer("");
       fetchCustomers();
     },
-    selectedUser
+    selectedCustomer
   });  
 
-  const { titleFormDeleteUser, handleSubmitFormDeleteUser, messageFormDeleteUser, setMessageFormDeleteUser, messageTypeFormDeleteUser } = formDeleteUser({
+  const { titleFormDeleteCustomer, handleSubmitFormDeleteCustomer, messageFormDeleteCustomer, setMessageFormDeleteCustomer, messageTypeFormDeleteCustomer } = formDeleteCustomer({
     onSuccess: () => {
-      setMenuDeleteUserAtivo(false);
-      setMessageFormDeleteUser("");
+      setMenuDeleteCustomerAtivo(false);
+      setMessageFormDeleteCustomer("");
       fetchCustomers();
     },
-    selectedUser
+    selectedCustomer
   });
 
-
-
   useEffect(() => {
-    fetchCustomers();
+    if (customers.length === 0) {
+      fetchCustomers();
+    }
   }, []);
 
   const clientesNumerados = customers.map((cliente, index) => ({
@@ -68,7 +57,7 @@ export default function UsersPage() {
     customer.nome.toLowerCase().includes(busca.toLowerCase())
   );
 
-  if (loading) {
+  if (loading && customers.length === 0) {
     return(
       <div style={{ display: "flex", flexDirection: "column", gap: "5px", justifyContent: "center", alignItems: "center", height: "100vh" }}>
         <Spinner animation="border" role="status" />
@@ -77,9 +66,21 @@ export default function UsersPage() {
     )
   }
 
+  if (error && customers.length === 0) {
+    return(
+      <div style={{ display: "flex", flexDirection: "column", gap: "15px", justifyContent: "center", alignItems: "center", height: "100vh" }}>
+        <i className="bi bi-exclamation-triangle" style={{ fontSize: "48px", color: "#dc3545" }} />
+        <span style={{ color: "#666" }}>{error}</span>
+        <Button onClick={fetchCustomers} variant="outline-primary">
+          Tentar Novamente
+        </Button>
+      </div>
+    )
+  }
+
   return (
     <>
-      <Container className={menuAddUserAtivo || menuEditUserAtivo || menuDeleteUserAtivo ? "blur" : ""}>
+      <div className={`w-100 min-vh-100 bg-light ${menuAddCustomerAtivo || menuEditCustomerAtivo || menuDeleteCustomerAtivo ? "opacity-50" : ""}`} style={{ fontFamily: "Roboto, sans-serif" }}>
         <div style={{ padding: "35px 30px" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "30px" }}>
             <div>
@@ -87,17 +88,19 @@ export default function UsersPage() {
               <p style={{ color: "#666", margin: 0 }}>Gerencie sua base de clientes</p>
             </div>
             <Button 
-              style={{ padding: "10px 20px", borderRadius: "8px" }}
-              onClick={() => setMenuAddUserAtivo(true)}
-              variant="outline-success"
+              variant="primary"
+              onClick={() => setMenuAddCustomerAtivo(true)}
+              className="d-flex align-items-center gap-2"
+              style={{ borderRadius: '8px', padding: '8px 16px', fontWeight: '500', border: 'none', backgroundColor: '#e76e50' }}
             >
-              + Novo Cliente
+              <FiPlus size={18} />
+              Novo Cliente
             </Button>
           </div>
 
           <div style={{ marginBottom: "30px", position: "relative", maxWidth: "300px" }}>
             <CiSearch size={20} style={{ position: "absolute", left: "15px", top: "50%", transform: "translateY(-50%)", color: "#999" }} />
-            <SearchInput 
+            <Form.Control
               type="text" 
               placeholder="Buscar clientes..." 
               value={busca}
@@ -121,7 +124,24 @@ export default function UsersPage() {
               };
 
               return (
-                <Card key={customer.id} className="h-100 border-0 shadow-sm">
+                <Card 
+                  key={customer.id} 
+                  className="h-100"
+                  style={{ 
+                    borderRadius: '12px', 
+                    border: 'none', 
+                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)', 
+                    transition: 'transform 0.2s, box-shadow 0.2s' 
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 4px 16px rgba(0, 0, 0, 0.12)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.08)';
+                  }}
+                >
                   <Card.Body>
                     <div className="d-flex align-items-start mb-3">
                       <div 
@@ -173,11 +193,11 @@ export default function UsersPage() {
 
                     <div className="d-flex gap-2">
                       <Button
-                        variant="outline-secondary"
+                        variant="outline-primary"
                         size="sm"
                         onClick={() => {
-                          setSelectedUser(customer);
-                          setMenuEditUserAtivo(true);
+                          setSelectedCustomer(customer);
+                          setMenuEditCustomerAtivo(true);
                         }}
                         title="Editar cliente"
                       >
@@ -187,12 +207,12 @@ export default function UsersPage() {
                         variant="outline-danger"
                         size="sm"
                         onClick={() => {
-                          setSelectedUser(customer);
-                          setMenuDeleteUserAtivo(true);
+                          setSelectedCustomer(customer);
+                          setMenuDeleteCustomerAtivo(true);
                         }}
                         title="Excluir cliente"
                       >
-                        <SlTrash /> Excluir
+                        <SlTrash />
                       </Button>
                     </div>
                   </Card.Footer>
@@ -208,42 +228,42 @@ export default function UsersPage() {
             </div>
           )}
         </div>
-      </Container>
+      </div>
 
-      {menuAddUserAtivo && (
+      {menuAddCustomerAtivo && (
         <ModalForm
-          title={titleFormAddUser}
-          visible={menuAddUserAtivo}
-          setVisible={setMenuAddUserAtivo}
-          fields={fieldsFormAddUser}
-          onSubmit={handleSubmitFormAddUser}
-          message={messageFormAddUser}
-          messageType={messageTypeFormAddUser}
+          title={titleFormAddCustomer}
+          visible={menuAddCustomerAtivo}
+          setVisible={setMenuAddCustomerAtivo}
+          fields={fieldsFormAddCustomer}
+          onSubmit={handleSubmitFormAddCustomer}
+          message={messageFormAddCustomer}
+          messageType={messageTypeFormAddCustomer}
           action={"add"}
         />
       )}
 
-      {selectedUser && menuEditUserAtivo && (
+      {selectedCustomer && menuEditCustomerAtivo && (
         <ModalForm
-          title={titleFormEditUser}
-          visible={menuEditUserAtivo}
-          setVisible={setMenuEditUserAtivo}
-          fields={fieldsFormEditUser}
-          onSubmit={handleSubmitFormEditUser}
-          message={messageFormEditUser}
-          messageType={messageTypeFormEditUser}
+          title={titleFormEditCustomer}
+          visible={menuEditCustomerAtivo}
+          setVisible={setMenuEditCustomerAtivo}
+          fields={fieldsFormEditCustomer}
+          onSubmit={handleSubmitFormEditCustomer}
+          message={messageFormEditCustomer}
+          messageType={messageTypeFormEditCustomer}
           action={"edit"}
         />
       )}
 
-      {selectedUser && menuDeleteUserAtivo && (
+      {selectedCustomer && menuDeleteCustomerAtivo && (
         <ModalForm
-          title={titleFormDeleteUser}
-          visible={menuDeleteUserAtivo}
-          setVisible={setMenuDeleteUserAtivo}
-          onSubmit={handleSubmitFormDeleteUser}
-          message={messageFormDeleteUser}
-          messageType={messageTypeFormDeleteUser}
+          title={titleFormDeleteCustomer}
+          visible={menuDeleteCustomerAtivo}
+          setVisible={setMenuDeleteCustomerAtivo}
+          onSubmit={handleSubmitFormDeleteCustomer}
+          message={messageFormDeleteCustomer}
+          messageType={messageTypeFormDeleteCustomer}
           action={"delete"}
         />
       )}
