@@ -20,22 +20,19 @@ namespace api.Servicos
             var hoje = DateTime.UtcNow;
             var umaSemana = hoje.AddDays(7);
             
-            // Crítico: abaixo do estoque mínimo OU validade vencida
             if (quantidade < estoqueMinimo)
-                return "Crítico";
+                return "Crítico Estoque Mínimo";
             
             if (validade.HasValue && validade.Value <= hoje)
-                return "Crítico";
+                return "Crítico Validade";
             
-            // Baixo: próximo do estoque mínimo (até 20% acima) OU validade em até 1 semana
             var margemEstoque = estoqueMinimo * 1.2;
             if (quantidade <= margemEstoque)
-                return "Baixo";
+                return "Baixo Estoque Mínimo";
             
             if (validade.HasValue && validade.Value <= umaSemana)
-                return "Baixo";
+                return "Baixo Validade";
             
-            // OK: estoque bom e validade OK
             return "OK";
         }
 
@@ -124,7 +121,7 @@ namespace api.Servicos
         public async Task<IEnumerable<InsumosDTO>> ObterInsumosComAlertas()
         {
             var insumos = await ObterTodosInsumos();
-            return insumos.Where(i => i.StatusEstoque == "Baixo" || i.StatusEstoque == "Crítico").ToList();
+            return insumos.Where(i => i.StatusEstoque == "Baixo Estoque Mínimo" || i.StatusEstoque == "Crítico Estoque Mínimo" || i.StatusEstoque == "Baixo Validade" || i.StatusEstoque == "Crítico Validade").ToList();
         }
     }
 }

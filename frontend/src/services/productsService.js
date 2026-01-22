@@ -3,23 +3,23 @@ import axios from "axios";
 const API_URL = import.meta.env.VITE_API_URL;
 
 export async function getProducts() {
-    const response = await axios.get(`${API_URL}/Produtos`);
-    if (response.status !== 200) {
-        console.error("Erro ao buscar os usuários");
-        return;
+    try {
+        const response = await axios.get(`${API_URL}/Produtos`);
+        return response.data;
+    } catch (error) {
+        console.error('Erro ao buscar produtos:', error);
+        throw new Error('Erro ao carregar produtos');
     }
-
-    return response.data;
 }
 
 export async function getRecipes() {
-    const response = await axios.get(`${API_URL}/Receitas`);
-    if (response.status !== 200) {
-        console.error("Erro ao buscar os usuários");
-        return;
+    try {
+        const response = await axios.get(`${API_URL}/Receitas`);
+        return response.data;
+    } catch (error) {
+        console.error('Erro ao buscar receitas:', error);
+        throw new Error('Erro ao carregar receitas');
     }
-
-    return response.data;
 }
 
 export const addProduct = async ({ name, price, recipeId, cost, ativo = true }) => {
@@ -32,12 +32,10 @@ export const addProduct = async ({ name, price, recipeId, cost, ativo = true }) 
             ativo: ativo
         };
         const response = await axios.post(`${API_URL}/Produtos`, novoProduto);
-
-        if (response.status === 200 || response.status === 201) {
-            return response.data; 
-        }
+        return response.data; 
     } catch (error) {
-        throw error;
+        console.error('Erro ao adicionar produto:', error);
+        throw new Error('Erro ao adicionar produto');
     }
 }
 
@@ -52,25 +50,22 @@ export const editProduct = async ({ nome, preco, custo, receita_id, ativo, id })
             ativo
         });
 
-        if (response.status === 200 || response.status === 201) {
-            return response.data; 
-        }
+        return response.data; 
     }
     catch (error) { 
-        throw error;  
+        console.error('Erro ao editar produto:', error);
+        throw new Error('Erro ao editar produto');
     }
 }
 
 export const deleteProduct = async (id) => {
     try {
         const response = await axios.delete(`${API_URL}/Produtos/${id}`);
-
-        if (response.status === 200 || response.status === 201) {
-            return response.data; 
-        }
+        return response.data; 
     }
     catch (error) {
-        throw error;
+        console.error('Erro ao deletar produto:', error);
+        throw new Error('Erro ao deletar produto');
     }
 }
 
@@ -81,14 +76,10 @@ export const addRecipe = async ({ name, modo_preparo, ingredientes }) => {
             modo_Preparo: modo_preparo,
             ingredientes: ingredientes
         };
-        console.log("Nova receita " + novaReceita);
-
         const response = await axios.post(`${API_URL}/Receitas`, novaReceita);
-        
-        if (response.status === 200 || response.status === 201) {
-            return response.data; 
-        }
+        return response.data; 
     } catch (error) {
-        throw error;
+        console.error('Erro ao adicionar receita:', error);
+        throw new Error('Erro ao adicionar receita');
     }
 }

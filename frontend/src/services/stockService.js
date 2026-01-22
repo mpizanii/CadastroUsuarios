@@ -4,9 +4,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 export const getInsumos = async () => {
     try {
-        console.log('Buscando insumos...');
         const response = await axios.get(`${API_URL}/Insumos`);
-        console.log('Insumos recebidos:', response.data);
         return response.data;
     } catch (error) {
         console.error('Erro ao buscar insumos:', error);
@@ -16,9 +14,7 @@ export const getInsumos = async () => {
 
 export const getInsumosComAlertas = async () => {
     try {
-        console.log('Buscando insumos com alertas...');
         const response = await axios.get(`${API_URL}/Insumos/alertas`);
-        console.log('Insumos com alertas:', response.data);
         return response.data;
     } catch (error) {
         console.error('Erro ao buscar alertas:', error);
@@ -38,9 +34,7 @@ export const getInsumoById = async (id) => {
 
 export const addInsumo = async (insumo) => {
     try {
-        console.log('Adicionando insumo:', insumo);
         const response = await axios.post(`${API_URL}/Insumos`, insumo);
-        console.log('Insumo adicionado:', response.data);
         return response.data;
     } catch (error) {
         console.error('Erro ao adicionar insumo:', error);
@@ -50,9 +44,7 @@ export const addInsumo = async (insumo) => {
 
 export const editInsumo = async (id, insumo) => {
     try {
-        console.log('Editando insumo:', id, insumo);
         const response = await axios.patch(`${API_URL}/Insumos/${id}`, insumo);
-        console.log('Insumo editado:', response.data);
         return response.data;
     } catch (error) {
         console.error('Erro ao editar insumo:', error);
@@ -62,9 +54,7 @@ export const editInsumo = async (id, insumo) => {
 
 export const deleteInsumo = async (id) => {
     try {
-        console.log('Deletando insumo:', id);
         const response = await axios.delete(`${API_URL}/Insumos/${id}`);
-        console.log('Insumo deletado');
         return response.data;
     } catch (error) {
         console.error('Erro ao deletar insumo:', error);

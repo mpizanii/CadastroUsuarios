@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { addProduct, editProduct, deleteProduct, getRecipes, addRecipe } from "./ApiCalls.js";
+import { addProduct, editProduct, deleteProduct, getRecipes, addRecipe } from "../services/productsService";
 
 export const formAddProduct = ({ onSuccess }) => {
     const [name, setName] = useState("");
@@ -116,7 +116,7 @@ export const formAddProduct = ({ onSuccess }) => {
             setRecipeMode("existing");
             setNewRecipeName("");
             setNewRecipeMethod("");
-            setNewIngredients([{ nome: "", quantidade: 0, unidade: "" }]);
+            setNewIngredients([{ nome: "", quantidade: 0, unidade: "g" }]);
             setAtivo(true);
             setCost("");
             if (onSuccess) onSuccess();
