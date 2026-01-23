@@ -72,6 +72,13 @@ namespace api.Controllers
                 return NotFound();
             return Ok(new { message = "Baixa no estoque realizada com sucesso" });
         }
+        
+        [HttpPost("verificar-estoque")]
+        public async Task<IActionResult> VerificarEstoque([FromBody] List<PedidoProdutoDTO> produtos)
+        {
+            var resultado = await _pedidosServico.VerificarEstoquePedido(produtos);
+            return Ok(resultado);
+        }
     }
 
     public class AtualizarStatusDTO

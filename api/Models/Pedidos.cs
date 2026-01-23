@@ -18,7 +18,7 @@ namespace api.Models
         public DateTime DataPedido { get; set; }
 
         [Column("valor")]
-        public decimal ValorTotal { get; set; }
+        public double ValorTotal { get; set; }
 
         [Column("status")]
         public string Status { get; set; } = "Pendente"; // Pendente, Em Preparo, Em Rota de Entrega, Entregue

@@ -1,80 +1,4 @@
-import styled from "styled-components";
 import { Modal, Button, Form } from "react-bootstrap";
-
-const StyledFormInput = styled.input`
-    width: 100%;
-    height: 30px;
-    border-radius: 10px;
-    border: 1px solid #ccc;
-    padding: 5px;
-`;
-
-const StyledFormSelect = styled.select`
-    width: 100%;
-    height: 30px;
-    line-height: 30px;
-    font-size: 14px;
-    border-radius: 10px;
-    border: 1px solid #ccc;
-    padding: 0 10px;
-    box-sizing: border-box;
-    cursor: pointer;
-`;
-
-const StyledFormTextarea = styled.textarea`
-    width: 100%;
-    min-height: 80px;
-    border-radius: 10px;
-    border: 1px solid #ccc;
-    padding: 5px;
-    resize: vertical;
-    font-family: inherit;
-`;
-
-const IngredientRow = styled.div`
-    display: flex;
-    gap: 8px;
-    margin-bottom: 10px;
-    width: 100%;
-    align-items: center;
-    justify-content: space-between;
-    > input, > select {
-        box-sizing: border-box;
-    }
-`;
-
-const SmallInput = styled.input`
-    height: 30px;
-    border-radius: 10px;
-    border: 1px solid #ccc;
-    padding: 5px;
-    box-sizing: border-box;
-`;
-
-const AddButton = styled(Button)`
-    border: none;
-    background: none;
-    color: green;
-    width: 30px;    
-    height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-`;
-
-const RemoveButton = styled(Button)`
-    border: none;
-    width: 30px;    
-    height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-`;
-
-const Message = styled.div`
-  margin-top: 20px;
-  color: ${(props) => (props.type === "success" ? "green" : "red")};
-`;
 
 export default function ModalForm( { title, visible, setVisible, fields, onSubmit, message, messageType = "success", action } ){
     return(
@@ -101,7 +25,7 @@ export default function ModalForm( { title, visible, setVisible, fields, onSubmi
                             </div>
         
                             <div style={{ display: "flex", justifyContent: "center", marginTop: "5px" }}>
-                                {message && <Message type={messageType}>{message}</Message>}
+                                {message && <div style={{ marginTop: "20px", color: messageType === "success" ? "green" : "red" }}>{message}</div>}
                             </div>
                     </Modal.Footer>
                 </>
@@ -131,30 +55,33 @@ export default function ModalForm( { title, visible, setVisible, fields, onSubmi
                                 ) : field.type === "select" ? (
                                     <>
                                         <label htmlFor={field.id} style={{ fontWeight: "bold" }}>{field.label}</label>
-                                        <StyledFormSelect
+                                        <Form.Select
                                             id={field.id}
                                             value={field.value}
                                             onChange={(e) => field.onChange(e.target.value)}
                                             required={field.required || false}
+                                            style={{ height: "30px", lineHeight: "30px", fontSize: "14px", borderRadius: "10px", padding: "0 10px" }}
                                         >
-                                            <option value={0}>{field.placeholder || "Selecione..."}</option>
+                                            <option value="">{field.placeholder || "Selecione uma opção..."}</option>
                                             {field.options?.map((option) => (
                                                 <option key={option.value} value={option.value}>
                                                     {option.label}
                                                 </option>
                                             ))}
-                                        </StyledFormSelect>
+                                        </Form.Select>
                                     </>
                                 ) : field.type === "textarea" ? (
                                     <>
                                         <label htmlFor={field.id} style={{ fontWeight: "bold" }}>{field.label}</label>
-                                        <StyledFormTextarea
+                                        <Form.Control
+                                            as="textarea"
                                             id={field.id}
                                             placeholder={field.placeholder || ""}
                                             value={field.value}
                                             onChange={(e) => field.onChange(e.target.value)}
                                             required={field.required || false}
                                             rows={field.rows || 3}
+                                            style={{ minHeight: "80px", borderRadius: "10px", resize: "vertical" }}
                                         />
                                     </>
                                 ) : field.type === "checkbox" ? (
@@ -171,52 +98,54 @@ export default function ModalForm( { title, visible, setVisible, fields, onSubmi
                                     <>
                                         <div style={{ width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "5px" }}>
                                             <label htmlFor={field.id} style={{ fontWeight: "bold" }}>{field.label}</label>
-                                            <AddButton 
+                                            <Button 
                                                 variant="outline-success" 
                                                 type="button"
                                                 onClick={field.onAdd}
+                                                style={{ border: "none", background: "none", color: "green", width: "30px", height: "30px", display: "flex", alignItems: "center", justifyContent: "center" }}
                                             >
                                                 <i className="bi bi-plus-circle" />
-                                            </AddButton>
+                                            </Button>
                                         </div>
                                         <div style={{ width: "100%", display: "flex", flexDirection: "column", alignItems: "center" }}>
                                             {field.value.map((ingredient, idx) => (
-                                                <IngredientRow key={idx}>
-                                                    <SmallInput
+                                                <div key={idx} style={{ display: "flex", gap: "8px", marginBottom: "10px", width: "100%", alignItems: "center", justifyContent: "space-between" }}>
+                                                    <Form.Control
                                                         placeholder="Nome do ingrediente"
                                                         value={ingredient.nome || ""}
                                                         onChange={(e) => field.onUpdate(idx, 'nome', e.target.value)}
-                                                        style={{ width:"70%" }}
+                                                        style={{ width:"70%", height: "30px", borderRadius: "10px", padding: "5px" }}
                                                         required
                                                     />
-                                                    <SmallInput
+                                                    <Form.Control
                                                         type="number"
                                                         step="0.01"
                                                         placeholder="Qtd"
                                                         value={ingredient.quantidade || ""}
                                                         onChange={(e) => field.onUpdate(idx, 'quantidade', e.target.value)}
-                                                        style={{ width:"15%" }}
+                                                        style={{ width:"15%", height: "30px", borderRadius: "10px", padding: "5px" }}
                                                         required
                                                     />
-                                                    <StyledFormSelect
+                                                    <Form.Select
                                                         value={ingredient.unidade || "g"}
                                                         onChange={(e) => field.onUpdate(idx, 'unidade', e.target.value)}
-                                                        style={{ width:"15%" }}
+                                                        style={{ width:"15%", height: "30px", borderRadius: "10px", padding: "0 10px", fontSize: "14px" }}
                                                     >
                                                         {field.unitOptions.map((u) => (
                                                             <option key={u} value={u}>{u}</option>
                                                         ))}
-                                                    </ StyledFormSelect>
+                                                    </Form.Select>
                                                     {field.value.length > 1 && (
-                                                        <RemoveButton 
+                                                        <Button 
                                                             variant="danger" 
                                                             type="button"
                                                             onClick={() => field.onRemove(idx)}
+                                                            style={{ border: "none", width: "30px", height: "30px", display: "flex", alignItems: "center", justifyContent: "center" }}
                                                         >
                                                             <i class="bi bi-x-lg"></i>
-                                                        </RemoveButton>
+                                                        </Button>
                                                     )}
-                                                </IngredientRow>
+                                                </div>
                                             ))}
                                             
                                         </div>
@@ -225,54 +154,56 @@ export default function ModalForm( { title, visible, setVisible, fields, onSubmi
                                     <>
                                         <div style={{ width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "5px" }}>
                                             <label htmlFor={field.id} style={{ fontWeight: "bold" }}>{field.label}</label>
-                                            <AddButton 
+                                            <Button 
                                                 variant="outline-success" 
                                                 type="button"
                                                 onClick={field.onAddProduto}
+                                                style={{ border: "none", background: "none", color: "green", width: "30px", height: "30px", display: "flex", alignItems: "center", justifyContent: "center" }}
                                             >
                                                 <i className="bi bi-plus-circle" />
-                                            </AddButton>
+                                            </Button>
                                         </div>
                                         <div style={{ width: "100%", display: "flex", flexDirection: "column", alignItems: "center", gap: "8px" }}>
                                             {field.value.map((produto, idx) => (
                                                 <div key={idx} style={{ display: "flex", gap: "8px", width: "100%", alignItems: "center" }}>
-                                                    <StyledFormSelect
+                                                    <Form.Select
                                                         value={produto.produtoId || ""}
                                                         onChange={(e) => field.onProdutoChange(idx, 'produtoId', e.target.value)}
-                                                        style={{ flex: 2 }}
+                                                        style={{ flex: 2, height: "30px", borderRadius: "10px", padding: "0 10px", fontSize: "14px" }}
                                                         required
                                                     >
                                                         <option value="">Selecione um produto...</option>
                                                         {field.produtosDisponiveis.map((p) => (
                                                             <option key={p.id} value={p.id}>{p.nome}</option>
                                                         ))}
-                                                    </StyledFormSelect>
-                                                    <SmallInput
+                                                    </Form.Select>
+                                                    <Form.Control
                                                         type="number"
                                                         min="1"
                                                         placeholder="Qtd"
                                                         value={produto.quantidade || ""}
                                                         onChange={(e) => field.onProdutoChange(idx, 'quantidade', e.target.value)}
-                                                        style={{ width: "80px" }}
+                                                        style={{ width: "80px", height: "30px", borderRadius: "10px", padding: "5px" }}
                                                         required
                                                     />
-                                                    <SmallInput
+                                                    <Form.Control
                                                         type="number"
                                                         step="0.01"
                                                         placeholder="Preço"
                                                         value={produto.precoUnitario || ""}
                                                         onChange={(e) => field.onProdutoChange(idx, 'precoUnitario', e.target.value)}
-                                                        style={{ width: "100px" }}
+                                                        style={{ width: "100px", height: "30px", borderRadius: "10px", padding: "5px" }}
                                                         required
                                                     />
                                                     {field.value.length > 1 && (
-                                                        <RemoveButton 
+                                                        <Button 
                                                             variant="danger" 
                                                             type="button"
                                                             onClick={() => field.onRemoveProduto(idx)}
+                                                            style={{ border: "none", width: "30px", height: "30px", display: "flex", alignItems: "center", justifyContent: "center" }}
                                                         >
                                                             <i className="bi bi-x-lg"></i>
-                                                        </RemoveButton>
+                                                        </Button>
                                                     )}
                                                 </div>
                                             ))}
@@ -281,18 +212,18 @@ export default function ModalForm( { title, visible, setVisible, fields, onSubmi
                                 ) : field.disabled ? (
                                     <>
                                         <label htmlFor={field.id} style={{ fontWeight: "bold" }}>{field.label}</label>
-                                        <StyledFormInput
+                                        <Form.Control
                                             id={field.id}
                                             type={field.type || "text"} 
                                             value={field.value}
                                             disabled
-                                            style={{ backgroundColor: '#e9ecef', cursor: 'not-allowed' }}
+                                            style={{ height: "30px", borderRadius: "10px", backgroundColor: '#e9ecef', cursor: 'not-allowed' }}
                                         />
                                     </>
                                 ) : (
                                     <>
                                         <label htmlFor={field.id} style={{ fontWeight: "bold" }}>{field.label}</label>
-                                        <StyledFormInput
+                                        <Form.Control
                                             id={field.id}
                                             type={field.type || "text"} 
                                             placeholder={field.placeholder || ""}
@@ -300,6 +231,7 @@ export default function ModalForm( { title, visible, setVisible, fields, onSubmi
                                             onChange={(e) => field.onChange(e.target.value)}
                                             required={field.required || false}
                                             step={field.step}
+                                            style={{ height: "30px", borderRadius: "10px", padding: "5px" }}
                                         />
                                     </>
                                 )}
@@ -312,7 +244,7 @@ export default function ModalForm( { title, visible, setVisible, fields, onSubmi
                         </div>
 
                         <div style={{ display: "flex", justifyContent: "center", marginTop: "5px" }}>
-                            {message && <Message type={messageType}>{message}</Message>}
+                            {message && <div style={{ marginTop: "20px", color: messageType === "success" ? "green" : "red" }}>{message}</div>}
                         </div>
                     </Form>
                 </Modal.Body>
