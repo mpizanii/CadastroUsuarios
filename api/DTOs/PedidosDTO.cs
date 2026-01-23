@@ -7,6 +7,7 @@ namespace api.DTOs
     {
         public int Id { get; set; }
         public int? ClienteId { get; set; }
+        public string? ClienteNome { get; set; }
         public DateTime DataPedido { get; set; }
         public decimal ValorTotal { get; set; }
         public string Status { get; set; } = "Pendente";

@@ -25,6 +25,11 @@ namespace api.Servicos
 
             foreach (var pedido in pedidos)
             {
+                var clienteNome = await _context.Clientes
+                    .Where(c => c.Id == pedido.ClienteId)
+                    .Select(c => c.Nome)
+                    .FirstOrDefaultAsync();
+
                 var pedidoProdutos = await _context.PedidosProdutos
                     .Where(pp => pp.PedidoId == pedido.Id)
                     .ToListAsync();
@@ -45,6 +50,7 @@ namespace api.Servicos
                 {
                     Id = pedido.Id,
                     ClienteId = pedido.ClienteId,
+                    ClienteNome = clienteNome,
                     DataPedido = pedido.DataPedido,
                     ValorTotal = pedido.ValorTotal,
                     Status = pedido.Status,
@@ -60,6 +66,11 @@ namespace api.Servicos
         {
             var pedido = await _context.Pedidos.FindAsync(id);
             if (pedido == null) return null;
+
+            var clienteNome = await _context.Clientes
+                .Where(c => c.Id == pedido.ClienteId)
+                .Select(c => c.Nome)
+                .FirstOrDefaultAsync();
 
             var pedidoProdutos = await _context.PedidosProdutos
                 .Where(pp => pp.PedidoId == pedido.Id)
@@ -81,6 +92,7 @@ namespace api.Servicos
             {
                 Id = pedido.Id,
                 ClienteId = pedido.ClienteId,
+                ClienteNome = clienteNome,
                 DataPedido = pedido.DataPedido,
                 ValorTotal = pedido.ValorTotal,
                 Status = pedido.Status,
