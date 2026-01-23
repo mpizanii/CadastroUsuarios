@@ -43,6 +43,7 @@ namespace api.Servicos
                         ProdutoId = pp.ProdutoId,
                         ProdutoNome = produto?.Nome ?? "Produto não encontrado",
                         Quantidade = pp.Quantidade,
+                        PrecoUnitario = produto?.Preco ?? 0,
                     });
                 }
 
@@ -85,6 +86,7 @@ namespace api.Servicos
                     ProdutoId = pp.ProdutoId,
                     ProdutoNome = produto?.Nome ?? "Produto não encontrado",
                     Quantidade = pp.Quantidade,
+                    PrecoUnitario = produto?.Preco ?? 0,
                 });
             }
 

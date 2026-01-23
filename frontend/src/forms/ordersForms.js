@@ -160,47 +160,29 @@ export const formAddPedido = ({ onSuccess, onVerificarMapeamento }) => {
     };
 };
 
-export const formEditStatus = ({ pedido, onSuccess }) => {
+export const formEditOrderStatus = ({ pedido, onSuccess }) => {
     const [status, setStatus] = useState(pedido?.status || "Pendente");
     const [messageFormEditStatus, setMessageFormEditStatus] = useState("");
     const [messageTypeFormEditStatus, setMessageTypeFormEditStatus] = useState("success");
-    const [clienteNome, setClienteNome] = useState("");
 
-    useEffect(() => {
-        const loadClienteNome = async () => {
-            if (pedido?.clienteId) {
-                try {
-                    const clientes = await getCustomers();
-                    const cliente = clientes.find(c => c.id === pedido.clienteId);
-                    if (cliente) {
-                        setClienteNome(cliente.nome);
-                    }
-                } catch (error) {
-                    console.error("Erro ao buscar nome do cliente:", error);
-                }
-            }
-        }
-        loadClienteNome();
-    }, [pedido]);
-
-    const titleFormEditStatus = "Atualizar Status do Pedido";
+    const titleFormEditStatus = "Alterar Status do Pedido";
 
     const fieldsFormEditStatus = [
         {
-            id: "pedidoNumero",
+            id: "pedidoInfo",
             label: "Pedido",
-            value: `#${String(pedido?.id).padStart(4, '0')}`,
+            value: `#${String(pedido?.id).padStart(4, '0')} - ${pedido?.clienteNome}`,
             disabled: true
         },
         {
-            id: "cliente",
-            label: "Cliente",
-            value: clienteNome || "",
+            id: "statusAtual",
+            label: "Status Atual",
+            value: pedido?.status || "",
             disabled: true
         },
         {
-            id: "status",
-            label: "Status",
+            id: "novoStatus",
+            label: "Novo Status",
             type: "select",
             value: status,
             onChange: setStatus,
@@ -213,15 +195,27 @@ export const formEditStatus = ({ pedido, onSuccess }) => {
         event.preventDefault();
         setMessageFormEditStatus("");
 
+        if (status === pedido?.status) {
+            setMessageTypeFormEditStatus("error");
+            setMessageFormEditStatus("Selecione um status diferente do atual.");
+            return;
+        }
+
         try {
             await updatePedidoStatus(pedido.id, status);
             setMessageTypeFormEditStatus("success");
             setMessageFormEditStatus("Status atualizado com sucesso!");
 
             if (onSuccess) onSuccess();
+
+            setMessageFormEditStatus("");
+            setStatus(pedido?.status || "Pendente");
         } catch (error) {
             setMessageTypeFormEditStatus("error");
             setMessageFormEditStatus(error.message || "Erro ao atualizar status.");
+
+            setMessageFormEditStatus("");
+            setStatus(pedido?.status || "Pendente");
         }
     };
 

@@ -9,7 +9,7 @@ namespace api.DTOs
         public int? ClienteId { get; set; }
         public string? ClienteNome { get; set; }
         public DateTime DataPedido { get; set; }
-        public decimal ValorTotal { get; set; }
+        public double ValorTotal { get; set; }
         public string Status { get; set; } = "Pendente";
         public string? Observacoes { get; set; }
         public List<PedidoProdutoDTO> Produtos { get; set; } = new();
@@ -20,7 +20,7 @@ namespace api.DTOs
         public int ProdutoId { get; set; }
         public string ProdutoNome { get; set; } = string.Empty;
         public int Quantidade { get; set; }
-        public decimal PrecoUnitario { get; set; }
+        public double PrecoUnitario { get; set; } = 0;
     }
 
     public class CriarPedidoDTO
