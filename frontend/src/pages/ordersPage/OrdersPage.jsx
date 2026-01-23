@@ -9,6 +9,7 @@ import ModalDetalhesPedidos from '../../components/pedidos/ModalDetalhesPedidos'
 import { formAddPedido, formEditOrderStatus, formDeletePedido } from '../../forms/ordersForms';
 import { useOrders } from '../../contexts';
 import { useOrderActions } from '../../hooks/useOrderActions';
+import ModalAvisosEstoque from '../../components/alertas/ModalAvisosEstoque';
 
 const OrdersPage = () => {
   const { orders, loading, error, fetchOrders, fetchCustomersAndProducts, produtosDisponiveis, clientesDisponiveis } = useOrders();
@@ -29,7 +30,7 @@ const OrdersPage = () => {
   } = useOrderActions({ fetchOrders });
 
 
-  const { titleFormAddPedido, fieldsFormAddPedido, handleSubmitFormAddPedido, messageFormAddPedido, messageTypeFormAddPedido } = formAddPedido({
+  const { titleFormAddPedido, fieldsFormAddPedido, handleSubmitFormAddPedido, messageFormAddPedido, messageTypeFormAddPedido, showAvisosEstoque, setShowAvisosEstoque, avisosEstoque, handleConfirmarComAvisos, handleCancelarComAvisos } = formAddPedido({
     onSuccess: async () => {
       await fetchOrders();
       setMenuAddPedidoAtivo(false);
@@ -241,6 +242,14 @@ const OrdersPage = () => {
           action="add"
         />
       )}
+
+      <ModalAvisosEstoque
+        visible={showAvisosEstoque}
+        setVisible={setShowAvisosEstoque}
+        avisos={avisosEstoque}
+        onConfirmar={handleConfirmarComAvisos}
+        onCancelar={handleCancelarComAvisos}
+      />
 
       {selectedPedido && menuOrderDetailsAtivo && (
         <ModalDetalhesPedidos

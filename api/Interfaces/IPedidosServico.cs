@@ -12,5 +12,6 @@ namespace api.Interfaces
         Task<bool> DeletarPedido(int id);
         Task<VerificarMapeamentoDTO> VerificarMapeamentoProdutos(List<PedidoProdutoDTO> produtos);
         Task<bool> DarBaixaEstoque(int pedidoId);
+        Task<VerificarEstoqueDTO> VerificarEstoquePedido(List<PedidoProdutoDTO> produtos);
     }
 }

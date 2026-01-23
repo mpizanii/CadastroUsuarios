@@ -71,3 +71,13 @@ export const darBaixaEstoque = async (pedidoId) => {
         throw new Error('Erro ao dar baixa no estoque');
     }
 };
+
+export const verificarEstoquePedido = async (produtos) => {
+    try {
+        const response = await axios.post(`${API_URL}/Pedidos/verificar-estoque`, produtos);
+        return response.data;
+    } catch (error) {
+        console.error('Erro ao verificar estoque:', error);
+        throw new Error('Erro ao verificar estoque');
+    }
+}

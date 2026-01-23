@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { addPedido, updatePedidoStatus, deletePedido } from "../services/ordersService";
+import { addPedido, updatePedidoStatus, deletePedido, verificarEstoquePedido } from "../services/ordersService";
 import { useOrders } from "../contexts/OrdersContext";
 
 const STATUS_OPTIONS = {"Pendente": "Pendente", "Em Preparo": "Em Preparo", "Em Rota de Entrega": "Em Rota de Entrega", "Entregue": "Entregue"};
@@ -12,6 +12,9 @@ export const formAddPedido = ({ onSuccess, onVerificarMapeamento }) => {
     const [produtos, setProdutos] = useState([{ produtoId: "", quantidade: 1, precoUnitario: 0 }]);
     const [messageFormAddPedido, setMessageFormAddPedido] = useState("");
     const [messageTypeFormAddPedido, setMessageTypeFormAddPedido] = useState("success");
+    const [pedidoPendente, setPedidoPendente] = useState(null);
+    const [showAvisosEstoque, setShowAvisosEstoque] = useState(false);
+    const [avisosEstoque, setAvisosEstoque] = useState([]);
 
     const titleFormAddPedido = "Novo Pedido";
 
@@ -78,6 +81,23 @@ export const formAddPedido = ({ onSuccess, onVerificarMapeamento }) => {
         }
     ];
 
+    const criarPedido = async (pedidoData) => {
+        try {
+            if (onVerificarMapeamento) {
+                await onVerificarMapeamento(pedidoData);
+            } else {
+                await addPedido(pedidoData);
+                setMessageTypeFormAddPedido("success");
+                setMessageFormAddPedido("Pedido criado com sucesso!");
+            }
+
+            if (onSuccess) onSuccess();
+        } catch (error) {
+            setMessageTypeFormAddPedido("error");
+            setMessageFormAddPedido(error.message || "Erro ao criar pedido.");
+        }
+    };
+
     const handleSubmitFormAddPedido = async (event) => {
         event.preventDefault();
         setMessageFormAddPedido("");
@@ -96,51 +116,63 @@ export const formAddPedido = ({ onSuccess, onVerificarMapeamento }) => {
         }
 
         try {
+            const produtos = produtosValidos.map(p => ({
+                produtoId: parseInt(p.produtoId),
+                quantidade: parseInt(p.quantidade),
+                precoUnitario: parseFloat(p.precoUnitario)
+            }));
+
+            const verificacaoEstoque = await verificarEstoquePedido(produtos);
+
             const pedidoData = {
                 clienteId: clienteId ? parseInt(clienteId) : null,
                 clienteNome: clienteNome,
                 observacoes: observacoes,
-                produtos: produtosValidos.map(p => ({
-                    produtoId: parseInt(p.produtoId),
-                    quantidade: parseInt(p.quantidade),
-                    precoUnitario: parseFloat(p.precoUnitario)
-                })),
+                produtos: produtos,
                 darBaixaEstoque: true
             };
 
-            if (onVerificarMapeamento) {
-                await onVerificarMapeamento(pedidoData);
-
-                setClienteId("");
-                setClienteNome("");
-                setObservacoes("");
-                setProdutos([{ produtoId: "", quantidade: 1, precoUnitario: 0 }]);
-
-                if (onSuccess) onSuccess();
-            } else {
-                await addPedido(pedidoData);
-                setMessageTypeFormAddPedido("success");
-                setMessageFormAddPedido("Pedido criado com sucesso!");
-
-                setClienteId("");
-                setClienteNome("");
-                setObservacoes("");
-                setProdutos([{ produtoId: "", quantidade: 1, precoUnitario: 0 }]);
-
-                if (onSuccess) onSuccess();
+            if (verificacaoEstoque.temAvisos && verificacaoEstoque.avisos.length > 0) {
+                setAvisosEstoque(verificacaoEstoque.avisos);
+                setPedidoPendente(pedidoData);
+                setShowAvisosEstoque(true);
+                return;
             }
+
+            await criarPedido(pedidoData);
+
         } catch (error) {
             setMessageTypeFormAddPedido("error");
             setMessageFormAddPedido(error.message || "Erro ao criar pedido.");
         }
     };
 
+    const handleConfirmarComAvisos = async () => {
+        setShowAvisosEstoque(false);
+        await criarPedido(pedidoPendente);
+        setPedidoPendente(null);
+        setAvisosEstoque([]);
+    }
+
+    const handleCancelarComAvisos = () => {
+        setShowAvisosEstoque(false);
+        setPedidoPendente(null);
+        setAvisosEstoque([]);
+        setMessageTypeFormAddPedido("info");
+        setMessageFormAddPedido("Criação do pedido cancelada devido aos avisos de estoque.");
+    }
+
     return {
         titleFormAddPedido,
         fieldsFormAddPedido,
         handleSubmitFormAddPedido,
         messageFormAddPedido,
-        messageTypeFormAddPedido
+        messageTypeFormAddPedido,
+        showAvisosEstoque,
+        setShowAvisosEstoque,
+        avisosEstoque,
+        handleConfirmarComAvisos,
+        handleCancelarComAvisos
     };
 };
 

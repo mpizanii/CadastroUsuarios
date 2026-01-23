@@ -44,4 +44,21 @@ namespace api.DTOs
         public string ProdutoNome { get; set; } = string.Empty;
         public int ReceitaId { get; set; }
     }
+
+    public class VerificarEstoqueDTO
+    {
+        public bool TemAvisos { get; set; }
+        public List<AvisoEstoqueDTO> Avisos { get; set; } = new();
+    }
+
+    public class AvisoEstoqueDTO
+    {
+        public string Tipo { get; set; } // "Crítico", "Alerta", "Info"
+        public string Mensagem { get; set; }
+        public string InsumoNome { get; set; } = string.Empty;
+        public double QuantidadeAtual { get; set; }
+        public double QuantidadeNecessaria { get; set; }
+        public double QuantidadeFaltante { get; set; }
+        public string ProdutoNome { get; set; } = string.Empty;
+    }
 }
