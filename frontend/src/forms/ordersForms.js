@@ -1,35 +1,17 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { addPedido, updatePedidoStatus, deletePedido } from "../services/ordersService";
-import { getProducts } from "../services/productsService";
-import { getCustomers } from "../services/customerService";
+import { useOrders } from "../contexts/OrdersContext";
 
 const STATUS_OPTIONS = {"Pendente": "Pendente", "Em Preparo": "Em Preparo", "Em Rota de Entrega": "Em Rota de Entrega", "Entregue": "Entregue"};
 
 export const formAddPedido = ({ onSuccess, onVerificarMapeamento }) => {
+    const { produtosDisponiveis, clientesDisponiveis } = useOrders();
     const [clienteId, setClienteId] = useState("");
     const [clienteNome, setClienteNome] = useState("");
     const [observacoes, setObservacoes] = useState("");
     const [produtos, setProdutos] = useState([{ produtoId: "", quantidade: 1, precoUnitario: 0 }]);
-    const [produtosDisponiveis, setProdutosDisponiveis] = useState([]);
-    const [clientesDisponiveis, setClientesDisponiveis] = useState([]);
     const [messageFormAddPedido, setMessageFormAddPedido] = useState("");
     const [messageTypeFormAddPedido, setMessageTypeFormAddPedido] = useState("success");
-
-    useEffect(() => {
-        const loadData = async () => {
-            try {
-                const [produtosData, clientesData] = await Promise.all([
-                    getProducts(),
-                    getCustomers()
-                ]);
-                setProdutosDisponiveis(produtosData || []);
-                setClientesDisponiveis(clientesData || []);
-            } catch (error) {
-                console.error("Erro ao carregar dados:", error);
-            }
-        };
-        loadData();
-    }, []);
 
     const titleFormAddPedido = "Novo Pedido";
 
@@ -133,6 +115,8 @@ export const formAddPedido = ({ onSuccess, onVerificarMapeamento }) => {
                 setClienteNome("");
                 setObservacoes("");
                 setProdutos([{ produtoId: "", quantidade: 1, precoUnitario: 0 }]);
+
+                if (onSuccess) onSuccess();
             } else {
                 await addPedido(pedidoData);
                 setMessageTypeFormAddPedido("success");
@@ -161,7 +145,7 @@ export const formAddPedido = ({ onSuccess, onVerificarMapeamento }) => {
 };
 
 export const formEditOrderStatus = ({ pedido, onSuccess }) => {
-    const [status, setStatus] = useState(pedido?.status || "Pendente");
+    const [status, setStatus] = useState("");
     const [messageFormEditStatus, setMessageFormEditStatus] = useState("");
     const [messageTypeFormEditStatus, setMessageTypeFormEditStatus] = useState("success");
 
@@ -185,9 +169,10 @@ export const formEditOrderStatus = ({ pedido, onSuccess }) => {
             label: "Novo Status",
             type: "select",
             value: status,
+            placeholder: "Selecione o novo status",
             onChange: setStatus,
             options: Object.values(STATUS_OPTIONS).map(s => ({ value: s, label: s })),
-            required: true
+            required: true,
         }
     ];
 

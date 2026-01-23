@@ -62,6 +62,7 @@ export default function ModalForm( { title, visible, setVisible, fields, onSubmi
                                             required={field.required || false}
                                             style={{ height: "30px", lineHeight: "30px", fontSize: "14px", borderRadius: "10px", padding: "0 10px" }}
                                         >
+                                            <option value="">{field.placeholder || "Selecione uma opção..."}</option>
                                             {field.options?.map((option) => (
                                                 <option key={option.value} value={option.value}>
                                                     {option.label}

@@ -11,7 +11,7 @@ import { useOrders } from '../../contexts';
 import { useOrderActions } from '../../hooks/useOrderActions';
 
 const OrdersPage = () => {
-  const { orders, loading, error, fetchOrders } = useOrders();
+  const { orders, loading, error, fetchOrders, fetchCustomersAndProducts, produtosDisponiveis, clientesDisponiveis } = useOrders();
   const [menuAddPedidoAtivo, setMenuAddPedidoAtivo] = useState(false);
   const [menuOrderDetailsAtivo, setMenuOrderDetailsAtivo] = useState(false);
   const [menuEditStatusAtivo, setMenuEditStatusAtivo] = useState(false);
@@ -30,33 +30,27 @@ const OrdersPage = () => {
 
 
   const { titleFormAddPedido, fieldsFormAddPedido, handleSubmitFormAddPedido, messageFormAddPedido, messageTypeFormAddPedido } = formAddPedido({
-    onSuccess: () => {
-      fetchOrders();
+    onSuccess: async () => {
+      await fetchOrders();
       setMenuAddPedidoAtivo(false);
       resetMapeamentoState();
     },
     onVerificarMapeamento: handleVerificarMapeamento
   });
 
-  const { 
-    titleFormEditStatus, 
-    fieldsFormEditStatus, 
-    handleSubmitFormEditStatus, 
-    messageFormEditStatus, 
-    messageTypeFormEditStatus 
-  } = formEditOrderStatus({
-    onSuccess: () => {
+  const { titleFormEditStatus, fieldsFormEditStatus, handleSubmitFormEditStatus, messageFormEditStatus, messageTypeFormEditStatus } = formEditOrderStatus({
+    onSuccess: async () => {
+      await fetchOrders();
       setMenuEditStatusAtivo(false);
-      fetchOrders();
       resetMapeamentoState();
     },
     pedido: selectedPedido
   });
 
   const { titleFormDeletePedido, textFormDeletePedido, handleSubmitFormDeletePedido, messageFormDeletePedido, messageTypeFormDeletePedido } = formDeletePedido({
-    onSuccess: () => {
+    onSuccess: async () => {
+      await fetchOrders();
       setMenuDeletePedidoAtivo(false);
-      fetchOrders();
       resetMapeamentoState();
     },
     pedido: selectedPedido
@@ -65,6 +59,9 @@ const OrdersPage = () => {
   useEffect(() => {
     if (orders.length === 0) {
       fetchOrders();
+    }
+    if (produtosDisponiveis.length === 0 || clientesDisponiveis.length === 0) {
+      fetchCustomersAndProducts();
     }
   }, []);
 
