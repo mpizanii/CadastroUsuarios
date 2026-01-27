@@ -25,6 +25,11 @@ namespace api.Servicos
 
             foreach (var pedido in pedidos)
             {
+                var clienteNome = await _context.Clientes
+                    .Where(c => c.Id == pedido.ClienteId)
+                    .Select(c => c.Nome)
+                    .FirstOrDefaultAsync();
+
                 var pedidoProdutos = await _context.PedidosProdutos
                     .Where(pp => pp.PedidoId == pedido.Id)
                     .ToListAsync();
@@ -38,6 +43,7 @@ namespace api.Servicos
                         ProdutoId = pp.ProdutoId,
                         ProdutoNome = produto?.Nome ?? "Produto não encontrado",
                         Quantidade = pp.Quantidade,
+                        PrecoUnitario = produto?.Preco ?? 0,
                     });
                 }
 
@@ -45,6 +51,7 @@ namespace api.Servicos
                 {
                     Id = pedido.Id,
                     ClienteId = pedido.ClienteId,
+                    ClienteNome = clienteNome,
                     DataPedido = pedido.DataPedido,
                     ValorTotal = pedido.ValorTotal,
                     Status = pedido.Status,
@@ -61,6 +68,11 @@ namespace api.Servicos
             var pedido = await _context.Pedidos.FindAsync(id);
             if (pedido == null) return null;
 
+            var clienteNome = await _context.Clientes
+                .Where(c => c.Id == pedido.ClienteId)
+                .Select(c => c.Nome)
+                .FirstOrDefaultAsync();
+
             var pedidoProdutos = await _context.PedidosProdutos
                 .Where(pp => pp.PedidoId == pedido.Id)
                 .ToListAsync();
@@ -74,6 +86,7 @@ namespace api.Servicos
                     ProdutoId = pp.ProdutoId,
                     ProdutoNome = produto?.Nome ?? "Produto não encontrado",
                     Quantidade = pp.Quantidade,
+                    PrecoUnitario = produto?.Preco ?? 0,
                 });
             }
 
@@ -81,6 +94,7 @@ namespace api.Servicos
             {
                 Id = pedido.Id,
                 ClienteId = pedido.ClienteId,
+                ClienteNome = clienteNome,
                 DataPedido = pedido.DataPedido,
                 ValorTotal = pedido.ValorTotal,
                 Status = pedido.Status,
@@ -163,7 +177,7 @@ namespace api.Servicos
             foreach (var produtoDTO in produtos)
             {
                 var produto = await _context.Produtos.FindAsync(produtoDTO.ProdutoId);
-                if (produto == null || produto.Receita_id == 0) continue;
+                if (produto == null || produto.Receita_id == null) continue;
 
                 var ingredientes = await _context.ReceitaIngredientes
                     .Where(ri => ri.ReceitaId == produto.Receita_id)
@@ -182,7 +196,7 @@ namespace api.Servicos
                             IngredienteId = ingrediente.Id,
                             IngredienteNome = ingrediente.Nome,
                             ProdutoNome = produto.Nome,
-                            ReceitaId = produto.Receita_id
+                            ReceitaId = produto.Receita_id.Value
                         });
                     }
                 }
@@ -229,6 +243,88 @@ namespace api.Servicos
 
             await _context.SaveChangesAsync();
             return true;
+        }
+
+        public async Task<VerificarEstoqueDTO> VerificarEstoquePedido(List<PedidoProdutoDTO> produtos)
+        {
+            var resultado = new VerificarEstoqueDTO
+            {
+                TemAvisos = false,
+                Avisos = new List<AvisoEstoqueDTO>()
+            };
+
+            foreach (var produtoDTO in produtos)
+            {
+                var produto = await _context.Produtos.FindAsync(produtoDTO.ProdutoId);
+                if (produto == null) continue;
+
+                var ingredientes = await _context.ReceitaIngredientes
+                    .Where(ri => ri.ReceitaId == produto.Receita_id)
+                    .ToListAsync();
+
+                foreach (var ingrediente in ingredientes)
+                {
+                    var mapeamento = await _context.IngredientesInsumo
+                        .FirstOrDefaultAsync(ii => ii.IngredienteId == ingrediente.Id);
+
+                    if (mapeamento != null)
+                    {
+                        var insumo = await _context.Insumos.FindAsync(mapeamento.InsumoId);
+                        if (insumo != null)
+                        {
+                            var quantidadeNecessaria = ingrediente.Quantidade * mapeamento.FatorConversao * produtoDTO.Quantidade;
+                            var quantidadeRestante = insumo.Quantidade - quantidadeNecessaria;
+
+                            if (quantidadeRestante < 0)
+                            {
+                                resultado.TemAvisos = true;
+                                resultado.Avisos.Add(new AvisoEstoqueDTO
+                                {
+                                    Tipo = "CRITICO",
+                                    Mensagem = $"Estoque insuficiente para o insumo {insumo.Nome} necessário para o produto {produto.Nome}.",
+                                    InsumoNome = insumo.Nome,
+                                    QuantidadeAtual = insumo.Quantidade,
+                                    QuantidadeNecessaria = quantidadeNecessaria,
+                                    QuantidadeFaltante = quantidadeNecessaria - insumo.Quantidade,
+                                    ProdutoNome = produto.Nome
+                                });
+                            }
+
+                            else if (quantidadeRestante < (insumo.Quantidade * 0.1) || quantidadeRestante < 10)
+                            {
+                                resultado.TemAvisos = true;
+                                resultado.Avisos.Add(new AvisoEstoqueDTO
+                                {
+                                    Tipo = "ALERTA",
+                                    Mensagem = $"Estoque de {insumo.Nome} ficará crítico após este pedido",
+                                    InsumoNome = insumo.Nome,
+                                    QuantidadeAtual = insumo.Quantidade,
+                                    QuantidadeNecessaria = quantidadeNecessaria,
+                                    QuantidadeFaltante = 0,
+                                    ProdutoNome = produto.Nome
+                                });
+                            }
+
+                            else if (quantidadeRestante < (insumo.Quantidade * 0.3))
+                            {
+                                resultado.TemAvisos = true;
+                                resultado.Avisos.Add(new AvisoEstoqueDTO
+                                {
+                                    Tipo = "INFO",
+                                    Mensagem = $"Estoque de {insumo.Nome} ficará baixo após este pedido",
+                                    InsumoNome = insumo.Nome,
+                                    QuantidadeAtual = insumo.Quantidade,
+                                    QuantidadeNecessaria = quantidadeNecessaria,
+                                    QuantidadeFaltante = 0,
+                                    ProdutoNome = produto.Nome
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+
+            return resultado;
         }
     }
 }

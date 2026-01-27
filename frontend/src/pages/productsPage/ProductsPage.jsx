@@ -1,34 +1,24 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import ModalForm from "../../components/menu/ModalForm.jsx";
-import { getProducts } from "./ApiCalls.js";
-import { formAddProduct, formEditProduct, formDeleteProduct } from "./Forms.js";
-import { Container, SearchInput } from "./StyledProductsPage";
+import { formAddProduct, formEditProduct, formDeleteProduct } from "../../forms/productsForms";
+import { formAddRecipe } from "../../forms/recipesForms.js";
 import { LuChefHat } from "react-icons/lu";
-import { Button, Card, Badge, Spinner } from "react-bootstrap";
+import { Button, Card, Badge, Spinner, Form } from "react-bootstrap";
 import { CiSearch } from "react-icons/ci";
 import { SlPencil, SlTrash } from "react-icons/sl";
-import { BiShow } from "react-icons/bi";
+import { useProducts } from "../../contexts";
+import { FiPlus } from 'react-icons/fi';
 
-export default function OrdersPage() {
+export default function ProductsPage() {
   const navigate = useNavigate();
+  const { products, loading, error, fetchProducts } = useProducts();
   const [menuAddProductAtivo, setMenuAddProductAtivo] = useState(false);
   const [menuEditProductAtivo, setMenuEditProductAtivo] = useState(false);
   const [menuDeleteProductAtivo, setMenuDeleteProductAtivo] = useState(false);
+  const [menuAddRecipeAtivo, setMenuAddRecipeAtivo] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [products, setProducts] = useState([]);
   const [busca, setBusca] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  const fetchProducts = async () => {
-    setLoading(true);
-    try {
-      const data = await getProducts(); 
-      setProducts(data || []);
-    } finally {
-      setLoading(false);
-    }
-  }
 
   const { titleFormAddProduct, fieldsFormAddProduct, handleSubmitFormAddProduct, messageFormAddProduct, setMessageFormAddProduct, messageTypeFormAddProduct } = formAddProduct({
     onSuccess: () => {
@@ -56,8 +46,19 @@ export default function OrdersPage() {
     selectedProduct
   });
 
+  const { titleFormAddRecipe, fieldsFormAddRecipe, handleSubmitFormAddRecipe, messageFormAddRecipe, setMessageFormAddRecipe, messageTypeFormAddRecipe } = formAddRecipe({
+    onSuccess: () => {
+      setMenuAddRecipeAtivo(false);
+      setMessageFormAddRecipe("");
+      fetchProducts();
+    },
+    selectedProduct
+  });
+
   useEffect(() => {
-    fetchProducts();
+    if (products.length === 0){
+      fetchProducts();
+    }
   }, []);
 
   const produtosNumerados = products.map((produto, index) => ({
@@ -69,7 +70,7 @@ export default function OrdersPage() {
     produto.nome.toLowerCase().includes(busca.toLowerCase())
   );
 
-  if (loading) {
+  if (loading && products.length === 0) {
     return(
       <div style={{ display: "flex", flexDirection: "column", gap: "5px", justifyContent: "center", alignItems: "center", height: "100vh" }}>
         <Spinner animation="border" role="status" />
@@ -78,9 +79,21 @@ export default function OrdersPage() {
     )
   }
 
+  if (error && products.length === 0) {
+    return(
+      <div style={{ display: "flex", flexDirection: "column", gap: "15px", justifyContent: "center", alignItems: "center", height: "100vh" }}>
+        <i className="bi bi-exclamation-triangle" style={{ fontSize: "48px", color: "#dc3545" }} />
+        <span style={{ color: "#666" }}>{error}</span>
+        <Button onClick={fetchProducts} variant="outline-primary">
+          Tentar Novamente
+        </Button>
+      </div>
+    )
+  }
+
   return (
     <>
-      <Container className={menuAddProductAtivo || menuEditProductAtivo || menuDeleteProductAtivo ? "blur" : ""}>
+      <div className={`w-100 min-vh-100 bg-light ${menuAddProductAtivo || menuEditProductAtivo || menuDeleteProductAtivo ? "opacity-50" : ""}`} style={{ fontFamily: "Roboto, sans-serif" }}>
         <div style={{ padding: "35px 30px" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "30px" }}>
             <div>
@@ -88,17 +101,19 @@ export default function OrdersPage() {
               <p style={{ color: "#666", margin: 0 }}>Gerencie seus produtos e vincule receitas</p>
             </div>
             <Button 
-              style={{ padding: "10px 20px", borderRadius: "8px" }}
+              variant="primary"
               onClick={() => setMenuAddProductAtivo(true)}
-              variant="outline-success"
+              className="d-flex align-items-center gap-2"
+              style={{ borderRadius: '8px', padding: '8px 16px', fontWeight: '500', border: 'none', backgroundColor: '#e76e50' }}
             >
-              + Novo Produto
+              <FiPlus size={18} />
+              Novo Produto
             </Button>
           </div>
 
           <div style={{ marginBottom: "30px", position: "relative", maxWidth: "300px" }}>
             <CiSearch size={20} style={{ position: "absolute", left: "15px", top: "50%", transform: "translateY(-50%)", color: "#999" }} />
-            <SearchInput 
+            <Form.Control
               type="text" 
               placeholder="Buscar produtos..." 
               value={busca}
@@ -111,7 +126,6 @@ export default function OrdersPage() {
             {produtosFiltrados.map((produto) => {
               const precoNum = Number(produto.preco) || 0;
               const custoNum = Number(produto.custo) || 0;
-              const margem = precoNum ? Math.round(((precoNum - custoNum) / precoNum) * 100) : 0;
 
               const formatCurrency = (value) => {
                 try {
@@ -122,10 +136,27 @@ export default function OrdersPage() {
               const status = produto.ativo === false ? 'inativo' : 'Ativo';
 
               return (
-                <Card key={produto.id} className="h-100 border-0 p-2 shadow-sm" style={{ borderRadius: "16px", overflow: "hidden" }}>
+                <Card 
+                  key={produto.id} 
+                  className="h-100 border-0 p-2 shadow-sm" 
+                  style={{ 
+                    borderRadius: '12px', 
+                    border: 'none', 
+                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)', 
+                    transition: 'transform 0.2s, box-shadow 0.2s' 
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 4px 16px rgba(0, 0, 0, 0.12)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.08)';
+                  }}
+                >
                   <Card.Body>
                     <div className="d-flex align-items-center justify-content-between mb-3">
-                      <div className="d-flex gap-3">
+                      <div className="d-flex gap-3" style={{ minWidth: 0, flex: 1 }}>
                         <div 
                           className="rounded d-flex align-items-center justify-content-center"
                           style={{
@@ -134,13 +165,18 @@ export default function OrdersPage() {
                             backgroundColor: "#e76e501a ",
                             fontSize: "20px",
                             color: "#e76e50",
+                            flexShrink: 0
                           }}
                         >
                           <LuChefHat />
                         </div>
-                        <div>
-                          <Card.Title className="mb-0 h5">{produto.nome}</Card.Title>
-                          <small className="text-muted">{produto.descricao || produto.nome}</small>
+                        <div style={{ minWidth: 0, flex: 1 }}>
+                          <Card.Title className="mb-0 h5 text-truncate" title={produto.nome}>
+                            {produto.nome}
+                          </Card.Title>
+                          <small className="text-muted text-truncate d-block" title={produto.descricao || produto.nome}>
+                            {produto.descricao || produto.nome}
+                          </small>
                         </div>
                       </div>
                       <Badge bg={status === 'Ativo' ? 'success' : 'secondary'}>{status}</Badge>
@@ -166,33 +202,44 @@ export default function OrdersPage() {
 
 
                       <div style={{ paddingTop: 10, display: 'flex', alignItems: 'center', gap: 10 }}>
-                        <Button 
-                          variant="outline-secondary" 
-                          size="sm" 
-                          title="Ver receita" 
-                          className="w-50"
-                          onClick={() => produto.receita_Id ? navigate(`/receitas/${produto.receita_Id}`) : alert('Este produto não possui receita associada')}
-                          disabled={!produto.receita_Id}
-                        >
-                          <LuChefHat /> Ver Receita
-                        </Button>
-                        <Button
-                          variant="outline-secondary"
-                          size="sm"
-                          onClick={() => { setSelectedProduct(produto); setMenuEditProductAtivo(true); }}
-                          title="Editar produto"
-                          className="w-50"
-                        >
-                          <SlPencil /> Editar
-                        </Button>
-                        <Button
-                          variant="outline-danger"
-                          size="sm"
-                          onClick={() => { setSelectedProduct(produto); setMenuDeleteProductAtivo(true); }}
-                          title="Excluir produto"
-                        >
-                          <SlTrash />
-                        </Button>
+                          {produto.receita_Id != null ?
+                            <Button 
+                              variant="outline-primary" 
+                              size="sm" 
+                              title="Ver receita" 
+                              className="w-50"
+                              onClick={() => navigate(`/receitas/${produto.receita_Id}`)}
+                            >
+                              <LuChefHat /> Ver Receita
+                            </Button>
+                            :
+                            <Button 
+                              variant="outline-primary" 
+                              size="sm" 
+                              title="Ver receita" 
+                              className="w-50"
+                              onClick={() => { setSelectedProduct(produto); setMenuAddRecipeAtivo(true); }}
+                            >
+                              <FiPlus /> Criar Receita
+                            </Button>
+                          }
+                          <Button
+                            variant="outline-primary"
+                            size="sm"
+                            onClick={() => { setSelectedProduct(produto); setMenuEditProductAtivo(true); }}
+                            title="Editar produto"
+                            className="w-50"
+                          >
+                            <SlPencil /> Editar
+                          </Button>
+                          <Button
+                            variant="outline-danger"
+                            size="sm"
+                            onClick={() => { setSelectedProduct(produto); setMenuDeleteProductAtivo(true); }}
+                            title="Excluir produto"
+                          >
+                            <SlTrash />
+                          </Button>
                       </div>
                     </div>
                   </Card.Body>
@@ -208,7 +255,7 @@ export default function OrdersPage() {
             </div>
           )}
         </div>
-      </Container>
+      </div>
 
       {menuAddProductAtivo && (
         <ModalForm
@@ -245,6 +292,19 @@ export default function OrdersPage() {
           message={messageFormDeleteProduct}
           messageType={messageTypeFormDeleteProduct}
           action={"delete"}
+        />
+      )}
+
+      {selectedProduct && menuAddRecipeAtivo && (
+        <ModalForm
+          title={titleFormAddRecipe}
+          visible={menuAddRecipeAtivo}
+          setVisible={setMenuAddRecipeAtivo}
+          fields={fieldsFormAddRecipe}
+          onSubmit={handleSubmitFormAddRecipe}
+          message={messageFormAddRecipe}
+          messageType={messageTypeFormAddRecipe}
+          action={"add"}
         />
       )}
     </>

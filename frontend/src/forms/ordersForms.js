@@ -1,35 +1,20 @@
-import { useState, useEffect } from "react";
-import { addPedido, updatePedidoStatus, deletePedido } from "./ApiCalls.js";
-import { getProducts } from "../productsPage/ApiCalls.js";
-import { getCustomers } from "../usersPage/ApiCalls.js";
+import { useState } from "react";
+import { addPedido, updatePedidoStatus, deletePedido, verificarEstoquePedido } from "../services/ordersService";
+import { useOrders } from "../contexts/OrdersContext";
 
 const STATUS_OPTIONS = {"Pendente": "Pendente", "Em Preparo": "Em Preparo", "Em Rota de Entrega": "Em Rota de Entrega", "Entregue": "Entregue"};
 
 export const formAddPedido = ({ onSuccess, onVerificarMapeamento }) => {
+    const { produtosDisponiveis, clientesDisponiveis } = useOrders();
     const [clienteId, setClienteId] = useState("");
     const [clienteNome, setClienteNome] = useState("");
     const [observacoes, setObservacoes] = useState("");
     const [produtos, setProdutos] = useState([{ produtoId: "", quantidade: 1, precoUnitario: 0 }]);
-    const [produtosDisponiveis, setProdutosDisponiveis] = useState([]);
-    const [clientesDisponiveis, setClientesDisponiveis] = useState([]);
     const [messageFormAddPedido, setMessageFormAddPedido] = useState("");
     const [messageTypeFormAddPedido, setMessageTypeFormAddPedido] = useState("success");
-
-    useEffect(() => {
-        const loadData = async () => {
-            try {
-                const [produtosData, clientesData] = await Promise.all([
-                    getProducts(),
-                    getCustomers()
-                ]);
-                setProdutosDisponiveis(produtosData || []);
-                setClientesDisponiveis(clientesData || []);
-            } catch (error) {
-                console.error("Erro ao carregar dados:", error);
-            }
-        };
-        loadData();
-    }, []);
+    const [pedidoPendente, setPedidoPendente] = useState(null);
+    const [showAvisosEstoque, setShowAvisosEstoque] = useState(false);
+    const [avisosEstoque, setAvisosEstoque] = useState([]);
 
     const titleFormAddPedido = "Novo Pedido";
 
@@ -46,7 +31,6 @@ export const formAddPedido = ({ onSuccess, onVerificarMapeamento }) => {
         const newProdutos = [...produtos];
         newProdutos[index][field] = value;
 
-        // Se mudou o produto, atualizar o preço unitário
         if (field === "produtoId") {
             const produto = produtosDisponiveis.find(p => p.id === parseInt(value));
             if (produto) {
@@ -97,13 +81,30 @@ export const formAddPedido = ({ onSuccess, onVerificarMapeamento }) => {
         }
     ];
 
+    const criarPedido = async (pedidoData) => {
+        try {
+            if (onVerificarMapeamento) {
+                await onVerificarMapeamento(pedidoData);
+            } else {
+                await addPedido(pedidoData);
+                setMessageTypeFormAddPedido("success");
+                setMessageFormAddPedido("Pedido criado com sucesso!");
+            }
+
+            if (onSuccess) onSuccess();
+        } catch (error) {
+            setMessageTypeFormAddPedido("error");
+            setMessageFormAddPedido(error.message || "Erro ao criar pedido.");
+        }
+    };
+
     const handleSubmitFormAddPedido = async (event) => {
         event.preventDefault();
         setMessageFormAddPedido("");
 
         if (!clienteNome && !clienteId) {
             setMessageTypeFormAddPedido("error");
-            setMessageFormAddPedido("Por favor, selecione ou digite o nome de um cliente.");
+            setMessageFormAddPedido("Por favor, selecione o nome de um cliente.");
             return;
         }
 
@@ -115,95 +116,95 @@ export const formAddPedido = ({ onSuccess, onVerificarMapeamento }) => {
         }
 
         try {
+            const produtos = produtosValidos.map(p => ({
+                produtoId: parseInt(p.produtoId),
+                quantidade: parseInt(p.quantidade),
+                precoUnitario: parseFloat(p.precoUnitario)
+            }));
+
+            const verificacaoEstoque = await verificarEstoquePedido(produtos);
+
             const pedidoData = {
                 clienteId: clienteId ? parseInt(clienteId) : null,
                 clienteNome: clienteNome,
                 observacoes: observacoes,
-                produtos: produtosValidos.map(p => ({
-                    produtoId: parseInt(p.produtoId),
-                    quantidade: parseInt(p.quantidade),
-                    precoUnitario: parseFloat(p.precoUnitario)
-                })),
+                produtos: produtos,
                 darBaixaEstoque: true
             };
 
-            // Verificar mapeamento antes de criar
-            if (onVerificarMapeamento) {
-                await onVerificarMapeamento(pedidoData);
-            } else {
-                await addPedido(pedidoData);
-                setMessageTypeFormAddPedido("success");
-                setMessageFormAddPedido("Pedido criado com sucesso!");
-
-                // Limpar formulário
-                setClienteId("");
-                setClienteNome("");
-                setObservacoes("");
-                setProdutos([{ produtoId: "", quantidade: 1, precoUnitario: 0 }]);
-
-                if (onSuccess) onSuccess();
+            if (verificacaoEstoque.temAvisos && verificacaoEstoque.avisos.length > 0) {
+                setAvisosEstoque(verificacaoEstoque.avisos);
+                setPedidoPendente(pedidoData);
+                setShowAvisosEstoque(true);
+                return;
             }
+
+            await criarPedido(pedidoData);
+
         } catch (error) {
             setMessageTypeFormAddPedido("error");
             setMessageFormAddPedido(error.message || "Erro ao criar pedido.");
         }
     };
 
+    const handleConfirmarComAvisos = async () => {
+        setShowAvisosEstoque(false);
+        await criarPedido(pedidoPendente);
+        setPedidoPendente(null);
+        setAvisosEstoque([]);
+    }
+
+    const handleCancelarComAvisos = () => {
+        setShowAvisosEstoque(false);
+        setPedidoPendente(null);
+        setAvisosEstoque([]);
+        setMessageTypeFormAddPedido("info");
+        setMessageFormAddPedido("Criação do pedido cancelada devido aos avisos de estoque.");
+    }
+
     return {
         titleFormAddPedido,
         fieldsFormAddPedido,
         handleSubmitFormAddPedido,
         messageFormAddPedido,
-        messageTypeFormAddPedido
+        messageTypeFormAddPedido,
+        showAvisosEstoque,
+        setShowAvisosEstoque,
+        avisosEstoque,
+        handleConfirmarComAvisos,
+        handleCancelarComAvisos
     };
 };
 
-export const formEditStatus = ({ pedido, onSuccess }) => {
-    const [status, setStatus] = useState(pedido?.status || "Pendente");
+export const formEditOrderStatus = ({ pedido, onSuccess }) => {
+    const [status, setStatus] = useState("");
     const [messageFormEditStatus, setMessageFormEditStatus] = useState("");
     const [messageTypeFormEditStatus, setMessageTypeFormEditStatus] = useState("success");
-    const [clienteNome, setClienteNome] = useState("");
 
-    useEffect(() => {
-        const loadClienteNome = async () => {
-            if (pedido?.clienteId) {
-                try {
-                    const clientes = await getCustomers();
-                    const cliente = clientes.find(c => c.id === pedido.clienteId);
-                    if (cliente) {
-                        setClienteNome(cliente.nome);
-                    }
-                } catch (error) {
-                    console.error("Erro ao buscar nome do cliente:", error);
-                }
-            }
-        }
-        loadClienteNome();
-    }, [pedido]);
-
-    const titleFormEditStatus = "Atualizar Status do Pedido";
+    const titleFormEditStatus = "Alterar Status do Pedido";
 
     const fieldsFormEditStatus = [
         {
-            id: "pedidoNumero",
+            id: "pedidoInfo",
             label: "Pedido",
-            value: `#${String(pedido?.id).padStart(4, '0')}`,
+            value: `#${String(pedido?.id).padStart(4, '0')} - ${pedido?.clienteNome}`,
             disabled: true
         },
         {
-            id: "cliente",
-            label: "Cliente",
-            value: clienteNome || "",
+            id: "statusAtual",
+            label: "Status Atual",
+            value: pedido?.status || "",
             disabled: true
         },
         {
-            id: "status",
-            label: "Status",
+            id: "novoStatus",
+            label: "Novo Status",
             type: "select",
             value: status,
+            placeholder: "Selecione o novo status",
             onChange: setStatus,
             options: Object.values(STATUS_OPTIONS).map(s => ({ value: s, label: s })),
-            required: true
+            required: true,
         }
     ];
 
@@ -211,15 +212,27 @@ export const formEditStatus = ({ pedido, onSuccess }) => {
         event.preventDefault();
         setMessageFormEditStatus("");
 
+        if (status === pedido?.status) {
+            setMessageTypeFormEditStatus("error");
+            setMessageFormEditStatus("Selecione um status diferente do atual.");
+            return;
+        }
+
         try {
             await updatePedidoStatus(pedido.id, status);
             setMessageTypeFormEditStatus("success");
             setMessageFormEditStatus("Status atualizado com sucesso!");
 
             if (onSuccess) onSuccess();
+
+            setMessageFormEditStatus("");
+            setStatus(pedido?.status || "Pendente");
         } catch (error) {
             setMessageTypeFormEditStatus("error");
             setMessageFormEditStatus(error.message || "Erro ao atualizar status.");
+
+            setMessageFormEditStatus("");
+            setStatus(pedido?.status || "Pendente");
         }
     };
 
@@ -249,9 +262,11 @@ export const formDeletePedido = ({ pedido, onSuccess }) => {
             setMessageFormDeletePedido("Pedido deletado com sucesso!");
 
             if (onSuccess) onSuccess();
+            setMessageFormDeletePedido("");
         } catch (error) {
             setMessageTypeFormDeletePedido("error");
             setMessageFormDeletePedido(error.message || "Erro ao deletar pedido.");
+            setMessageFormDeletePedido("");
         }
     };
 

@@ -75,5 +75,24 @@ namespace api.Servicos
                 .Where(i => i.ReceitaId == receitaId)
                 .ToListAsync();
         }
+
+        public async Task<bool> DeletarReceita(int id)
+        {
+            var receita = await _context.Receitas.FindAsync(id);
+            if (receita == null) return false;
+
+            var ingredientes = await _context.ReceitaIngredientes
+                .Where(i => i.ReceitaId == id)
+                .ToListAsync();
+
+            foreach (var ingrediente in ingredientes)
+            {
+                _context.ReceitaIngredientes.Remove(ingrediente);
+            }
+
+            _context.Receitas.Remove(receita);
+            await _context.SaveChangesAsync();
+            return true;
+        }
     }
 }
