@@ -22,12 +22,11 @@ export async function getRecipes() {
     }
 }
 
-export const addProduct = async ({ name, price, recipeId, cost, ativo = true }) => {
+export const addProduct = async ({ name, price, cost, ativo = true }) => {
     try {
         const novoProduto = {
             nome: name,
             preco: price,
-            receita_id: recipeId,
             custo: cost,
             ativo: ativo
         };
@@ -50,6 +49,7 @@ export const editProduct = async ({ nome, preco, custo, receita_id, ativo, id })
             ativo
         });
 
+        console.log("Produto editado com sucesso:", response.data);
         return response.data; 
     }
     catch (error) { 

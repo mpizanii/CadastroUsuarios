@@ -83,6 +83,7 @@ namespace api.Servicos
             produto.Preco = produtoDTO.Preco;
             produto.Custo = produtoDTO.Custo;
             produto.Ativo = produtoDTO.Ativo;
+            produto.Receita_id = produtoDTO.Receita_Id;
 
             await _context.SaveChangesAsync();
             return true;
@@ -93,7 +94,10 @@ namespace api.Servicos
             var produto = await _context.Produtos.FindAsync(id);
             if (produto == null) return false;
 
-            await _receitasServico.DeletarReceita(produto.Receita_id);
+            if (produto.Receita_id.HasValue)
+            {
+                await _receitasServico.DeletarReceita(produto.Receita_id.Value);
+            }
 
             _context.Produtos.Remove(produto);
             await _context.SaveChangesAsync();
