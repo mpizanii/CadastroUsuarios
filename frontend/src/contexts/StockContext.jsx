@@ -5,12 +5,18 @@ const StockContext = createContext();
 
 export function StockProvider({ children }) {
     const [insumos, setInsumos] = useState([]);
+    const [insumosLoaded, setInsumosLoaded] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [alertas, setAlertas] = useState([]);
     const [loadingAlertas, setLoadingAlertas] = useState(false);
 
-    const fetchInsumos = useCallback(async () => {
+    const fetchInsumos = useCallback(async (forceReload = false) => {
+        if (insumosLoaded && !forceReload) {
+            console.log("Insumos já carregados, não buscando novamente.");
+            return insumos;
+        }
+
         console.log("Buscando insumos da API");
         setLoading(true);
         setError(null);
@@ -18,6 +24,7 @@ export function StockProvider({ children }) {
         try {
             const data = await getInsumos();
             setInsumos(data || []);
+            setInsumosLoaded(true);
 
             console.log("Insumos atualizados da API");
             return data;
@@ -28,7 +35,7 @@ export function StockProvider({ children }) {
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [insumosLoaded, insumos]);
 
     const fetchAlertas = async () => {
         setLoadingAlertas(true);
@@ -59,6 +66,7 @@ export function StockProvider({ children }) {
 
     const value = {
         insumos,
+        insumosLoaded,
         loading,
         error,
         alertas,

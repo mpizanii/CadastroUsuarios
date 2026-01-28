@@ -11,6 +11,7 @@ namespace api.Interfaces
     {
         Task<IEnumerable<ProdutosDTO>> ObterTodosProdutos();
         Task<ProdutosDTO> ObterProdutoPorId(int id);
+        Task<ProdutosDTO> ObterProdutoPorReceitaId(int receitaId);
         Task<Produtos> AdicionarProduto(Produtos produto);
         Task<bool> EditarProduto(int id, ProdutosDTO produtoDto);
         Task<bool> DeletarProduto(int id);

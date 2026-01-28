@@ -5,7 +5,6 @@ import { FiArrowLeft } from "react-icons/fi";
 import { SlPencil } from "react-icons/sl";
 import { MdOutlineMap } from "react-icons/md";
 import MapeamentoModal from "../../components/mapeamento/MapeamentoModal";
-import { getIngredientesComMapeamento,  mapearIngrediente, getRecipeDetails } from "../../services/recipesService";
 import { useRecipeDetails } from "../../hooks/useRecipeDetails";
 
 export default function RecipeDetailPage() {
@@ -17,7 +16,6 @@ export default function RecipeDetailPage() {
   const { 
     recipe,
     product,
-    ingredients,
     insumos,
     loading,
     error,
@@ -105,8 +103,8 @@ export default function RecipeDetailPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {ingredients && ingredients.length > 0 ? (
-                    ingredients.map((ingrediente, index) => (
+                  {recipe.ingredientes && recipe.ingredientes.length > 0 ? (
+                    recipe.ingredientes.map((ingrediente, index) => (
                       <tr key={index} style={{ borderBottom: "1px solid #f0f0f0" }}>
                         <td style={{ padding: "16px 20px" }}>
                           <div 
