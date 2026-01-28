@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
-import { supabase } from "../../services/supabase";
-import { CustomContainer, LeftSectionLogin, RightSectionLogin, Message } from "./StyledAuthPages";
+import { supabase } from "../../utils/supabase";
 import svgAnimadoRedefinirSenha from "../../assets/svgAnimadoRedefinirSenha.svg";
-import { Row, Col, Card, Form, Button } from "react-bootstrap";
+import { Container, Row, Col, Card, Form, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
 export default function ResetPasswordPage() {
@@ -60,13 +59,13 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <CustomContainer fluid>
+    <Container fluid style={{ width: "100vw", height: "100vh", backgroundColor: "#e9ecef" }}>
       <Row className="justify-content-center align-items-center h-100">
         <Col md={8}>
           <Card className="shadow-lg" style={{ borderRadius: "10px", overflow: "hidden" }}>
             <Row className="g-0">
               <Col md={6}>
-                <LeftSectionLogin>
+                <div className="bg-white h-100 d-flex flex-column justify-content-center align-items-center text-dark" style={{ padding: "2rem" }}>
                   <h1>Redefinição de senha!</h1>
                   <img
                     src={svgAnimadoRedefinirSenha}
@@ -79,11 +78,11 @@ export default function ResetPasswordPage() {
                   >
                     Business illustrations by Storyset
                   </a>
-                </LeftSectionLogin>
+                </div>
               </Col>
 
               <Col md={6}>
-                <RightSectionLogin>
+                <div className="h-100 d-flex w-100 flex-column justify-content-center text-white text-center" style={{ backgroundColor: "#8B0000", padding: "2rem" }}>
                   <h1>Redefinir Senha</h1>
                   <Form className="mt-3 d-flex justify-content-center align-items-center flex-column text-start w-100" onSubmit={handleSubmit}>
                     <Form.Group className="mb-3 position-relative" controlId="formNewPassword" style={{ width: "70%" }}>
@@ -111,13 +110,13 @@ export default function ResetPasswordPage() {
                     </Button>
                   </Form>
 
-                  {message && <Message type={messageType}>{message}</Message>}
-                </RightSectionLogin>
+                  {message && <div className="mt-3" style={{ color: messageType === "success" ? "green" : "red" }}>{message}</div>}
+                </div>
               </Col>
             </Row>
           </Card>
         </Col>
       </Row>
-    </CustomContainer>
+    </Container>
   );
 }

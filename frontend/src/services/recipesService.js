@@ -1,28 +1,33 @@
 import axios from "axios";
+import { useStock } from "../contexts/StockContext";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-export async function getIngredientesComMapeamento(receitaId) {
+export const addRecipe = async ({ name, modo_preparo, ingredientes }) => {
     try {
-        console.log(`Buscando ingredientes com mapeamento para receita ${receitaId}`);
-        const response = await axios.get(`${API_URL}/Mapeamento/receita/${receitaId}`);
-        console.log("Ingredientes com mapeamento:", response.data);
-        return response.data;
+        const novaReceita = {
+            nome: name,
+            modo_Preparo: modo_preparo,
+            ingredientes: ingredientes
+        };
+        const response = await axios.post(`${API_URL}/Receitas`, novaReceita);
+        return response.data; 
     } catch (error) {
-        console.error("Erro ao buscar ingredientes com mapeamento:", error);
-        return [];
+        console.error('Erro ao adicionar receita:', error);
+        throw new Error('Erro ao adicionar receita');
     }
 }
 
-export async function getInsumos() {
+export async function getRecipeDetails(id) {
     try {
-        console.log("Buscando insumos...");
-        const response = await axios.get(`${API_URL}/Insumos`);
-        console.log("Insumos encontrados:", response.data);
-        return response.data;
+        const response = await axios.get(`${API_URL}/Receitas/${id}`);
+
+        const associatedProduct = await axios.get(`${API_URL}/Produtos/receita/${id}`);
+        
+        return {recipe: response.data, product: associatedProduct.data };
     } catch (error) {
-        console.error("Erro ao buscar insumos:", error);
-        return [];
+        console.error("Erro ao buscar detalhes da receita:", error);
+        return null;
     }
 }
 

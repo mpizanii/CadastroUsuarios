@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { addInsumo, editInsumo, deleteInsumo } from "./ApiCalls.js";
+import { addInsumo, editInsumo, deleteInsumo } from "../services/stockService";
 
 const UNIT_OPTIONS = ["g", "ml", "un", "colher", "xícara"];
 
@@ -83,7 +83,6 @@ export const formAddInsumo = ({ onSuccess }) => {
             setMessageTypeFormAddInsumo("success");
             setMessageFormAddInsumo("Insumo cadastrado com sucesso!");
 
-            // Limpar form
             setNome("");
             setQuantidade("");
             setUnidade("g");
@@ -107,13 +106,11 @@ export const formAddInsumo = ({ onSuccess }) => {
 };
 
 export const formEditInsumo = ({ insumo, onSuccess }) => {
-    const [nome, setNome] = useState(insumo?.nome || "");
-    const [quantidade, setQuantidade] = useState(insumo?.quantidade || "");
-    const [unidade, setUnidade] = useState(insumo?.unidade || "g");
-    const [validade, setValidade] = useState(
-        insumo?.validade ? new Date(insumo.validade).toISOString().split('T')[0] : ""
-    );
-    const [estoqueMinimo, setEstoqueMinimo] = useState(insumo?.estoqueMinimo || "");
+    const [newName, setNewName] = useState("");
+    const [newQuantity, setNewQuantity] = useState("");
+    const [newUnit, setNewUnit] = useState("");
+    const [newValidity, setNewValidity] = useState("");
+    const [newMinimumStock, setNewMinimumStock] = useState("");
     const [messageFormEditInsumo, setMessageFormEditInsumo] = useState("");
     const [messageTypeFormEditInsumo, setMessageTypeFormEditInsumo] = useState("success");
 
@@ -123,45 +120,43 @@ export const formEditInsumo = ({ insumo, onSuccess }) => {
         { 
             id: "nome", 
             label: "Nome do Insumo", 
-            placeholder: "Ex: Farinha de Trigo", 
-            value: nome, 
-            onChange: setNome, 
-            required: true 
+            placeholder: insumo?.nome, 
+            value: newName, 
+            onChange: setNewName, 
         },
         { 
             id: "quantidade", 
             label: "Quantidade Atual", 
             type: "number", 
-            placeholder: "0", 
-            value: quantidade, 
-            onChange: setQuantidade, 
-            required: true,
+            placeholder: insumo?.quantidade, 
+            value: newQuantity, 
+            onChange: setNewQuantity, 
             step: "0.01"
         },
         { 
             id: "unidade", 
             label: "Unidade", 
             type: "select", 
-            value: unidade, 
-            onChange: setUnidade, 
+            placeholder: insumo?.unidade,
+            value: newUnit, 
+            onChange: setNewUnit, 
             options: UNIT_OPTIONS.map((unit) => ({ value: unit, label: unit })),
-            required: true 
         },
         { 
             id: "validade", 
             label: "Data de Validade", 
+            placeholder: insumo?.validade,
             type: "date", 
-            value: validade, 
-            onChange: setValidade 
+            value: newValidity, 
+            onChange: setNewValidity 
         },
         { 
             id: "estoqueMinimo", 
             label: "Estoque Mínimo", 
             type: "number", 
-            placeholder: "0", 
-            value: estoqueMinimo, 
-            onChange: setEstoqueMinimo, 
-            required: true,
+            placeholder: insumo?.estoqueMinimo, 
+            value: newMinimumStock, 
+            onChange: setNewMinimumStock, 
             step: "0.01"
         }
     ];
@@ -170,28 +165,36 @@ export const formEditInsumo = ({ insumo, onSuccess }) => {
         event.preventDefault();
         setMessageFormEditInsumo("");
 
-        if (!nome || !quantidade || !unidade || !estoqueMinimo) {
-            setMessageTypeFormEditInsumo("error");
-            setMessageFormEditInsumo("Por favor, preencha todos os campos obrigatórios.");
-            return;
-        }
-
         try {
             await editInsumo(insumo.id, {
-                nome,
-                quantidade: parseFloat(quantidade),
-                unidade,
-                validade: validade ? new Date(validade).toISOString() : null,
-                estoqueMinimo: parseFloat(estoqueMinimo)
+                nome: newName || insumo?.nome,
+                quantidade: parseFloat(newQuantity) || insumo?.quantidade,
+                unidade: newUnit || insumo?.unidade,
+                validade: newValidity || insumo?.validade,
+                estoqueMinimo: parseFloat(newMinimumStock) || insumo?.estoqueMinimo
             });
 
             setMessageTypeFormEditInsumo("success");
             setMessageFormEditInsumo("Insumo atualizado com sucesso!");
 
             if (onSuccess) onSuccess();
+
+            setNewName("");
+            setNewQuantity("");
+            setNewUnit("g");
+            setNewValidity("");
+            setNewMinimumStock("");
+            setMessageFormEditInsumo("");
         } catch (error) {
             setMessageTypeFormEditInsumo("error");
             setMessageFormEditInsumo(error.message || "Erro ao atualizar insumo.");
+
+            setNewName("");
+            setNewQuantity("");
+            setNewUnit("g");
+            setNewValidity("");
+            setNewMinimumStock("");
+             setMessageFormEditInsumo(error.message || "Erro ao atualizar insumo.");
         }
     };
 

@@ -25,7 +25,7 @@ namespace api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AdicionarReceita(ReceitasDTO receita)
+        public async Task<IActionResult> AdicionarReceita(CriarReceitasDTO receita)
         {
             var novaReceita = await _receitasServico.AdicionarReceita(receita);
             return CreatedAtAction(nameof(ObterPorId), new { id = novaReceita.Id }, novaReceita);
@@ -41,7 +41,7 @@ namespace api.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> ObterPorId(int id)
         {
-            var receita = await _receitasServico.ObterPorId(id);
+            var receita = await _receitasServico.ObterReceitaComMapeamento(id);
             if (receita == null)
             {
                 return NotFound();

@@ -53,6 +53,25 @@ namespace api.Controllers
             }
         }
 
+        [HttpGet("receita/{receitaId}")]
+        public async Task<IActionResult> ObterProdutoPorReceitaId(int receitaId)
+        {
+            try
+            {
+                var produto = await _produtosServico.ObterProdutoPorReceitaId(receitaId);
+                if (produto == null)
+                {
+                    return NotFound();
+                }
+                return Ok(produto);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Erro ao obter produto: " + ex.Message);
+                return StatusCode(500, "Erro interno do servidor");
+            }
+        }
+
         [HttpPost]
         public async Task<IActionResult> AdicionarProduto([FromBody] Produtos produto)
         {

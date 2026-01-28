@@ -10,9 +10,10 @@ namespace api.Interfaces
 {
     public interface IReceitasServico
     {
-        Task<Receitas> AdicionarReceita(ReceitasDTO receita);
-        Task<Receitas?> ObterPorId(int id);
+        Task<Receitas> AdicionarReceita(CriarReceitasDTO receita);
+        Task<ReceitasComMapeamentoDTO?> ObterReceitaComMapeamento(int id);
         Task<List<Receitas?>> ObterReceitas();
         Task<List<ReceitaIngredientes>?> ObterIngredientesReceita(int receitaId);
+        Task<bool> DeletarReceita(int id);
     }
 }
