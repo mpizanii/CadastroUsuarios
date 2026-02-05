@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { addInsumo, editInsumo, deleteInsumo } from "../services/stockService";
 
 const UNIT_OPTIONS = ["g", "ml", "un", "colher", "xícara"];
@@ -111,10 +111,36 @@ export const formEditInsumo = ({ insumo, onSuccess }) => {
     const [newUnit, setNewUnit] = useState("");
     const [newValidity, setNewValidity] = useState("");
     const [newMinimumStock, setNewMinimumStock] = useState("");
+    const [showUnitWarning, setShowUnitWarning] = useState(false);
+    const [confirmUnitChange, setConfirmUnitChange] = useState(false);
     const [messageFormEditInsumo, setMessageFormEditInsumo] = useState("");
     const [messageTypeFormEditInsumo, setMessageTypeFormEditInsumo] = useState("success");
 
     const titleFormEditInsumo = "Editar Insumo";
+
+    useEffect(() => {
+        if (insumo?.unidade) {
+            setNewUnit(insumo.unidade);
+        }
+        setShowUnitWarning(false);
+        setConfirmUnitChange(false);
+        setNewName("");
+        setNewQuantity("");
+        setNewValidity("");
+        setNewMinimumStock("");
+        setMessageFormEditInsumo("");
+    }, [insumo]);
+
+    const handleUnitChange = (value) => {
+        setNewUnit(value);
+        if (value && value !== insumo?.unidade) {
+            setShowUnitWarning(true);
+            setConfirmUnitChange(false);
+        } else {
+            setShowUnitWarning(false);
+            setConfirmUnitChange(false);
+        }
+    };
 
     const fieldsFormEditInsumo = [
         { 
@@ -137,9 +163,8 @@ export const formEditInsumo = ({ insumo, onSuccess }) => {
             id: "unidade", 
             label: "Unidade", 
             type: "select", 
-            placeholder: insumo?.unidade,
             value: newUnit, 
-            onChange: setNewUnit, 
+            onChange: handleUnitChange, 
             options: UNIT_OPTIONS.map((unit) => ({ value: unit, label: unit })),
         },
         { 
@@ -158,43 +183,66 @@ export const formEditInsumo = ({ insumo, onSuccess }) => {
             value: newMinimumStock, 
             onChange: setNewMinimumStock, 
             step: "0.01"
-        }
+        },
+        ...(showUnitWarning ? [{
+            id: "confirmUnitChange",
+            label: "Confirmar Alteração de Unidade",
+            type: "checkbox",
+            value: confirmUnitChange,
+            onChange: setConfirmUnitChange,
+            helperText: "Alterar a unidade removerá todos os mapeamentos deste insumo em receitas. Esta ação não pode ser desfeita.",
+            required: true
+        }]: [])
     ];
 
     const handleSubmitFormEditInsumo = async (event) => {
         event.preventDefault();
         setMessageFormEditInsumo("");
 
+        if (newUnit && newUnit !== insumo?.unidade && !confirmUnitChange) {
+            setMessageTypeFormEditInsumo("error");
+            setMessageFormEditInsumo("Por favor, confirme a alteração de unidade.");
+            return;
+        }
+
         try {
+            const unitChanged = newUnit && newUnit !== insumo?.unidade;
             await editInsumo(insumo.id, {
                 nome: newName || insumo?.nome,
                 quantidade: parseFloat(newQuantity) || insumo?.quantidade,
                 unidade: newUnit || insumo?.unidade,
                 validade: newValidity || insumo?.validade,
-                estoqueMinimo: parseFloat(newMinimumStock) || insumo?.estoqueMinimo
+                estoqueMinimo: parseFloat(newMinimumStock) || insumo?.estoqueMinimo,
+                removeMapping: unitChanged
             });
 
             setMessageTypeFormEditInsumo("success");
-            setMessageFormEditInsumo("Insumo atualizado com sucesso!");
+            setMessageFormEditInsumo(
+                unitChanged 
+                    ? "Insumo atualizado e mapeamentos removidos com sucesso!" 
+                    : "Insumo atualizado com sucesso!"
+            );
 
             if (onSuccess) onSuccess();
 
             setNewName("");
             setNewQuantity("");
-            setNewUnit("g");
+            setNewUnit("");
             setNewValidity("");
             setNewMinimumStock("");
-            setMessageFormEditInsumo("");
+            setShowUnitWarning(false);
+            setConfirmUnitChange(false);
         } catch (error) {
             setMessageTypeFormEditInsumo("error");
             setMessageFormEditInsumo(error.message || "Erro ao atualizar insumo.");
 
             setNewName("");
             setNewQuantity("");
-            setNewUnit("g");
+            setNewUnit("");
             setNewValidity("");
             setNewMinimumStock("");
-             setMessageFormEditInsumo(error.message || "Erro ao atualizar insumo.");
+            setShowUnitWarning(false);
+            setConfirmUnitChange(false);
         }
     };
 

@@ -62,7 +62,7 @@ export default function ModalForm( { title, visible, setVisible, fields, onSubmi
                                             required={field.required || false}
                                             style={{ height: "30px", lineHeight: "30px", fontSize: "14px", borderRadius: "10px", padding: "0 10px" }}
                                         >
-                                            <option value="">{field.placeholder || "Selecione uma opção..."}</option>
+                                            {field.placeholder && <option value="">{field.placeholder}</option>}
                                             {field.options?.map((option) => (
                                                 <option key={option.value} value={option.value}>
                                                     {option.label}
@@ -85,15 +85,22 @@ export default function ModalForm( { title, visible, setVisible, fields, onSubmi
                                         />
                                     </>
                                 ) : field.type === "checkbox" ? (
-                                    <div style={{ width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-                                        <label style={{ margin: 0, fontWeight: "bold" }}>{field.label}</label>
-                                        <Form.Check 
-                                            type="switch"
-                                            id={field.id}
-                                            checked={Boolean(field.value)}
-                                            onChange={(e) => field.onChange(e.target.checked)}
-                                        />
-                                    </div>
+                                    <>
+                                        <div style={{ width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                                            <label style={{ margin: 0, fontWeight: "bold" }}>{field.label}</label>
+                                            <Form.Check 
+                                                type="switch"
+                                                id={field.id}
+                                                checked={Boolean(field.value)}
+                                                onChange={(e) => field.onChange(e.target.checked)}
+                                            />
+                                        </div>
+                                        {field.helperText && (
+                                            <small style={{ color: "#dc3535", fontSize: "0.875em", marginTop: "-4px", display: "block", marginBottom: "8px" }}>
+                                                {field.helperText}
+                                            </small>
+                                        )}
+                                    </>
                                 ) : field.type === "ingredients-list" ? (
                                     <>
                                         <div style={{ width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "5px" }}>
