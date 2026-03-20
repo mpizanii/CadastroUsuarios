@@ -1,39 +1,5 @@
 import { useState, useEffect } from "react";
 import { Modal, Button, Form, Alert } from "react-bootstrap";
-import styled from "styled-components";
-
-const StyledFormSelect = styled.select`
-    width: 100%;
-    height: 40px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    padding: 0 12px;
-    font-size: 14px;
-    &:focus {
-        outline: none;
-        border-color: #0d6efd;
-    }
-`;
-
-const WarningBox = styled.div`
-    background: #fff3cd;
-    border: 1px solid #ffc107;
-    border-radius: 8px;
-    padding: 12px;
-    margin-bottom: 16px;
-    font-size: 14px;
-    color: #856404;
-`;
-
-const SuccessBox = styled.div`
-    background: #d1e7dd;
-    border: 1px solid #28a745;
-    border-radius: 8px;
-    padding: 12px;
-    margin-bottom: 16px;
-    font-size: 14px;
-    color: #0f5132;
-`;
 
 export default function MapeamentoModal({ 
     visible, 
@@ -127,10 +93,11 @@ export default function MapeamentoModal({
                 <Form onSubmit={handleSubmit}>
                     <Form.Group className="mb-3">
                         <Form.Label>Insumo do Estoque</Form.Label>
-                        <StyledFormSelect
+                        <Form.Select
                             value={selectedInsumoId}
                             onChange={(e) => setSelectedInsumoId(e.target.value)}
                             required
+                            style={{ height: '40px', borderRadius: '8px', fontSize: '14px' }}
                         >
                             <option value="">Selecione um insumo...</option>
                             {insumos.map((insumo) => (
@@ -138,13 +105,13 @@ export default function MapeamentoModal({
                                     {insumo.nome} ({insumo.quantidade} {insumo.unidade} disponível)
                                 </option>
                             ))}
-                        </StyledFormSelect>
+                        </Form.Select>
                     </Form.Group>
 
                     {insumoSelecionado && (
                         <>
                             {unidadesCompativeis ? (
-                                <SuccessBox>
+                                <Alert variant="success" className="mb-3" style={{ fontSize: '14px' }}>
                                     <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
                                         <strong>Unidades compatíveis!</strong>
                                     </div>
@@ -155,9 +122,9 @@ export default function MapeamentoModal({
                                     <div style={{ marginTop: "8px", fontSize: "13px", fontStyle: "italic" }}>
                                         Ao criar um pedido, será descontado automaticamente do estoque.
                                     </div>
-                                </SuccessBox>
+                                </Alert>
                             ) : (
-                                <WarningBox>
+                                <Alert variant="warning" className="mb-3" style={{ fontSize: '14px' }}>
                                     <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
                                         <span style={{ fontSize: "18px" }}>⚠️</span>
                                         <strong>Unidades incompatíveis!</strong>
@@ -169,7 +136,7 @@ export default function MapeamentoModal({
                                     <div style={{ marginTop: "8px", fontSize: "13px" }}>
                                         Você precisa ajustar as unidades para serem iguais antes de mapear.
                                     </div>
-                                </WarningBox>
+                                </Alert>
                             )}
                         </>
                     )}

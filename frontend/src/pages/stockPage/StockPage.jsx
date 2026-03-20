@@ -2,124 +2,13 @@ import { Container, Row, Col, Card, Badge, Button, Form, InputGroup, Modal, Spin
 import { FiSearch, FiPackage, FiEdit2, FiTrash2, FiPlus } from 'react-icons/fi';
 import { LuPackagePlus } from 'react-icons/lu';
 import { useState, useEffect } from 'react';
-import styled from 'styled-components';
 import ModalForm from '../../components/menu/ModalForm';
-import { getInsumos, getInsumosComAlertas } from './ApiCalls';
-import { formAddInsumo, formEditInsumo, formDeleteInsumo, formAdicionar } from './Forms';
-
-const StyledCard = styled(Card)`
-  border-radius: 12px;
-  border: none;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  transition: transform 0.2s, box-shadow 0.2s;
-  
-  &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-  }
-`;
-
-const IconBox = styled.div`
-  width: 56px;
-  height: 56px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: ${props => props.bgColor || '#fff8e6'};
-`;
-
-const StyledButton = styled(Button)`
-  border-radius: 8px;
-  padding: 8px 16px;
-  font-weight: 500;
-  border: none;
-  
-  &.btn-primary {
-    background-color: #e76e50;
-    
-    &:hover {
-      background-color: #d45a3c;
-    }
-  }
-`;
-
-const SearchInput = styled(Form.Control)`
-  border-radius: 8px;
-  border: 1px solid #e0e0e0;
-  padding: 10px 16px;
-  
-  &:focus {
-    border-color: #e76e50;
-    box-shadow: 0 0 0 0.2rem rgba(231, 110, 80, 0.15);
-  }
-`;
-
-const AlertButton = styled(Button)`
-  border-radius: 8px;
-  padding: 10px 20px;
-  font-weight: 500;
-  border: 1px solid #e0e0e0;
-  background-color: white;
-  color: #333;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  
-  &:hover {
-    background-color: #f8f9fa;
-    border-color: #e76e50;
-    color: #333;
-  }
-`;
-
-const ProgressBar = styled.div`
-  width: 100%;
-  height: 6px;
-  background-color: #f0f0f0;
-  border-radius: 3px;
-  overflow: hidden;
-  margin-top: 8px;
-  
-  .progress-fill {
-    height: 100%;
-    background-color: ${props => props.color || '#4caf50'};
-    transition: width 0.3s ease;
-  }
-`;
-
-const AlertModal = styled(Modal)`
-  .modal-content {
-    border-radius: 12px;
-    border: none;
-  }
-  
-  .modal-header {
-    border-bottom: 1px solid #f0f0f0;
-    padding: 20px 24px;
-  }
-  
-  .modal-body {
-    padding: 24px;
-  }
-`;
-
-const AlertItem = styled.div`
-  padding: 16px;
-  border-radius: 8px;
-  background-color: #f8f9fa;
-  margin-bottom: 12px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  
-  &:last-child {
-    margin-bottom: 0;
-  }
-`;
+import { getInsumosComAlertas } from '../../services/stockService';
+import { formAddInsumo, formEditInsumo, formDeleteInsumo, formAdicionar } from '../../forms/stockForms';
+import { useStock } from '../../contexts/StockContext';
 
 const StockPage = () => {
-  const [insumos, setInsumos] = useState([]);
+  const { insumos, loading, error, fetchInsumos } = useStock();
   const [filteredInsumos, setFilteredInsumos] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [menuAddInsumoAtivo, setMenuAddInsumoAtivo] = useState(false);
@@ -129,25 +18,11 @@ const StockPage = () => {
   const [selectedInsumo, setSelectedInsumo] = useState(null);
   const [showAlertModal, setShowAlertModal] = useState(false);
   const [alertas, setAlertas] = useState([]);
-  const [loading, setLoading] = useState(false);
-
-  const loadInsumos = async () => {
-    setLoading(true);
-    try {
-      const data = await getInsumos();
-      setInsumos(data);
-      setFilteredInsumos(data);
-    } catch (error) {
-      console.error('Erro ao carregar insumos:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const { titleFormAddInsumo, fieldsFormAddInsumo, handleSubmitFormAddInsumo, messageFormAddInsumo, messageTypeFormAddInsumo } = formAddInsumo({
     onSuccess: () => {
       setMenuAddInsumoAtivo(false);
-      loadInsumos();
+      fetchInsumos();
     },
   });
 
@@ -155,7 +30,7 @@ const StockPage = () => {
     insumo: selectedInsumo,
     onSuccess: () => {
       setMenuEditInsumoAtivo(false);
-      loadInsumos();
+      fetchInsumos();
     },
   });
 
@@ -163,7 +38,7 @@ const StockPage = () => {
     insumo: selectedInsumo,
     onSuccess: () => {
       setMenuDeleteInsumoAtivo(false);
-      loadInsumos();
+      fetchInsumos();
     },
   });
 
@@ -171,12 +46,14 @@ const StockPage = () => {
     insumo: selectedInsumo,
     onSuccess: () => {
       setMenuAdicionarAtivo(false);
-      loadInsumos();
+      fetchInsumos();
     },
   });
 
   useEffect(() => {
-    loadInsumos();
+    if (insumos.length === 0) {
+      fetchInsumos();
+    }
   }, []);
 
   useEffect(() => {
@@ -225,11 +102,23 @@ const StockPage = () => {
     return date.toLocaleDateString('pt-BR');
   };
 
-  if (loading) {
+  if (loading && insumos.length === 0) {
     return(
       <div style={{ display: "flex", flexDirection: "column", gap: "5px", justifyContent: "center", alignItems: "center", height: "100vh" }}>
         <Spinner animation="border" role="status" />
         <span>Carregando insumos</span>
+      </div>
+    )
+  }
+
+  if (error && insumos.length === 0) {
+    return(
+      <div style={{ display: "flex", flexDirection: "column", gap: "15px", justifyContent: "center", alignItems: "center", height: "100vh" }}>
+        <i className="bi bi-exclamation-triangle" style={{ fontSize: "48px", color: "#dc3545" }} />
+        <span style={{ color: "#666" }}>{error}</span>
+        <Button onClick={fetchInsumos} variant="outline-primary">
+          Tentar Novamente
+        </Button>
       </div>
     )
   }
@@ -244,14 +133,15 @@ const StockPage = () => {
             <p className="text-muted mb-0">Controle seu estoque de insumos</p>
           </Col>
           <Col xs="auto">
-            <StyledButton 
-              variant="primary" 
+            <Button 
+              variant="primary"
               onClick={() => setMenuAddInsumoAtivo(true)}
               className="d-flex align-items-center gap-2"
+              style={{ borderRadius: '8px', padding: '8px 16px', fontWeight: '500', border: 'none', backgroundColor: '#e76e50' }}
             >
               <FiPlus size={18} />
               Novo Insumo
-            </StyledButton>
+            </Button>
           </Col>
         </Row>
 
@@ -262,23 +152,44 @@ const StockPage = () => {
               <InputGroup.Text style={{ backgroundColor: 'white', border: '1px solid #e0e0e0', borderRight: 'none' }}>
                 <FiSearch />
               </InputGroup.Text>
-              <SearchInput
+              <Form.Control
                 placeholder="Buscar insumos..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                style={{ borderLeft: 'none' }}
+                style={{ borderLeft: 'none', borderRadius: '8px', border: '1px solid #e0e0e0', padding: '10px 16px' }}
               />
             </InputGroup>
           </Col>
           <Col md={6} className="d-flex justify-content-end">
-            <AlertButton onClick={loadAlertas}>
+            <Button 
+              onClick={loadAlertas}
+              style={{ 
+                borderRadius: '8px', 
+                padding: '10px 20px', 
+                fontWeight: '500', 
+                border: '1px solid #e0e0e0', 
+                backgroundColor: 'white', 
+                color: '#333', 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '8px' 
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#f8f9fa';
+                e.currentTarget.style.borderColor = '#e76e50';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'white';
+                e.currentTarget.style.borderColor = '#e0e0e0';
+              }}
+            >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
                 <line x1="12" y1="9" x2="12" y2="13"/>
                 <line x1="12" y1="17" x2="12.01" y2="17"/>
               </svg>
               Alertas
-            </AlertButton>
+            </Button>
           </Col>
         </Row>
 
@@ -290,12 +201,37 @@ const StockPage = () => {
 
             return (
               <Col key={insumo.id} xs={12} sm={6} lg={4} xl={3} className="mb-4">
-                <StyledCard>
+                <Card
+                  style={{ 
+                    borderRadius: '12px', 
+                    border: 'none', 
+                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)', 
+                    transition: 'transform 0.2s, box-shadow 0.2s' 
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-4px)';
+                    e.currentTarget.style.boxShadow = '0 4px 16px rgba(0, 0, 0, 0.12)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.08)';
+                  }}
+                >
                   <Card.Body>
                     <div className="d-flex justify-content-between align-items-start mb-3">
-                      <IconBox bgColor="#fff8e6">
+                      <div 
+                        style={{ 
+                          width: '56px', 
+                          height: '56px', 
+                          borderRadius: '12px', 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          justifyContent: 'center', 
+                          backgroundColor: '#fff8e6' 
+                        }}
+                      >
                         <FiPackage size={24} color="#f59e0b" />
-                      </IconBox>
+                      </div>
                       {getStatusBadge(insumo.statusEstoque)}
                     </div>
 
@@ -317,9 +253,26 @@ const StockPage = () => {
                           {insumo.estoqueMinimo} {insumo.unidade}
                         </span>
                       </div>
-                      <ProgressBar color={progressColor}>
-                        <div className="progress-fill" style={{ width: `${nivelEstoque}%` }} />
-                      </ProgressBar>
+                      <div 
+                        style={{ 
+                          width: '100%', 
+                          height: '6px', 
+                          backgroundColor: '#f0f0f0', 
+                          borderRadius: '3px', 
+                          overflow: 'hidden', 
+                          marginTop: '8px' 
+                        }}
+                      >
+                        <div 
+                          className="progress-fill" 
+                          style={{ 
+                            height: '100%', 
+                            backgroundColor: progressColor, 
+                            transition: 'width 0.3s ease', 
+                            width: `${nivelEstoque}%` 
+                          }} 
+                        />
+                      </div>
                       <div className="text-end mt-1">
                         <span className="small text-muted">Nível do estoque</span>
                         <span className="small fw-bold ms-2">{nivelEstoque}%</span>
@@ -351,7 +304,7 @@ const StockPage = () => {
                       </Button>
                     </div>
                   </Card.Body>
-                </StyledCard>
+                </Card>
               </Col>
             );
           })}
@@ -431,8 +384,13 @@ const StockPage = () => {
       )}
 
       {/* Modal de Alertas */}
-      <AlertModal show={showAlertModal} onHide={() => setShowAlertModal(false)} centered size="lg">
-        <Modal.Header closeButton>
+      <Modal 
+        show={showAlertModal} 
+        onHide={() => setShowAlertModal(false)} 
+        centered 
+        size="lg"
+      >
+        <Modal.Header closeButton style={{ borderBottom: '1px solid #f0f0f0', padding: '20px 24px' }}>
           <Modal.Title className="fw-bold">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="me-2">
               <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
@@ -442,7 +400,7 @@ const StockPage = () => {
             Alertas de Estoque
           </Modal.Title>
         </Modal.Header>
-        <Modal.Body>
+        <Modal.Body style={{ padding: '24px' }}>
           {alertas.length === 0 ? (
             <div className="text-center py-4">
               <p className="text-muted mb-0">Nenhum alerta no momento! 🎉</p>
@@ -454,7 +412,18 @@ const StockPage = () => {
                 {alertas.length} {alertas.length === 1 ? 'insumo requer' : 'insumos requerem'} atenção
               </p>
               {alertas.map((insumo) => (
-                <AlertItem key={insumo.id}>
+                <div 
+                  key={insumo.id}
+                  style={{ 
+                    padding: '16px', 
+                    borderRadius: '8px', 
+                    backgroundColor: '#f8f9fa', 
+                    marginBottom: '12px', 
+                    display: 'flex', 
+                    justifyContent: 'space-between', 
+                    alignItems: 'center' 
+                  }}
+                >
                   <div>
                     <div className="fw-bold">{insumo.nome}</div>
                     <small className="text-muted">
@@ -464,12 +433,12 @@ const StockPage = () => {
                     </small>
                   </div>
                   {getStatusBadge(insumo.statusEstoque)}
-                </AlertItem>
+                </div>
               ))}
             </>
           )}
         </Modal.Body>
-      </AlertModal>
+      </Modal>
     </div>
   );
 };

@@ -4,11 +4,8 @@ import { Container, Card, Table, Badge, Button, Spinner } from "react-bootstrap"
 import { FiArrowLeft } from "react-icons/fi";
 import { SlPencil } from "react-icons/sl";
 import { MdOutlineMap } from "react-icons/md";
-import axios from "axios";
-import MapeamentoModal from "./MapeamentoModal";
-import { getIngredientesComMapeamento, getInsumos, mapearIngrediente } from "./MapeamentoApi";
-
-const API_URL = import.meta.env.VITE_API_URL;
+import MapeamentoModal from "../../components/mapeamento/MapeamentoModal";
+import { getIngredientesComMapeamento,  mapearIngrediente, getRecipeDetails } from "../../services/recipesService";
 
 export default function RecipeDetailPage() {
   const { id } = useParams();
@@ -25,21 +22,12 @@ export default function RecipeDetailPage() {
     const fetchRecipeDetails = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`${API_URL}/Receitas/${id}`);
-        setRecipe(response.data);
-        
-        // Buscar produto associado
-        const productsResponse = await axios.get(`${API_URL}/Produtos`);
-        const associatedProduct = productsResponse.data.find(p => p.receita_Id === parseInt(id));
-        setProduct(associatedProduct);
+        const details = await getRecipeDetails(id);
 
-        // Buscar ingredientes com mapeamento
-        const ingredientesData = await getIngredientesComMapeamento(id);
-        setIngredients(ingredientesData);
-
-        // Buscar insumos disponíveis
-        const insumosData = await getInsumos();
-        setInsumos(insumosData);
+        setRecipe(details.recipe);
+        setProduct(details.product);
+        setIngredients(details.ingredientes);
+        setInsumos(details.insumos);
       } catch (error) {
         console.error("Erro ao buscar receita:", error);
       } finally {
