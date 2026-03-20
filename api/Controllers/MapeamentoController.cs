@@ -15,13 +15,6 @@ namespace api.Controllers
             _mapeamentoServico = mapeamentoServico;
         }
 
-        [HttpGet("receita/{receitaId}")]
-        public async Task<ActionResult<IEnumerable<IngredienteComMapeamentoDTO>>> GetIngredientesComMapeamento(int receitaId)
-        {
-            var ingredientes = await _mapeamentoServico.ObterIngredientesComMapeamento(receitaId);
-            return Ok(ingredientes);
-        }
-
         [HttpPost]
         public async Task<IActionResult> MapearIngrediente(MapearIngredienteDTO mapearDTO)
         {

@@ -52,6 +52,23 @@ namespace api.Servicos
             return produto;
         }
 
+        public async Task<ProdutosDTO> ObterProdutoPorReceitaId(int receitaId)
+        {
+            var produto = await _context.Produtos
+                .Where(p => p.Receita_id == receitaId)
+                .Select(p => new ProdutosDTO
+                {
+                    Id = p.Id,
+                    Nome = p.Nome,
+                    Preco = p.Preco,
+                    Custo = p.Custo,
+                    Ativo = p.Ativo,
+                    Receita_Id = p.Receita_id,
+                }).FirstOrDefaultAsync();
+
+            return produto;
+        }
+
         public async Task<Produtos> AdicionarProduto(Produtos produto)
         {
             _context.Produtos.Add(produto);

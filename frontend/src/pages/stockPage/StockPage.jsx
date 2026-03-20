@@ -1,5 +1,5 @@
-import { Container, Row, Col, Card, Badge, Button, Form, InputGroup, Modal, Spinner } from 'react-bootstrap';
-import { FiSearch, FiPackage, FiEdit2, FiTrash2, FiPlus } from 'react-icons/fi';
+import { Row, Col, Card, Badge, Button, Form, Spinner } from 'react-bootstrap';
+import { FiPackage, FiEdit2, FiTrash2, FiPlus } from 'react-icons/fi';
 import { LuPackagePlus } from 'react-icons/lu';
 import { useState, useEffect } from 'react';
 import ModalForm from '../../components/menu/ModalForm';
@@ -22,7 +22,7 @@ export default function StockPage() {
   const { titleFormAddInsumo, fieldsFormAddInsumo, handleSubmitFormAddInsumo, messageFormAddInsumo, messageTypeFormAddInsumo } = formAddInsumo({
     onSuccess: () => {
       setMenuAddInsumoAtivo(false);
-      fetchInsumos();
+      fetchInsumos(true);
     },
   });
 
@@ -30,7 +30,7 @@ export default function StockPage() {
     insumo: selectedInsumo,
     onSuccess: () => {
       setMenuEditInsumoAtivo(false);
-      fetchInsumos();
+      fetchInsumos(true);
     },
   });
 
@@ -38,7 +38,7 @@ export default function StockPage() {
     insumo: selectedInsumo,
     onSuccess: () => {
       setMenuDeleteInsumoAtivo(false);
-      fetchInsumos();
+      fetchInsumos(true);
     },
   });
 
@@ -46,13 +46,13 @@ export default function StockPage() {
     insumo: selectedInsumo,
     onSuccess: () => {
       setMenuAdicionarAtivo(false);
-      fetchInsumos();
+      fetchInsumos(true);
     },
   });
 
   useEffect(() => {
     if (insumos.length === 0) {
-      fetchInsumos();
+      fetchInsumos(true);
     }
     if (alertas.length === 0) {
       fetchAlertas();
