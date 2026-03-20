@@ -1,18 +1,20 @@
 import { Row, Col, Card, Badge, Button, Spinner } from 'react-bootstrap';
-import { FiPlus, FiEdit2, FiTrash2 } from 'react-icons/fi';
+import { FiPlus } from 'react-icons/fi';
+import { SlPencil, SlTrash } from "react-icons/sl";
 import { MdOutlineShoppingCart } from "react-icons/md";
 import { useState, useEffect } from 'react';
 import ModalForm from '../../components/menu/ModalForm';
 import IngredientesNaoMapeados from '../../components/mapeamento/IngredientesNãoMapeados';
-import { formAddPedido, formEditStatus, formDeletePedido } from '../../forms/ordersForms';
-import { useNavigate } from 'react-router-dom';
+import ModalDetalhesPedidos from '../../components/pedidos/ModalDetalhesPedidos';
+import { formAddPedido, formEditOrderStatus, formDeletePedido } from '../../forms/ordersForms';
 import { useOrders } from '../../contexts';
 import { useOrderActions } from '../../hooks/useOrderActions';
+import ModalAvisosEstoque from '../../components/alertas/ModalAvisosEstoque';
 
 const OrdersPage = () => {
-  const navigate = useNavigate();
-  const { orders, loading, error, fetchOrders } = useOrders();
+  const { orders, loading, error, fetchOrders, fetchCustomersAndProducts, produtosDisponiveis, clientesDisponiveis } = useOrders();
   const [menuAddPedidoAtivo, setMenuAddPedidoAtivo] = useState(false);
+  const [menuOrderDetailsAtivo, setMenuOrderDetailsAtivo] = useState(false);
   const [menuEditStatusAtivo, setMenuEditStatusAtivo] = useState(false);
   const [menuDeletePedidoAtivo, setMenuDeletePedidoAtivo] = useState(false);
   const [selectedPedido, setSelectedPedido] = useState(null);
@@ -28,28 +30,28 @@ const OrdersPage = () => {
   } = useOrderActions({ fetchOrders });
 
 
-  const { titleFormAddPedido, fieldsFormAddPedido, handleSubmitFormAddPedido, messageFormAddPedido, messageTypeFormAddPedido } = formAddPedido({
-    onSuccess: () => {
-      fetchOrders();
+  const { titleFormAddPedido, fieldsFormAddPedido, handleSubmitFormAddPedido, messageFormAddPedido, messageTypeFormAddPedido, showAvisosEstoque, setShowAvisosEstoque, avisosEstoque, handleConfirmarComAvisos, handleCancelarComAvisos } = formAddPedido({
+    onSuccess: async () => {
+      await fetchOrders();
       setMenuAddPedidoAtivo(false);
       resetMapeamentoState();
     },
     onVerificarMapeamento: handleVerificarMapeamento
   });
 
-  const { titleFormEditStatus, fieldsFormEditStatus, handleSubmitFormEditStatus, messageFormEditStatus, messageTypeFormEditStatus } = formEditStatus({
-    onSuccess: () => {
+  const { titleFormEditStatus, fieldsFormEditStatus, handleSubmitFormEditStatus, messageFormEditStatus, messageTypeFormEditStatus } = formEditOrderStatus({
+    onSuccess: async () => {
+      await fetchOrders();
       setMenuEditStatusAtivo(false);
-      fetchOrders();
       resetMapeamentoState();
     },
     pedido: selectedPedido
   });
 
   const { titleFormDeletePedido, textFormDeletePedido, handleSubmitFormDeletePedido, messageFormDeletePedido, messageTypeFormDeletePedido } = formDeletePedido({
-    onSuccess: () => {
+    onSuccess: async () => {
+      await fetchOrders();
       setMenuDeletePedidoAtivo(false);
-      fetchOrders();
       resetMapeamentoState();
     },
     pedido: selectedPedido
@@ -58,6 +60,9 @@ const OrdersPage = () => {
   useEffect(() => {
     if (orders.length === 0) {
       fetchOrders();
+    }
+    if (produtosDisponiveis.length === 0 || clientesDisponiveis.length === 0) {
+      fetchCustomersAndProducts();
     }
   }, []);
 
@@ -110,7 +115,7 @@ const OrdersPage = () => {
 
   return (
     <>
-      <div className={`w-100 min-vh-100 bg-light ${menuAddPedidoAtivo || menuEditStatusAtivo || menuDeletePedidoAtivo ? "opacity-50" : ""}`} style={{ fontFamily: "Roboto, sans-serif" }}>
+      <div className={`w-100 min-vh-100 bg-light ${menuAddPedidoAtivo || menuOrderDetailsAtivo || menuEditStatusAtivo || menuDeletePedidoAtivo ? "opacity-50" : ""}`} style={{ fontFamily: "Roboto, sans-serif" }}>
         <div style={{ padding: "35px 30px" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "30px" }}>
             <div>
@@ -162,13 +167,13 @@ const OrdersPage = () => {
                     </div>
 
                     <div className="mb-3">
-                      <h5 className="fw-bold mb-2">{pedido.clienteNome}</h5>
+                      <h5>{pedido.clienteNome}</h5>
                       <p className="text-muted small mb-1">
                         {formatDate(pedido.dataPedido)} • {pedido.produtos?.length || 0} produtos
                       </p>
                     </div>
 
-                    <div className="mb-3 pb-3" style={{ borderBottom: '1px solid #eee' }}>
+                    <div className="mb-2 pb-1" style={{ borderBottom: '1px solid #eee' }}>
                       <div className="d-flex justify-content-between">
                         <span className="text-muted">Valor Total:</span>
                         <span className="fw-bold" style={{ color: '#2E8B57', fontSize: '1.1rem' }}>
@@ -181,17 +186,26 @@ const OrdersPage = () => {
                       <Button
                         variant="outline-primary"
                         size="sm"
-                        className="flex-fill"
+                        className="d-flex align-items-center justify-content-center gap-1 w-50"
+                        onClick={() => { setSelectedPedido(pedido); setMenuOrderDetailsAtivo(true); }}
+                      >
+                        <MdOutlineShoppingCart /> Ver Detalhes
+                      </Button>
+                      <Button
+                        variant="outline-primary"
+                        size="sm"
+                        className="d-flex align-items-center justify-content-center gap-1 w-50"
+                        title="Editar Status"
                         onClick={() => { setSelectedPedido(pedido); setMenuEditStatusAtivo(true); }}
                       >
-                        <FiEdit2 className="me-1" /> Status
+                        <SlPencil /> Editar Status
                       </Button>
                       <Button
                         variant="outline-danger"
                         size="sm"
                         onClick={() => { setSelectedPedido(pedido); setMenuDeletePedidoAtivo(true); }}
                       >
-                        <FiTrash2 />
+                        <SlTrash />
                       </Button>
                     </div>
                   </Card.Body>
@@ -226,6 +240,22 @@ const OrdersPage = () => {
           message={messageFormAddPedido}
           messageType={messageTypeFormAddPedido}
           action="add"
+        />
+      )}
+
+      <ModalAvisosEstoque
+        visible={showAvisosEstoque}
+        setVisible={setShowAvisosEstoque}
+        avisos={avisosEstoque}
+        onConfirmar={handleConfirmarComAvisos}
+        onCancelar={handleCancelarComAvisos}
+      />
+
+      {selectedPedido && menuOrderDetailsAtivo && (
+        <ModalDetalhesPedidos
+          pedido={selectedPedido}
+          visible={menuOrderDetailsAtivo}
+          setVisible={setMenuOrderDetailsAtivo}
         />
       )}
 

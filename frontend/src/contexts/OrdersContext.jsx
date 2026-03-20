@@ -1,15 +1,18 @@
 import { createContext, useContext, useState, useCallback } from "react";
 import { getPedidos } from "../services/ordersService";
+import { getProducts } from "../services/productsService";
+import { getCustomers } from "../services/customerService";
 
 const OrdersContext = createContext();
 
 export function OrdersProvider({ children }) {
     const [orders, setOrders] = useState([]);
+    const [produtosDisponiveis, setProdutosDisponiveis] = useState([]);
+    const [clientesDisponiveis, setClientesDisponiveis] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
     const fetchOrders = useCallback(async () => {
-        console.log("Buscando pedidos da API");
         setLoading(true);
         setError(null);
 
@@ -17,7 +20,6 @@ export function OrdersProvider({ children }) {
             const data = await getPedidos();
             setOrders(data || []);
 
-            console.log("Pedidos atualizados da API");
             return data;
         } catch (error) {
             console.error("Erro ao buscar pedidos:", error);
@@ -25,6 +27,19 @@ export function OrdersProvider({ children }) {
             return [];
         } finally {
             setLoading(false);
+        }
+    }, []);
+
+    const fetchCustomersAndProducts = useCallback(async () => {
+        try {
+            const [produtosData, clientesData] = await Promise.all([
+                getProducts(),
+                getCustomers()
+            ]);
+            setProdutosDisponiveis(produtosData || []);
+            setClientesDisponiveis(clientesData || []);
+        } catch (error) {
+            console.error("Erro ao carregar dados:", error);
         }
     }, []);
 
@@ -47,7 +62,10 @@ export function OrdersProvider({ children }) {
         orders,
         loading,
         error,
+        produtosDisponiveis,
+        clientesDisponiveis,
         fetchOrders,
+        fetchCustomersAndProducts,
         setOrders,
         addOrder,
         updateOrder,
