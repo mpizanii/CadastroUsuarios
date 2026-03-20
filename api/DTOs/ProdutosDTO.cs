@@ -16,6 +16,6 @@ namespace api.DTOs
         {
             get => Preco != 0 ? (Preco - Custo) / Preco * 100 : 0;
         }
-        public int Receita_Id { get; set; } = 0;
+        public int? Receita_Id { get; set; } = null;
     }
 }

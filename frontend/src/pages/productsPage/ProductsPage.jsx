@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import ModalForm from "../../components/menu/ModalForm.jsx";
 import { formAddProduct, formEditProduct, formDeleteProduct } from "../../forms/productsForms";
+import { formAddRecipe } from "../../forms/recipesForms.js";
 import { LuChefHat } from "react-icons/lu";
 import { Button, Card, Badge, Spinner, Form } from "react-bootstrap";
 import { CiSearch } from "react-icons/ci";
@@ -15,6 +16,7 @@ export default function ProductsPage() {
   const [menuAddProductAtivo, setMenuAddProductAtivo] = useState(false);
   const [menuEditProductAtivo, setMenuEditProductAtivo] = useState(false);
   const [menuDeleteProductAtivo, setMenuDeleteProductAtivo] = useState(false);
+  const [menuAddRecipeAtivo, setMenuAddRecipeAtivo] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [busca, setBusca] = useState("");
 
@@ -39,6 +41,15 @@ export default function ProductsPage() {
     onSuccess: () => {
       setMenuDeleteProductAtivo(false);
       setMessageFormDeleteProduct("");
+      fetchProducts();
+    },
+    selectedProduct
+  });
+
+  const { titleFormAddRecipe, fieldsFormAddRecipe, handleSubmitFormAddRecipe, messageFormAddRecipe, setMessageFormAddRecipe, messageTypeFormAddRecipe } = formAddRecipe({
+    onSuccess: () => {
+      setMenuAddRecipeAtivo(false);
+      setMessageFormAddRecipe("");
       fetchProducts();
     },
     selectedProduct
@@ -191,33 +202,44 @@ export default function ProductsPage() {
 
 
                       <div style={{ paddingTop: 10, display: 'flex', alignItems: 'center', gap: 10 }}>
-                        <Button 
-                          variant="outline-primary" 
-                          size="sm" 
-                          title="Ver receita" 
-                          className="w-50"
-                          onClick={() => produto.receita_Id ? navigate(`/receitas/${produto.receita_Id}`) : alert('Este produto não possui receita associada')}
-                          disabled={!produto.receita_Id}
-                        >
-                          <LuChefHat /> Ver Receita
-                        </Button>
-                        <Button
-                          variant="outline-primary"
-                          size="sm"
-                          onClick={() => { setSelectedProduct(produto); setMenuEditProductAtivo(true); }}
-                          title="Editar produto"
-                          className="w-50"
-                        >
-                          <SlPencil /> Editar
-                        </Button>
-                        <Button
-                          variant="outline-danger"
-                          size="sm"
-                          onClick={() => { setSelectedProduct(produto); setMenuDeleteProductAtivo(true); }}
-                          title="Excluir produto"
-                        >
-                          <SlTrash />
-                        </Button>
+                          {produto.receita_Id != null ?
+                            <Button 
+                              variant="outline-primary" 
+                              size="sm" 
+                              title="Ver receita" 
+                              className="w-50"
+                              onClick={() => navigate(`/receitas/${produto.receita_Id}`)}
+                            >
+                              <LuChefHat /> Ver Receita
+                            </Button>
+                            :
+                            <Button 
+                              variant="outline-primary" 
+                              size="sm" 
+                              title="Ver receita" 
+                              className="w-50"
+                              onClick={() => { setSelectedProduct(produto); setMenuAddRecipeAtivo(true); }}
+                            >
+                              <FiPlus /> Criar Receita
+                            </Button>
+                          }
+                          <Button
+                            variant="outline-primary"
+                            size="sm"
+                            onClick={() => { setSelectedProduct(produto); setMenuEditProductAtivo(true); }}
+                            title="Editar produto"
+                            className="w-50"
+                          >
+                            <SlPencil /> Editar
+                          </Button>
+                          <Button
+                            variant="outline-danger"
+                            size="sm"
+                            onClick={() => { setSelectedProduct(produto); setMenuDeleteProductAtivo(true); }}
+                            title="Excluir produto"
+                          >
+                            <SlTrash />
+                          </Button>
                       </div>
                     </div>
                   </Card.Body>
@@ -270,6 +292,19 @@ export default function ProductsPage() {
           message={messageFormDeleteProduct}
           messageType={messageTypeFormDeleteProduct}
           action={"delete"}
+        />
+      )}
+
+      {selectedProduct && menuAddRecipeAtivo && (
+        <ModalForm
+          title={titleFormAddRecipe}
+          visible={menuAddRecipeAtivo}
+          setVisible={setMenuAddRecipeAtivo}
+          fields={fieldsFormAddRecipe}
+          onSubmit={handleSubmitFormAddRecipe}
+          message={messageFormAddRecipe}
+          messageType={messageTypeFormAddRecipe}
+          action={"add"}
         />
       )}
     </>

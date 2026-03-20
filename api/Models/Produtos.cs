@@ -21,7 +21,7 @@ namespace api.Models
         public double Preco { get; set; } = 0;
         
         [Column("receita_id")]
-        public int Receita_id { get; set; }
+        public int? Receita_id { get; set; } = null;
 
         [Column("created_at")]
         public DateTime Created_At { get; set; }

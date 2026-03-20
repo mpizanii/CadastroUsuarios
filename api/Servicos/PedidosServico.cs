@@ -177,7 +177,7 @@ namespace api.Servicos
             foreach (var produtoDTO in produtos)
             {
                 var produto = await _context.Produtos.FindAsync(produtoDTO.ProdutoId);
-                if (produto == null || produto.Receita_id == 0) continue;
+                if (produto == null || produto.Receita_id == null) continue;
 
                 var ingredientes = await _context.ReceitaIngredientes
                     .Where(ri => ri.ReceitaId == produto.Receita_id)
@@ -196,7 +196,7 @@ namespace api.Servicos
                             IngredienteId = ingrediente.Id,
                             IngredienteNome = ingrediente.Nome,
                             ProdutoNome = produto.Nome,
-                            ReceitaId = produto.Receita_id
+                            ReceitaId = produto.Receita_id.Value
                         });
                     }
                 }
