@@ -22,9 +22,16 @@ export async function getRecipes() {
     }
 }
 
-export const addProduct = async (produto) => {
+export const addProduct = async ({ name, price, recipeId, cost, ativo = true }) => {
     try {
-        const response = await axios.post(`${API_URL}/Produtos`, produto);
+        const novoProduto = {
+            nome: name,
+            preco: price,
+            receita_id: recipeId,
+            custo: cost,
+            ativo: ativo
+        };
+        const response = await axios.post(`${API_URL}/Produtos`, novoProduto);
         return response.data; 
     } catch (error) {
         console.error('Erro ao adicionar produto:', error);

@@ -14,7 +14,7 @@ export async function getCustomers() {
     }
 }
 
-export const addUser = async ({ name, email, phone, address }) => {
+export const addCustomer = async ({ name, email, phone, address }) => {
     try {
         const { data: { user } } = await supabase.auth.getUser();
         const novoCliente = {
@@ -32,7 +32,7 @@ export const addUser = async ({ name, email, phone, address }) => {
     }
 }
 
-export const editUser = async ({ nome, email, telefone, endereco, id }) => {
+export const editCustomer = async ({ nome, email, telefone, endereco, id }) => {
     try {
         const response = await axios.patch(`${API_URL}/Clientes/${id}`, {
             nome,
@@ -49,7 +49,7 @@ export const editUser = async ({ nome, email, telefone, endereco, id }) => {
     }
 }
 
-export const deleteUser = async (id) => {
+export const deleteCustomer = async (id) => {
     try {
         const response = await axios.delete(`${API_URL}/Clientes/${id}`);
         return response.data; 

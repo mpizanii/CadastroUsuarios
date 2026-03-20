@@ -46,7 +46,6 @@ export const formAddPedido = ({ onSuccess, onVerificarMapeamento }) => {
         const newProdutos = [...produtos];
         newProdutos[index][field] = value;
 
-        // Se mudou o produto, atualizar o preço unitário
         if (field === "produtoId") {
             const produto = produtosDisponiveis.find(p => p.id === parseInt(value));
             if (produto) {
@@ -103,7 +102,7 @@ export const formAddPedido = ({ onSuccess, onVerificarMapeamento }) => {
 
         if (!clienteNome && !clienteId) {
             setMessageTypeFormAddPedido("error");
-            setMessageFormAddPedido("Por favor, selecione ou digite o nome de um cliente.");
+            setMessageFormAddPedido("Por favor, selecione o nome de um cliente.");
             return;
         }
 
@@ -127,15 +126,18 @@ export const formAddPedido = ({ onSuccess, onVerificarMapeamento }) => {
                 darBaixaEstoque: true
             };
 
-            // Verificar mapeamento antes de criar
             if (onVerificarMapeamento) {
                 await onVerificarMapeamento(pedidoData);
+
+                setClienteId("");
+                setClienteNome("");
+                setObservacoes("");
+                setProdutos([{ produtoId: "", quantidade: 1, precoUnitario: 0 }]);
             } else {
                 await addPedido(pedidoData);
                 setMessageTypeFormAddPedido("success");
                 setMessageFormAddPedido("Pedido criado com sucesso!");
 
-                // Limpar formulário
                 setClienteId("");
                 setClienteNome("");
                 setObservacoes("");
@@ -249,9 +251,11 @@ export const formDeletePedido = ({ pedido, onSuccess }) => {
             setMessageFormDeletePedido("Pedido deletado com sucesso!");
 
             if (onSuccess) onSuccess();
+            setMessageFormDeletePedido("");
         } catch (error) {
             setMessageTypeFormDeletePedido("error");
             setMessageFormDeletePedido(error.message || "Erro ao deletar pedido.");
+            setMessageFormDeletePedido("");
         }
     };
 

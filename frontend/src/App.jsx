@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import LoginPage from "./pages/auth/LoginPage";
 import ResetPasswordPage from "./pages/auth/ResetPasswordPage"
-import UsersPage from './pages/usersPage/UsersPage';
+import CustomersPage from './pages/customersPage/CustomersPage';
 import ProductsPage from './pages/productsPage/ProductsPage';
 import StockPage from './pages/stockPage/StockPage';
 import OrdersPage from './pages/ordersPage/OrdersPage'
@@ -68,7 +68,7 @@ function Layout() {
           />
           <div style={{ marginLeft: '280px' }}>
             <Routes>
-              <Route path='/clientes' element={<ProtectedRoutes><UsersPage/></ProtectedRoutes>}/>
+              <Route path='/clientes' element={<ProtectedRoutes><CustomersPage/></ProtectedRoutes>}/>
               <Route path='/produtos' element={<ProtectedRoutes><ProductsPage/></ProtectedRoutes>}/>
               <Route path='/estoque' element={<ProtectedRoutes><StockPage/></ProtectedRoutes>}/>
               <Route path='/pedidos' element={<ProtectedRoutes><OrdersPage/></ProtectedRoutes>}/>

@@ -6,54 +6,29 @@ import { SlPencil } from "react-icons/sl";
 import { MdOutlineMap } from "react-icons/md";
 import MapeamentoModal from "../../components/mapeamento/MapeamentoModal";
 import { getIngredientesComMapeamento,  mapearIngrediente, getRecipeDetails } from "../../services/recipesService";
+import { useRecipeDetails } from "../../hooks/useRecipeDetails";
 
 export default function RecipeDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [recipe, setRecipe] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [product, setProduct] = useState(null);
-  const [ingredients, setIngredients] = useState([]);
-  const [insumos, setInsumos] = useState([]);
   const [showMapeamentoModal, setShowMapeamentoModal] = useState(false);
   const [selectedIngredient, setSelectedIngredient] = useState(null);
 
-  useEffect(() => {
-    const fetchRecipeDetails = async () => {
-      try {
-        setLoading(true);
-        const details = await getRecipeDetails(id);
-
-        setRecipe(details.recipe);
-        setProduct(details.product);
-        setIngredients(details.ingredientes);
-        setInsumos(details.insumos);
-      } catch (error) {
-        console.error("Erro ao buscar receita:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchRecipeDetails();
-  }, [id]);
+  const { 
+    recipe,
+    product,
+    ingredients,
+    insumos,
+    loading,
+    error,
+    handleMapearIngrediente,
+    calcularProgresso,
+    getModoPreparo
+  } = useRecipeDetails(id);
 
   const handleMapearClick = (ingrediente) => {
     setSelectedIngredient(ingrediente);
     setShowMapeamentoModal(true);
-  };
-
-  const handleMapear = async (ingredienteId, insumoId, fatorConversao) => {
-    await mapearIngrediente(ingredienteId, insumoId, fatorConversao);
-    // Recarregar ingredientes
-    const ingredientesData = await getIngredientesComMapeamento(id);
-    setIngredients(ingredientesData);
-  };
-
-  const calcularProgresso = () => {
-    if (!ingredients || ingredients.length === 0) return 0;
-    const mapeados = ingredients.filter(ing => ing.mapeado).length;
-    return Math.round((mapeados / ingredients.length) * 100);
   };
 
   if (loading) {
@@ -65,7 +40,7 @@ export default function RecipeDetailPage() {
     );
   }
 
-  if (!recipe) {
+  if (error || !recipe) {
     return (
       <Container className="py-5">
         <div className="text-center">
@@ -78,7 +53,8 @@ export default function RecipeDetailPage() {
     );
   }
 
-  const modoPreparo = recipe.modo_Preparo ? recipe.modo_Preparo.split(";").map(s => s.trim()).filter(s => s) : [];
+  const modoPreparo = getModoPreparo();
+  const progresso = calcularProgresso();
 
   return (
     <Container fluid style={{ padding: "35px 30px", backgroundColor: "#f8f9fa", minHeight: "100vh" }}>
@@ -108,13 +84,12 @@ export default function RecipeDetailPage() {
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 400px", gap: "20px" }}>
-          {/* Ingredientes */}
           <Card className="border-0 shadow-sm">
             <Card.Header className="bg-white border-bottom" style={{ padding: "20px" }}>
               <div className="d-flex justify-content-between align-items-center">
                 <h5 className="mb-0">Ingredientes</h5>
-                <Badge bg={calcularProgresso() === 100 ? "success" : calcularProgresso() > 0 ? "warning" : "secondary"}>
-                  {calcularProgresso()}% mapeado
+                <Badge bg={progresso === 100 ? "success" : progresso > 0 ? "warning" : "secondary"}>
+                  {progresso}% mapeado
                 </Badge>
               </div>
             </Card.Header>
@@ -153,9 +128,6 @@ export default function RecipeDetailPage() {
                           {ingrediente.mapeado ? (
                             <div>
                               <div style={{ fontWeight: "500", fontSize: "13px" }}>{ingrediente.insumoNome}</div>
-                              <div style={{ fontSize: "12px", color: "#6c757d" }}>
-                                Fator: {ingrediente.fatorConversao}x
-                              </div>
                             </div>
                           ) : (
                             <Badge bg="secondary" style={{ fontSize: "11px" }}>
@@ -186,7 +158,6 @@ export default function RecipeDetailPage() {
             </Card.Body>
           </Card>
 
-          {/* Modo de Preparo */}
           <Card className="border-0 shadow-sm" style={{ height: "fit-content" }}>
             <Card.Header className="bg-white border-bottom" style={{ padding: "20px" }}>
               <h5 className="mb-0">Modo de Preparo</h5>
@@ -208,14 +179,13 @@ export default function RecipeDetailPage() {
         </div>
       </div>
 
-      {/* Modal de Mapeamento */}
       {selectedIngredient && (
         <MapeamentoModal
           visible={showMapeamentoModal}
           setVisible={setShowMapeamentoModal}
           ingrediente={selectedIngredient}
           insumos={insumos}
-          onMapear={handleMapear}
+          onMapear={handleMapearIngrediente}
         />
       )}
     </Container>

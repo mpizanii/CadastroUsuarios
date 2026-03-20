@@ -116,7 +116,7 @@ export const formAddProduct = ({ onSuccess }) => {
             setRecipeMode("existing");
             setNewRecipeName("");
             setNewRecipeMethod("");
-            setNewIngredients([{ nome: "", quantidade: 0, unidade: "" }]);
+            setNewIngredients([{ nome: "", quantidade: 0, unidade: "g" }]);
             setAtivo(true);
             setCost("");
             if (onSuccess) onSuccess();
