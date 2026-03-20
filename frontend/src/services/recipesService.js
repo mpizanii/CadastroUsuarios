@@ -2,6 +2,21 @@ import axios from "axios";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
+export const addRecipe = async ({ name, modo_preparo, ingredientes }) => {
+    try {
+        const novaReceita = {
+            nome: name,
+            modo_Preparo: modo_preparo,
+            ingredientes: ingredientes
+        };
+        const response = await axios.post(`${API_URL}/Receitas`, novaReceita);
+        return response.data; 
+    } catch (error) {
+        console.error('Erro ao adicionar receita:', error);
+        throw new Error('Erro ao adicionar receita');
+    }
+}
+
 export async function getRecipeDetails(id) {
     try {
         const response = await axios.get(`${API_URL}/Receitas/${id}`);

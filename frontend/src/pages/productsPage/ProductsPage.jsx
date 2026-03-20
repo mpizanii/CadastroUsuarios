@@ -115,7 +115,6 @@ export default function ProductsPage() {
             {produtosFiltrados.map((produto) => {
               const precoNum = Number(produto.preco) || 0;
               const custoNum = Number(produto.custo) || 0;
-              const margem = precoNum ? Math.round(((precoNum - custoNum) / precoNum) * 100) : 0;
 
               const formatCurrency = (value) => {
                 try {
@@ -146,7 +145,7 @@ export default function ProductsPage() {
                 >
                   <Card.Body>
                     <div className="d-flex align-items-center justify-content-between mb-3">
-                      <div className="d-flex gap-3">
+                      <div className="d-flex gap-3" style={{ minWidth: 0, flex: 1 }}>
                         <div 
                           className="rounded d-flex align-items-center justify-content-center"
                           style={{
@@ -155,13 +154,18 @@ export default function ProductsPage() {
                             backgroundColor: "#e76e501a ",
                             fontSize: "20px",
                             color: "#e76e50",
+                            flexShrink: 0
                           }}
                         >
                           <LuChefHat />
                         </div>
-                        <div>
-                          <Card.Title className="mb-0 h5">{produto.nome}</Card.Title>
-                          <small className="text-muted">{produto.descricao || produto.nome}</small>
+                        <div style={{ minWidth: 0, flex: 1 }}>
+                          <Card.Title className="mb-0 h5 text-truncate" title={produto.nome}>
+                            {produto.nome}
+                          </Card.Title>
+                          <small className="text-muted text-truncate d-block" title={produto.descricao || produto.nome}>
+                            {produto.descricao || produto.nome}
+                          </small>
                         </div>
                       </div>
                       <Badge bg={status === 'Ativo' ? 'success' : 'secondary'}>{status}</Badge>
