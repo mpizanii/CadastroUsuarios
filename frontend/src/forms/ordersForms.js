@@ -15,6 +15,7 @@ export const formAddPedido = ({ onSuccess, onVerificarMapeamento }) => {
     const [pedidoPendente, setPedidoPendente] = useState(null);
     const [showAvisosEstoque, setShowAvisosEstoque] = useState(false);
     const [avisosEstoque, setAvisosEstoque] = useState([]);
+    const [darBaixaEstoque, setDarBaixaEstoque] = useState(true);
 
     const titleFormAddPedido = "Novo Pedido";
 
@@ -78,18 +79,29 @@ export const formAddPedido = ({ onSuccess, onVerificarMapeamento }) => {
             placeholder: "Observações sobre o pedido...",
             value: observacoes,
             onChange: setObservacoes
-        }
+        },
+        { 
+            id: "darBaixaEstoque", 
+            label: "Dar baixa automática no estoque", 
+            type: "checkbox", 
+            value: darBaixaEstoque, 
+            onChange: setDarBaixaEstoque 
+        },
     ];
 
     const criarPedido = async (pedidoData) => {
         try {
-            if (onVerificarMapeamento) {
-                await onVerificarMapeamento(pedidoData);
-            } else {
-                await addPedido(pedidoData);
-                setMessageTypeFormAddPedido("success");
-                setMessageFormAddPedido("Pedido criado com sucesso!");
+            if (darBaixaEstoque && onVerificarMapeamento) {
+                var resultado = await onVerificarMapeamento(pedidoData);
+
+                if (!resultado.sucesso) {
+                    return;
+                }
             }
+
+            await addPedido(pedidoData);
+            setMessageTypeFormAddPedido("success");
+            setMessageFormAddPedido("Pedido criado com sucesso!");
 
             if (onSuccess) onSuccess();
         } catch (error) {
@@ -129,7 +141,7 @@ export const formAddPedido = ({ onSuccess, onVerificarMapeamento }) => {
                 clienteNome: clienteNome,
                 observacoes: observacoes,
                 produtos: produtos,
-                darBaixaEstoque: true
+                darBaixaEstoque: darBaixaEstoque
             };
 
             if (verificacaoEstoque.temAvisos && verificacaoEstoque.avisos.length > 0) {

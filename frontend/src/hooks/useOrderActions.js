@@ -19,8 +19,6 @@ export const useOrderActions = ({ fetchOrders }) => {
         
         return { sucesso: false, mapeamentoIncompleto: true };
       } else {
-        await addPedido(pedidoData);
-        fetchOrders();
         return { sucesso: true };
       }
     } catch (error) {

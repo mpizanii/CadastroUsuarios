@@ -86,6 +86,18 @@ namespace api.Servicos
             var insumo = await _context.Insumos.FindAsync(id);
             if (insumo == null) return false;
 
+            if (insumoDTO.RemoveMapping)
+            {
+                var mapeamentos = await _context.IngredientesInsumo
+                    .Where(ii => ii.InsumoId == id)
+                    .ToListAsync();
+                
+                if (mapeamentos.Any())
+                {
+                    _context.IngredientesInsumo.RemoveRange(mapeamentos);
+                }
+            }
+
             if (!string.IsNullOrWhiteSpace(insumoDTO.Nome))
                 insumo.Nome = insumoDTO.Nome;
 
