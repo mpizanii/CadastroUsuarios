@@ -6,8 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-// Stub — campos básicos para permitir cascade delete de produtos.
-// Módulo Receitas expandirá esta entidade com ingredientes, serviços e controller.
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "receitas")
 @Getter
@@ -23,6 +24,9 @@ public class Recipe extends TenantAwareEntity {
     @Column(name = "nome", nullable = false)
     private String nome;
 
-    @Column(name = "modo_preparo")
+    @Column(name = "modo_preparo", nullable = false)
     private String modoPreparo;
+
+    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<RecipeIngredient> ingredients = new ArrayList<>();
 }
