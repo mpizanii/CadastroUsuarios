@@ -9,11 +9,11 @@
 
 | Aspecto | Status |
 |---|---|
-| Progresso geral (funcional) | ~60% |
-| Progresso módulos backend | ~71% |
+| Progresso geral (funcional) | ~70% |
+| Progresso módulos backend | ~86% |
 | Integração frontend | 0% (ainda usa C# API) |
-| Próximo módulo | Mapeamento (controller/service dentro de `recipes`) |
-| Módulos restantes | 2 (Mapeamento, Pedidos) |
+| Próximo módulo | Pedidos |
+| Módulos restantes | 1 (Pedidos) |
 
 ---
 
@@ -166,21 +166,28 @@ DELETE /api/insumos/{id}      ← delete → 204 No Content
 
 ## Módulos Pendentes (C# → Java)
 
-### ⏳ 6. Módulo Mapeamento
+### ✅ 6. Módulo Mapeamento (a seguir)
 
-**Prioridade:** JUNTO com Insumos (dependência entre eles)
-
-**C# reference:** `api/Controllers/MapeamentoController.cs` + `api/Servicos/MapeamentoServico.cs`
-
-**Endpoints a migrar:**
+**Endpoints implementados:**
 ```
-POST   /api/mapeamento        ← criar ou atualizar mapeamento ingrediente→insumo
-DELETE /api/mapeamento/{ingredienteId}  ← remover mapeamento
+PUT    /api/receitas/ingredientes/{ingredienteId}/mapeamento  ← upsert (idempotent)
+DELETE /api/receitas/ingredientes/{ingredienteId}/mapeamento  ← remover mapeamento
 ```
 
-**Observação:** O model `IngredientMapping.java` já existe no módulo `recipes`.
-Decidir se o controller/service de mapeamento fica no módulo `recipes` ou em um novo módulo `mapping`.
-Recomendado: dentro de `recipes` pois é fortemente acoplado.
+**Arquivos criados/modificados:**
+- `recipes/dto/MapIngredientRequest.java` — Record com `insumoId @NotNull @Positive` e `fatorConversao Double @PositiveOrZero`
+- `recipes/dto/MappingResponse.java` — Record com `id, ingredienteId, insumoId, fatorConversao`
+- `recipes/service/MappingService.java` — Interface com `upsert` e `delete`
+- `recipes/service/MappingServiceImpl.java` — Implementação: tenant isolation via `RecipeIngredientRepository.findByIdAndEmpresaId`, upsert via `findByRecipeIngredient_Id + orElseGet`
+- `recipes/controller/MappingController.java` — `PUT` + `DELETE` em `/api/receitas/ingredientes/{ingredienteId}/mapeamento`
+- `recipes/repository/RecipeIngredientRepository.java` — adicionado `findByIdAndEmpresaId`
+- `recipes/repository/IngredientMappingRepository.java` — adicionado `findByRecipeIngredient_Id` e `deleteByRecipeIngredient_Id`
+
+**Decisões tomadas:**
+- Endpoint usa `PUT` (idempotente) ao invés de `POST` — cria ou atualiza conforme existência
+- `fatorConversao` padrão `1.0` quando não informado
+- Tenant isolation: verifica se o `RecipeIngredient` pertence à empresa antes de salvar/deletar
+- Controller/service dentro do módulo `recipes` (acoplamento natural)
 
 ---
 
@@ -264,14 +271,10 @@ POST   /api/pedidos/verificar-estoque   ← verificar avisos de estoque antes de
 
 ```
 ✅ [Módulo 5] Inventory (Insumos) — CONCLUÍDO
+✅ [Módulo 6] Mapeamento — CONCLUÍDO
    ↓
 Próxima sessão:
-1. [Módulo 6] Mapeamento (controller/service dentro de recipes)
-   - POST /api/receitas/ingredientes/{ingredienteId}/mapeamento
-   - DELETE /api/receitas/ingredientes/{ingredienteId}/mapeamento
-   - IngredientMappingRepository já criado
-   ↓
-2. [Módulo 7] Pedidos (mais complexo)
+1. [Módulo 7] Pedidos (mais complexo)
    - Entidades: Order, OrderItem (pedidoprodutos)
    - DarBaixaEstoque, VerificarMapeamento, VerificarEstoque
    - JOIN FETCH obrigatório (fix N+1 do C#)
