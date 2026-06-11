@@ -5,10 +5,15 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
-// Stub — será expandido quando o módulo Insumos for implementado.
 @Repository
 public interface InsumoRepository extends JpaRepository<Insumo, Long> {
 
     List<Insumo> findAllByIdIn(List<Long> ids);
+
+    List<Insumo> findAllByEmpresaId(UUID empresaId);
+
+    Optional<Insumo> findByIdAndEmpresaId(Long id, UUID empresaId);
 }

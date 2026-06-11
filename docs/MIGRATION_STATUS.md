@@ -9,11 +9,11 @@
 
 | Aspecto | Status |
 |---|---|
-| Progresso geral (funcional) | ~42% |
-| Progresso módulos backend | ~57% |
+| Progresso geral (funcional) | ~60% |
+| Progresso módulos backend | ~71% |
 | Integração frontend | 0% (ainda usa C# API) |
-| Próximo módulo | `inventory` (Insumos) |
-| Módulos restantes | 3 (Insumos, Mapeamento, Pedidos) |
+| Próximo módulo | Mapeamento (controller/service dentro de `recipes`) |
+| Módulos restantes | 2 (Mapeamento, Pedidos) |
 
 ---
 
@@ -120,37 +120,51 @@
 
 ---
 
-## Módulos Pendentes (C# → Java)
+## Módulos Migrados — continuação
 
-### ⏳ 5. Módulo Insumos (inventory completo)
+### ✅ 5. Módulo Inventory — Insumos (commit a seguir)
 
-**Prioridade:** PRÓXIMO (pré-requisito para Pedidos)
-
-**C# reference:** `api/Controllers/InsumosController.cs` + `api/Servicos/InsumosServico.cs`
-
-**Endpoints a migrar:**
+**Endpoints implementados:**
 ```
-GET    /api/insumos           ← findAll (com status calculado)
+GET    /api/insumos           ← findAll (com statusEstoque calculado)
+GET    /api/insumos/alertas   ← insumos com status ≠ OK
 GET    /api/insumos/{id}      ← findById
-POST   /api/insumos           ← create
-PATCH  /api/insumos/{id}      ← update (com removeMapping opcional)
-DELETE /api/insumos/{id}      ← delete
-GET    /api/insumos/alertas   ← insumos com status crítico/baixo
+POST   /api/insumos           ← create → 201 Created
+PATCH  /api/insumos/{id}      ← update com removeMapping opcional → 200
+DELETE /api/insumos/{id}      ← delete → 204 No Content
 ```
 
-**Regras de negócio a implementar:**
-- Calcular `statusEstoque` dinamicamente:
-  - `CRITICO_ESTOQUE_MINIMO`: quantidade < estoque_minimo
-  - `CRITICO_VALIDADE`: validade <= hoje
-  - `BAIXO_ESTOQUE_MINIMO`: quantidade <= estoque_minimo × 1.2
-  - `BAIXO_VALIDADE`: validade <= hoje + 7 dias
-  - `OK`: caso contrário
-- Ao editar insumo com `removeMapping=true`: deletar todos os `IngredientMapping` vinculados
+**Arquivos criados/modificados:**
+- `inventory/model/Insumo.java` — expandido (extends TenantAwareEntity, BigDecimal quantidade/estoqueMinimo, LocalDate validade)
+- `inventory/repository/InsumoRepository.java` — expandido (findAllByEmpresaId, findByIdAndEmpresaId)
+- `inventory/dto/CreateInsumoRequest.java` — Record com validações Jakarta
+- `inventory/dto/UpdateInsumoRequest.java` — Record PATCH semantics + removeMapping flag
+- `inventory/dto/InsumoResponse.java` — Record com statusEstoque calculado
+- `inventory/mapper/InsumoMapper.java` — MapStruct com @Named calcularStatusEstoque
+- `inventory/service/InsumoService.java` — Interface
+- `inventory/service/InsumoServiceImpl.java` — Implementação com tenant isolation + removeMapping
+- `inventory/controller/InsumoController.java` — REST controller /api/insumos
+- `recipes/repository/IngredientMappingRepository.java` — NOVO: deleteAllByInsumoId para removeMapping
 
-**Atenção:** O stub `Insumo.java` precisa ser expandido com todos os campos.
-`InsumoRepository.java` precisa de novos métodos.
+**Decisões tomadas:**
+- `BigDecimal` para `quantidade` e `estoqueMinimo` (corresponde a `numeric` PostgreSQL)
+- `statusEstoque` calculado dinamicamente via `@Named` no MapStruct — não persistido
+- `removeMapping` é flag instrucional no DTO, não mapeado para a entidade
+- `Insumo extends TenantAwareEntity` — banco tem `created_at timestamp` (sem TZ), conversão OffsetDateTime→timestamp aceita (comportamento correto UTC, bug de TZ documentado em TD-05)
+- Campo `status` da tabela (legado C#) não mapeado — Hibernate `validate` ignora colunas não mapeadas
+
+**Regras de negócio implementadas (lógica C# migrada):**
+| Condição | Status |
+|---|---|
+| quantidade < estoqueMinimo | `CRITICO_ESTOQUE_MINIMO` |
+| validade ≤ hoje | `CRITICO_VALIDADE` |
+| quantidade ≤ estoqueMinimo × 1.2 | `BAIXO_ESTOQUE_MINIMO` |
+| validade ≤ hoje + 7 dias | `BAIXO_VALIDADE` |
+| sem alerta | `OK` |
 
 ---
+
+## Módulos Pendentes (C# → Java)
 
 ### ⏳ 6. Módulo Mapeamento
 
@@ -249,22 +263,26 @@ POST   /api/pedidos/verificar-estoque   ← verificar avisos de estoque antes de
 ## Próximos Passos (Ordem Recomendada)
 
 ```
+✅ [Módulo 5] Inventory (Insumos) — CONCLUÍDO
+   ↓
 Próxima sessão:
-1. [TD-02] Corrigir TenantAwareEntity em RecipeIngredient e IngredientMapping
+1. [Módulo 6] Mapeamento (controller/service dentro de recipes)
+   - POST /api/receitas/ingredientes/{ingredienteId}/mapeamento
+   - DELETE /api/receitas/ingredientes/{ingredienteId}/mapeamento
+   - IngredientMappingRepository já criado
    ↓
-2. [Módulo 5] Implementar inventory completo (expandir Insumo + InsumoRepository + service + controller)
+2. [Módulo 7] Pedidos (mais complexo)
+   - Entidades: Order, OrderItem (pedidoprodutos)
+   - DarBaixaEstoque, VerificarMapeamento, VerificarEstoque
+   - JOIN FETCH obrigatório (fix N+1 do C#)
    ↓
-3. [Módulo 6] Implementar controller/service de Mapeamento (dentro do módulo recipes)
+3. [Frontend] Integrar frontend com novo backend Java
    ↓
-4. [Módulo 7] Implementar Pedidos (mais complexo — JOIN FETCH + baixa estoque + verificações)
+4. [TD-01] Corrigir double → BigDecimal em Products (preco/custo)
    ↓
-5. [Frontend] Integrar frontend com novo backend Java (Axios interceptor + JWT headers)
+5. Testes e validação end-to-end
    ↓
-6. [TD-01] Corrigir double → BigDecimal
-   ↓
-7. Testes e validação end-to-end
-   ↓
-8. Go-live backend Java (descomissionar C#)
+6. Go-live backend Java (descomissionar C#)
 ```
 
 ---
