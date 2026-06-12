@@ -1,12 +1,8 @@
-import { supabase } from "../utils/supabase";
-import axios from "axios";
-
-const API_URL = import.meta.env.VITE_API_URL;
+import api from '../utils/axiosInstance';
 
 export async function getCustomers() {
     try {
-        const { data: { user } } = await supabase.auth.getUser();
-        const response = await axios.get(`${API_URL}/Clientes/usuario/${user.id}`);
+        const response = await api.get('/clientes');
         return response.data;
     } catch (error) {
         console.error("Erro ao buscar os clientes:", error);
@@ -16,16 +12,13 @@ export async function getCustomers() {
 
 export const addCustomer = async ({ name, email, phone, address }) => {
     try {
-        const { data: { user } } = await supabase.auth.getUser();
-        const novoCliente = {
+        const response = await api.post('/clientes', {
             nome: name,
             email: email,
             telefone: phone,
             endereco: address,
-            user_id: user.id
-        };
-        const response = await axios.post(`${API_URL}/Clientes`, novoCliente);
-        return response.data; 
+        });
+        return response.data;
     } catch (error) {
         console.error("Erro ao adicionar cliente:", error);
         throw new Error("Erro ao adicionar cliente");
@@ -34,16 +27,14 @@ export const addCustomer = async ({ name, email, phone, address }) => {
 
 export const editCustomer = async ({ nome, email, telefone, endereco, id }) => {
     try {
-        const response = await axios.patch(`${API_URL}/Clientes/${id}`, {
+        const response = await api.patch(`/clientes/${id}`, {
             nome,
             email,
             telefone,
             endereco
         });
-
-        return response.data; 
-    }
-    catch (error) { 
+        return response.data;
+    } catch (error) {
         console.error("Erro ao editar cliente:", error);
         throw new Error("Erro ao editar cliente");
     }
@@ -51,10 +42,8 @@ export const editCustomer = async ({ nome, email, telefone, endereco, id }) => {
 
 export const deleteCustomer = async (id) => {
     try {
-        const response = await axios.delete(`${API_URL}/Clientes/${id}`);
-        return response.data; 
-    }
-    catch (error) {
+        await api.delete(`/clientes/${id}`);
+    } catch (error) {
         console.error("Erro ao deletar cliente:", error);
         throw new Error("Erro ao deletar cliente");
     }

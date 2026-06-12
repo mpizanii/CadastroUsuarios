@@ -54,8 +54,8 @@ export const useRecipeDetails = (recipeId) => {
     };
 
     const getModoPreparo = () => {
-        if (!recipe?.modo_Preparo) return [];
-        return recipe.modo_Preparo
+        if (!recipe?.modoPreparo) return [];
+        return recipe.modoPreparo
             .split(";")
             .map(s => s.trim())
             .filter(s => s);

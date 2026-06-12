@@ -1,13 +1,13 @@
 import { createContext, useContext, useState, useCallback } from "react";
 import { getPedidos } from "../services/ordersService";
-import { getProducts } from "../services/productsService";
 import { getCustomers } from "../services/customerService";
+import { useProductsQuery } from "../hooks/useProductsQuery";
 
 const OrdersContext = createContext();
 
 export function OrdersProvider({ children }) {
     const [orders, setOrders] = useState([]);
-    const [produtosDisponiveis, setProdutosDisponiveis] = useState([]);
+    const { data: produtosDisponiveis = [] } = useProductsQuery();
     const [clientesDisponiveis, setClientesDisponiveis] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -30,16 +30,12 @@ export function OrdersProvider({ children }) {
         }
     }, []);
 
-    const fetchCustomersAndProducts = useCallback(async () => {
+    const fetchCustomers = useCallback(async () => {
         try {
-            const [produtosData, clientesData] = await Promise.all([
-                getProducts(),
-                getCustomers()
-            ]);
-            setProdutosDisponiveis(produtosData || []);
+            const clientesData = await getCustomers();
             setClientesDisponiveis(clientesData || []);
         } catch (error) {
-            console.error("Erro ao carregar dados:", error);
+            console.error("Erro ao carregar clientes:", error);
         }
     }, []);
 
@@ -65,7 +61,7 @@ export function OrdersProvider({ children }) {
         produtosDisponiveis,
         clientesDisponiveis,
         fetchOrders,
-        fetchCustomersAndProducts,
+        fetchCustomers,
         setOrders,
         addOrder,
         updateOrder,

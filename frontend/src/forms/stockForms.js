@@ -76,7 +76,7 @@ export const formAddInsumo = ({ onSuccess }) => {
                 nome,
                 quantidade: parseFloat(quantidade),
                 unidade,
-                validade: validade ? new Date(validade).toISOString() : null,
+                validade: validade || null,
                 estoqueMinimo: parseFloat(estoqueMinimo)
             });
 

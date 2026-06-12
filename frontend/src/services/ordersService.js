@@ -1,10 +1,8 @@
-import axios from 'axios';
-
-const API_URL = import.meta.env.VITE_API_URL;
+import api from '../utils/axiosInstance';
 
 export const getPedidos = async () => {
     try {
-        const response = await axios.get(`${API_URL}/Pedidos`);
+        const response = await api.get('/pedidos');
         return response.data;
     } catch (error) {
         console.error('Erro ao buscar pedidos:', error);
@@ -14,7 +12,7 @@ export const getPedidos = async () => {
 
 export const getPedidoById = async (id) => {
     try {
-        const response = await axios.get(`${API_URL}/Pedidos/${id}`);
+        const response = await api.get(`/pedidos/${id}`);
         return response.data;
     } catch (error) {
         console.error('Erro ao buscar pedido:', error);
@@ -24,7 +22,7 @@ export const getPedidoById = async (id) => {
 
 export const addPedido = async (pedido) => {
     try {
-        const response = await axios.post(`${API_URL}/Pedidos`, pedido);
+        const response = await api.post('/pedidos', pedido);
         return response.data;
     } catch (error) {
         console.error('Erro ao adicionar pedido:', error);
@@ -34,7 +32,7 @@ export const addPedido = async (pedido) => {
 
 export const updatePedidoStatus = async (id, status) => {
     try {
-        const response = await axios.patch(`${API_URL}/Pedidos/${id}/status`, { status });
+        const response = await api.patch(`/pedidos/${id}/status`, { status });
         return response.data;
     } catch (error) {
         console.error('Erro ao atualizar status:', error);
@@ -44,7 +42,7 @@ export const updatePedidoStatus = async (id, status) => {
 
 export const deletePedido = async (id) => {
     try {
-        const response = await axios.delete(`${API_URL}/Pedidos/${id}`);
+        const response = await api.delete(`/pedidos/${id}`);
         return response.data;
     } catch (error) {
         console.error('Erro ao deletar pedido:', error);
@@ -54,7 +52,7 @@ export const deletePedido = async (id) => {
 
 export const verificarMapeamentoProdutos = async (produtos) => {
     try {
-        const response = await axios.post(`${API_URL}/Pedidos/verificar-mapeamento`, produtos);
+        const response = await api.post('/pedidos/verificar-mapeamento', produtos);
         return response.data;
     } catch (error) {
         console.error('Erro ao verificar mapeamento:', error);
@@ -64,7 +62,7 @@ export const verificarMapeamentoProdutos = async (produtos) => {
 
 export const darBaixaEstoque = async (pedidoId) => {
     try {
-        const response = await axios.post(`${API_URL}/Pedidos/${pedidoId}/baixa-estoque`);
+        const response = await api.post(`/pedidos/${pedidoId}/baixa-estoque`);
         return response.data;
     } catch (error) {
         console.error('Erro ao dar baixa no estoque:', error);
@@ -74,10 +72,10 @@ export const darBaixaEstoque = async (pedidoId) => {
 
 export const verificarEstoquePedido = async (produtos) => {
     try {
-        const response = await axios.post(`${API_URL}/Pedidos/verificar-estoque`, produtos);
+        const response = await api.post('/pedidos/verificar-estoque', produtos);
         return response.data;
     } catch (error) {
         console.error('Erro ao verificar estoque:', error);
         throw new Error('Erro ao verificar estoque');
     }
-}
+};

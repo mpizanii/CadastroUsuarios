@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { addProduct, editProduct, deleteProduct } from "../services/productsService";
+import { useProductMutations } from "../hooks/useProductMutations";
 
 export const formAddProduct = ({ onSuccess }) => {
+    const { add } = useProductMutations();
     const [name, setName] = useState("");
     const [price, setPrice] = useState("");
     const [ativo, setAtivo] = useState(true);
@@ -42,7 +43,7 @@ export const formAddProduct = ({ onSuccess }) => {
         e.preventDefault();
 
         try{
-            await addProduct({ name, price, cost, ativo });
+            await add.mutateAsync({ name, price, cost, ativo });
             setMessageTypeFormAddProduct("success");
             setMessageFormAddProduct("Produto adicionado com sucesso.");
             setName("");
@@ -67,6 +68,7 @@ export const formAddProduct = ({ onSuccess }) => {
 };
 
 export const formEditProduct = ({ onSuccess, selectedProduct }) => {
+    const { edit } = useProductMutations();
     const [newName, setNewName] = useState("");
     const [newPrice, setNewPrice] = useState("");
     const [newCost, setNewCost] = useState("");
@@ -99,7 +101,14 @@ export const formEditProduct = ({ onSuccess, selectedProduct }) => {
         e.preventDefault();
 
         try{
-            await editProduct( { nome: newName || selectedProduct?.nome, preco: newPrice || selectedProduct?.preco, custo: newCost || selectedProduct?.custo, ativo: ativo ?? selectedProduct?.ativo, id: selectedProduct?.id } );
+            await edit.mutateAsync({
+                nome: newName || selectedProduct?.nome,
+                preco: newPrice || selectedProduct?.preco,
+                custo: newCost || selectedProduct?.custo,
+                ativo: ativo ?? selectedProduct?.ativo,
+                receitaId: selectedProduct?.receitaId ?? null,
+                id: selectedProduct?.id
+            });
             setMessageTypeFormEditProduct("success");
             setMessageFormEditProduct("Dados do produto editados com sucesso.");
             setNewName("");
@@ -124,6 +133,7 @@ export const formEditProduct = ({ onSuccess, selectedProduct }) => {
 }
 
 export const formDeleteProduct = ({ onSuccess, selectedProduct }) => {
+    const { del } = useProductMutations();
     const [messageFormDeleteProduct, setMessageFormDeleteProduct] = useState("");
     const [messageTypeFormDeleteProduct, setMessageTypeFormDeleteProduct] = useState("success");
 
@@ -132,7 +142,7 @@ export const formDeleteProduct = ({ onSuccess, selectedProduct }) => {
     async function handleSubmitFormDeleteProduct(e) {
         e.preventDefault();
         try{
-            await deleteProduct(selectedProduct?.id);
+            await del.mutateAsync(selectedProduct?.id);
             setMessageTypeFormDeleteProduct("success");
             setMessageFormDeleteProduct("Produto deletado com sucesso.");
             if (onSuccess) onSuccess();

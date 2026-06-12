@@ -7,12 +7,12 @@ import { LuChefHat } from "react-icons/lu";
 import { Button, Card, Badge, Spinner, Form } from "react-bootstrap";
 import { CiSearch } from "react-icons/ci";
 import { SlPencil, SlTrash } from "react-icons/sl";
-import { useProducts } from "../../contexts";
 import { FiPlus } from 'react-icons/fi';
+import { useProductsQuery } from '../../hooks/useProductsQuery';
 
 export default function ProductsPage() {
   const navigate = useNavigate();
-  const { products, loading, error, fetchProducts } = useProducts();
+  const { data: products = [], isLoading, isError, refetch } = useProductsQuery();
   const [menuAddProductAtivo, setMenuAddProductAtivo] = useState(false);
   const [menuEditProductAtivo, setMenuEditProductAtivo] = useState(false);
   const [menuDeleteProductAtivo, setMenuDeleteProductAtivo] = useState(false);
@@ -24,7 +24,7 @@ export default function ProductsPage() {
     onSuccess: () => {
       setMenuAddProductAtivo(false);
       setMessageFormAddProduct("");
-      fetchProducts();
+      refetch();
     },
   });  
 
@@ -32,7 +32,7 @@ export default function ProductsPage() {
     onSuccess: () => {
       setMenuEditProductAtivo(false);
       setMessageFormEditProduct("");
-      fetchProducts();
+      refetch();
     },
     selectedProduct
   });  
@@ -41,7 +41,7 @@ export default function ProductsPage() {
     onSuccess: () => {
       setMenuDeleteProductAtivo(false);
       setMessageFormDeleteProduct("");
-      fetchProducts();
+      refetch();
     },
     selectedProduct
   });
@@ -50,16 +50,10 @@ export default function ProductsPage() {
     onSuccess: () => {
       setMenuAddRecipeAtivo(false);
       setMessageFormAddRecipe("");
-      fetchProducts();
+      refetch();
     },
     selectedProduct
   });
-
-  useEffect(() => {
-    if (products.length === 0){
-      fetchProducts();
-    }
-  }, []);
 
   const produtosNumerados = products.map((produto, index) => ({
     ...produto,
@@ -70,7 +64,7 @@ export default function ProductsPage() {
     produto.nome.toLowerCase().includes(busca.toLowerCase())
   );
 
-  if (loading && products.length === 0) {
+  if (isLoading && products.length === 0) {
     return(
       <div style={{ display: "flex", flexDirection: "column", gap: "5px", justifyContent: "center", alignItems: "center", height: "100vh" }}>
         <Spinner animation="border" role="status" />
@@ -79,12 +73,12 @@ export default function ProductsPage() {
     )
   }
 
-  if (error && products.length === 0) {
+  if (isError && products.length === 0) {
     return(
       <div style={{ display: "flex", flexDirection: "column", gap: "15px", justifyContent: "center", alignItems: "center", height: "100vh" }}>
         <i className="bi bi-exclamation-triangle" style={{ fontSize: "48px", color: "#dc3545" }} />
         <span style={{ color: "#666" }}>{error}</span>
-        <Button onClick={fetchProducts} variant="outline-primary">
+        <Button onClick={refetch} variant="outline-primary">
           Tentar Novamente
         </Button>
       </div>
@@ -202,13 +196,13 @@ export default function ProductsPage() {
 
 
                       <div style={{ paddingTop: 10, display: 'flex', alignItems: 'center', gap: 10 }}>
-                          {produto.receita_Id != null ?
-                            <Button 
-                              variant="outline-primary" 
-                              size="sm" 
-                              title="Ver receita" 
+                          {produto.receitaId != null ?
+                            <Button
+                              variant="outline-primary"
+                              size="sm"
+                              title="Ver receita"
                               className="w-50"
-                              onClick={() => navigate(`/receitas/${produto.receita_Id}`)}
+                              onClick={() => navigate(`/receitas/${produto.receitaId}`)}
                             >
                               <LuChefHat /> Ver Receita
                             </Button>

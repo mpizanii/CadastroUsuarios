@@ -1,10 +1,8 @@
-import axios from "axios";
-
-const API_URL = import.meta.env.VITE_API_URL;
+import api from '../utils/axiosInstance';
 
 export async function getProducts() {
     try {
-        const response = await axios.get(`${API_URL}/Produtos`);
+        const response = await api.get('/produtos');
         return response.data;
     } catch (error) {
         console.error('Erro ao buscar produtos:', error);
@@ -14,7 +12,7 @@ export async function getProducts() {
 
 export async function getRecipes() {
     try {
-        const response = await axios.get(`${API_URL}/Receitas`);
+        const response = await api.get('/receitas');
         return response.data;
     } catch (error) {
         console.error('Erro ao buscar receitas:', error);
@@ -24,35 +22,31 @@ export async function getRecipes() {
 
 export const addProduct = async ({ name, price, cost, ativo = true }) => {
     try {
-        const novoProduto = {
+        const response = await api.post('/produtos', {
             nome: name,
-            preco: price,
-            custo: cost,
-            ativo: ativo
-        };
-        const response = await axios.post(`${API_URL}/Produtos`, novoProduto);
-        return response.data; 
+            preco: price !== undefined && price !== '' ? Number(price) : 0,
+            custo: cost !== undefined && cost !== '' ? Number(cost) : 0,
+            ativo: ativo ?? true,
+        });
+        return response.data;
     } catch (error) {
         console.error('Erro ao adicionar produto:', error);
         throw new Error('Erro ao adicionar produto');
     }
 }
 
-export const editProduct = async ({ nome, preco, custo, receita_id, ativo, id }) => {
+// Java usa PUT com semântica de full-replace (todos os campos obrigatórios exceto receitaId)
+export const editProduct = async ({ nome, preco, custo, receitaId, ativo, id }) => {
     try {
-        const response = await axios.put(`${API_URL}/Produtos/${id}`, {
-            id,
+        const response = await api.put(`/produtos/${id}`, {
             nome,
-            preco,
-            custo,
-            receita_id,
-            ativo
+            preco: preco !== undefined && preco !== '' ? Number(preco) : 0,
+            custo: custo !== undefined && custo !== '' ? Number(custo) : 0,
+            ativo: ativo ?? true,
+            receitaId: receitaId ?? null,
         });
-
-        console.log("Produto editado com sucesso:", response.data);
-        return response.data; 
-    }
-    catch (error) { 
+        return response.data;
+    } catch (error) {
         console.error('Erro ao editar produto:', error);
         throw new Error('Erro ao editar produto');
     }
@@ -60,10 +54,8 @@ export const editProduct = async ({ nome, preco, custo, receita_id, ativo, id })
 
 export const deleteProduct = async (id) => {
     try {
-        const response = await axios.delete(`${API_URL}/Produtos/${id}`);
-        return response.data; 
-    }
-    catch (error) {
+        await api.delete(`/produtos/${id}`);
+    } catch (error) {
         console.error('Erro ao deletar produto:', error);
         throw new Error('Erro ao deletar produto');
     }

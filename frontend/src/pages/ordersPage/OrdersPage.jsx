@@ -10,9 +10,11 @@ import { formAddPedido, formEditOrderStatus, formDeletePedido } from '../../form
 import { useOrders } from '../../contexts';
 import { useOrderActions } from '../../hooks/useOrderActions';
 import ModalAvisosEstoque from '../../components/alertas/ModalAvisosEstoque';
+import { useProductsQuery } from '../../hooks/useProductsQuery';
 
 const OrdersPage = () => {
-  const { orders, loading, error, fetchOrders, fetchCustomersAndProducts, produtosDisponiveis, clientesDisponiveis } = useOrders();
+  const { orders, loading, error, fetchOrders, fetchCustomers, clientesDisponiveis } = useOrders();
+  const { data: produtosDisponiveis = [] } = useProductsQuery();
   const [menuAddPedidoAtivo, setMenuAddPedidoAtivo] = useState(false);
   const [menuOrderDetailsAtivo, setMenuOrderDetailsAtivo] = useState(false);
   const [menuEditStatusAtivo, setMenuEditStatusAtivo] = useState(false);
@@ -62,7 +64,7 @@ const OrdersPage = () => {
       fetchOrders();
     }
     if (produtosDisponiveis.length === 0 || clientesDisponiveis.length === 0) {
-      fetchCustomersAndProducts();
+      fetchCustomers();
     }
   }, []);
 

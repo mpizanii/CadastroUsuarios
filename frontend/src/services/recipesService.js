@@ -1,17 +1,13 @@
-import axios from "axios";
-import { useStock } from "../contexts/StockContext";
+import api from '../utils/axiosInstance';
 
-const API_URL = import.meta.env.VITE_API_URL;
-
-export const addRecipe = async ({ name, modo_preparo, ingredientes }) => {
+export const addRecipe = async ({ name, modoPreparo, ingredientes }) => {
     try {
-        const novaReceita = {
+        const response = await api.post('/receitas', {
             nome: name,
-            modo_Preparo: modo_preparo,
-            ingredientes: ingredientes
-        };
-        const response = await axios.post(`${API_URL}/Receitas`, novaReceita);
-        return response.data; 
+            modoPreparo,
+            ingredientes,
+        });
+        return response.data;
     } catch (error) {
         console.error('Erro ao adicionar receita:', error);
         throw new Error('Erro ao adicionar receita');
@@ -20,26 +16,24 @@ export const addRecipe = async ({ name, modo_preparo, ingredientes }) => {
 
 export async function getRecipeDetails(id) {
     try {
-        const response = await axios.get(`${API_URL}/Receitas/${id}`);
-
-        const associatedProduct = await axios.get(`${API_URL}/Produtos/receita/${id}`);
-        
-        return {recipe: response.data, product: associatedProduct.data };
+        const [recipeRes, productRes] = await Promise.all([
+            api.get(`/receitas/${id}`),
+            api.get(`/produtos/receita/${id}`),
+        ]);
+        return { recipe: recipeRes.data, product: productRes.data };
     } catch (error) {
         console.error("Erro ao buscar detalhes da receita:", error);
         return null;
     }
 }
 
+// Java usa PUT (upsert idempotente) em /receitas/ingredientes/{id}/mapeamento
 export async function mapearIngrediente(ingredienteId, insumoId, fatorConversao) {
     try {
-        console.log("Mapeando ingrediente:", { ingredienteId, insumoId, fatorConversao });
-        const response = await axios.post(`${API_URL}/Mapeamento`, {
-            ingredienteId,
-            insumoId,
-            fatorConversao
-        });
-        console.log("Mapeamento criado:", response.data);
+        const response = await api.put(
+            `/receitas/ingredientes/${ingredienteId}/mapeamento`,
+            { insumoId, fatorConversao }
+        );
         return response.data;
     } catch (error) {
         console.error("Erro ao mapear ingrediente:", error);
@@ -49,8 +43,7 @@ export async function mapearIngrediente(ingredienteId, insumoId, fatorConversao)
 
 export async function removerMapeamento(ingredienteId) {
     try {
-        const response = await axios.delete(`${API_URL}/Mapeamento/${ingredienteId}`);
-        return response.data;
+        await api.delete(`/receitas/ingredientes/${ingredienteId}/mapeamento`);
     } catch (error) {
         throw error;
     }

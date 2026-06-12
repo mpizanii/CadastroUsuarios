@@ -1,10 +1,8 @@
-import axios from 'axios';
-
-const API_URL = import.meta.env.VITE_API_URL;
+import api from '../utils/axiosInstance';
 
 export const getInsumos = async () => {
     try {
-        const response = await axios.get(`${API_URL}/Insumos`);
+        const response = await api.get('/insumos');
         return response.data;
     } catch (error) {
         console.error('Erro ao buscar insumos:', error);
@@ -14,7 +12,7 @@ export const getInsumos = async () => {
 
 export const getInsumosComAlertas = async () => {
     try {
-        const response = await axios.get(`${API_URL}/Insumos/alertas`);
+        const response = await api.get('/insumos/alertas');
         return response.data;
     } catch (error) {
         console.error('Erro ao buscar alertas:', error);
@@ -24,7 +22,7 @@ export const getInsumosComAlertas = async () => {
 
 export const getInsumoById = async (id) => {
     try {
-        const response = await axios.get(`${API_URL}/Insumos/${id}`);
+        const response = await api.get(`/insumos/${id}`);
         return response.data;
     } catch (error) {
         console.error('Erro ao buscar insumo:', error);
@@ -34,7 +32,7 @@ export const getInsumoById = async (id) => {
 
 export const addInsumo = async (insumo) => {
     try {
-        const response = await axios.post(`${API_URL}/Insumos`, insumo);
+        const response = await api.post('/insumos', insumo);
         return response.data;
     } catch (error) {
         console.error('Erro ao adicionar insumo:', error);
@@ -44,7 +42,7 @@ export const addInsumo = async (insumo) => {
 
 export const editInsumo = async (id, insumo) => {
     try {
-        const response = await axios.patch(`${API_URL}/Insumos/${id}`, insumo);
+        const response = await api.patch(`/insumos/${id}`, insumo);
         return response.data;
     } catch (error) {
         console.error('Erro ao editar insumo:', error);
@@ -54,7 +52,7 @@ export const editInsumo = async (id, insumo) => {
 
 export const deleteInsumo = async (id) => {
     try {
-        const response = await axios.delete(`${API_URL}/Insumos/${id}`);
+        const response = await api.delete(`/insumos/${id}`);
         return response.data;
     } catch (error) {
         console.error('Erro ao deletar insumo:', error);

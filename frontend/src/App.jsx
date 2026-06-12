@@ -14,19 +14,24 @@ import ProtectedRoutes from './utils/protectedroutes';
 import "bootstrap-icons/font/bootstrap-icons.css";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import SideBar from './components/menu/Sidebar';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+const queryClient = new QueryClient();
 
 function App() {
   return (
     <BrowserRouter>
-      <OrdersProvider>
-        <ProductsProvider>
-          <StockProvider>
-            <CustomersProvider>
-              <Layout/>
-            </CustomersProvider>
-          </StockProvider>
-        </ProductsProvider>
-      </OrdersProvider>
+      <QueryClientProvider client={queryClient}>
+        <OrdersProvider>
+          <ProductsProvider>
+            <StockProvider>
+              <CustomersProvider>
+                <Layout/>
+              </CustomersProvider>
+            </StockProvider>
+          </ProductsProvider>
+        </OrdersProvider>
+      </QueryClientProvider>
     </BrowserRouter>
   )
 }

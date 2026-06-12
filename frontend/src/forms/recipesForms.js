@@ -47,9 +47,9 @@ export const formAddRecipe = ({ onSuccess, selectedProduct }) => {
         e.preventDefault();
 
         try{
-            const receita = await addRecipe({ name, modo_preparo: recipeMethod, ingredientes: ingredients });
+            const receita = await addRecipe({ name, modoPreparo: recipeMethod, ingredientes: ingredients });
 
-            await editProduct({ nome: selectedProduct.nome, preco: selectedProduct.preco, custo: selectedProduct.custo, receita_id: receita.id, ativo: selectedProduct.ativo, id: selectedProduct.id });
+            await editProduct({ nome: selectedProduct.nome, preco: selectedProduct.preco, custo: selectedProduct.custo, receitaId: receita.id, ativo: selectedProduct.ativo, id: selectedProduct.id });
             setMessageTypeFormAddRecipe("success");
             setMessageFormAddRecipe("Receita adicionada com sucesso.");
             setName("");
