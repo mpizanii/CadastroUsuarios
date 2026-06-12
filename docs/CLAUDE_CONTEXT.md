@@ -3,7 +3,7 @@
 > Este documento foi criado especificamente para que futuras sessões do Claude Code consigam
 > retomar o desenvolvimento rapidamente sem precisar reanalisar todo o código.
 >
-> **Atualizado em:** 2026-06-11
+> **Atualizado em:** 2026-06-12
 
 ---
 
@@ -13,11 +13,11 @@
 Está em migração de ASP.NET Core 8 (C#) para Spring Boot 3.4 (Java 21).
 
 **O que existe:**
-- Backend Java em `backend/` — módulos Clientes, Produtos, Receitas implementados + infraestrutura multi-tenant
+- Backend Java em `backend/` — **todos os módulos migrados**: Clientes, Produtos, Receitas, Insumos, Mapeamento, Pedidos
 - Backend C# em `api/` — API completa mas legada, sem autenticação, a ser descontinuada
 - Frontend React em `frontend/` — ainda apontando para o C# API
 
-**O que falta:** Módulos Insumos, Mapeamento, Pedidos e integração frontend.
+**O que falta:** Apenas integração frontend (0% integrado ao Java).
 
 **Banco:** Supabase PostgreSQL (project `avugtvhjgtlcilumrvmr`), dev em Neon.tech.
 
@@ -33,12 +33,13 @@ Está em migração de ASP.NET Core 8 (C#) para Spring Boot 3.4 (Java 21).
 - ✅ `GET/POST/DELETE /api/receitas`
 - ✅ `GET /api/receitas/{id}` com N+1 corrigido
 - ✅ `GET /api/receitas/{id}/ingredientes`
+- ✅ `GET/POST/PATCH/DELETE /api/insumos` + `GET /api/insumos/alertas`
+- ✅ `PUT/DELETE /api/receitas/ingredientes/{id}/mapeamento`
+- ✅ `GET/POST/PATCH/DELETE /api/pedidos` + verificar-mapeamento + verificar-estoque + baixa-estoque
 - ✅ `GET /actuator/health`
 
 ### Ainda no C# (`api/`) — a migrar
-- ⏳ `/api/Insumos` — CRUD + alertas de estoque
-- ⏳ `/api/Mapeamento` — mapeamento ingrediente→insumo
-- ⏳ `/api/Pedidos` — CRUD + baixa estoque + verificações
+- Todos os módulos foram migrados. O C# pode ser descontinuado após integração do frontend.
 
 ### Frontend (`frontend/`)
 - Aponta para `http://localhost:5191/api` (C#)
@@ -209,33 +210,21 @@ logging.level.org.flywaydb=INFO
 ## Próximos Passos da Migração
 
 ### Imediato (próxima sessão)
-1. **Corrigir TD-02:** `RecipeIngredient` e `IngredientMapping` não herdam `TenantAwareEntity`
-   - Problema: sem `@PrePersist` para `created_at`, sem enforcement automático de tenant
-   - Solução: verificar se o banco tem `created_at` nessas tabelas (não tem) — adicionar `empresa_id` enforcement manual ou aceitar a limitação
+1. **Integrar frontend com backend Java**
+   - Mudar `VITE_API_URL` para `http://localhost:8080/api`
+   - Criar interceptor Axios global para injetar `Authorization: Bearer <jwt>`
+   - `customerService.js`: remover `user_id` do body, remover `/usuario/${user.id}` da URL
+   - `productsService.js`: mudar `PUT` → `PATCH`
+   - Testar todos os fluxos com JWT real
 
-2. **Implementar módulo `inventory` (Insumos) completo**
-   - Expandir `Insumo.java` com todos os campos
-   - Criar `CreateInsumoRequest`, `UpdateInsumoRequest`, `InsumoResponse`
-   - Criar `InsumoService` + `InsumoServiceImpl` com cálculo de status
-   - Criar `InsumoController` com `/api/insumos` e `/api/insumos/alertas`
-   - Referência: `api/Servicos/InsumosServico.cs`
-
-3. **Implementar Mapeamento** (dentro do módulo `recipes`)
-   - Controller: `POST /api/receitas/ingredientes/{ingredienteId}/mapeamento`
-   - Body: `{ insumoId, fatorConversao }`
-   - Lógica: upsert (criar se não existe, atualizar se existe)
-   - DELETE: `DELETE /api/receitas/ingredientes/{ingredienteId}/mapeamento`
-   - Referência: `api/Servicos/MapeamentoServico.cs`
-
-4. **Implementar módulo `orders` (Pedidos)**
-   - Entidades: `Order`, `OrderItem` (tabela `pedidoprodutos`)
-   - Todos os endpoints listados em MIGRATION_STATUS.md
-   - Atenção especial ao `DarBaixaEstoque` — lógica complexa de inventário
-   - Referência: `api/Servicos/PedidosServico.cs`
+2. **Corrigir TD-01:** `double` → `BigDecimal` em `Product.preco` e `Product.custo`
+   - Módulo `orders` já usa `BigDecimal` para `valor`
+   - `products` ainda usa `double` — corrigir antes do go-live
 
 ### Depois
-5. Integrar frontend com novo backend (Axios interceptor JWT)
-6. Corrigir `double` → `BigDecimal` em entidades financeiras
+3. Testes unitários e de integração
+4. Descomissionar C# API
+5. Implementar `@PreAuthorize` por role em endpoints críticos
 
 ---
 

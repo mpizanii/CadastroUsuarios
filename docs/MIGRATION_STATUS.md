@@ -1,6 +1,6 @@
 # MIGRATION_STATUS.md — Status da Migração C# → Java
 
-> **Última atualização:** 2026-06-11
+> **Última atualização:** 2026-06-12
 > **Branch:** `dev`
 
 ---
@@ -9,11 +9,11 @@
 
 | Aspecto | Status |
 |---|---|
-| Progresso geral (funcional) | ~70% |
-| Progresso módulos backend | ~86% |
+| Progresso geral (funcional) | ~85% |
+| Progresso módulos backend | ~100% |
 | Integração frontend | 0% (ainda usa C# API) |
-| Próximo módulo | Pedidos |
-| Módulos restantes | 1 (Pedidos) |
+| Próximo módulo | Integração Frontend |
+| Módulos restantes | 0 (backend completo) |
 
 ---
 
@@ -191,31 +191,49 @@ DELETE /api/receitas/ingredientes/{ingredienteId}/mapeamento  ← remover mapeam
 
 ---
 
-### ⏳ 7. Módulo Pedidos (mais complexo)
+### ✅ 7. Módulo Pedidos (commit a seguir)
 
-**Prioridade:** APÓS Insumos + Mapeamento
-
-**C# reference:** `api/Controllers/PedidosController.cs` + `api/Servicos/PedidosServico.cs`
-
-**Endpoints a migrar:**
+**Endpoints implementados:**
 ```
-GET    /api/pedidos                     ← findAll
-GET    /api/pedidos/{id}                ← findById
-POST   /api/pedidos                     ← create (com DarBaixaEstoque opcional)
-PATCH  /api/pedidos/{id}/status         ← atualizar status
-DELETE /api/pedidos/{id}                ← delete (cascade pedidoprodutos)
+GET    /api/pedidos                      ← findAll (com items + nomes de produto/cliente)
+GET    /api/pedidos/{id}                 ← findById
+POST   /api/pedidos                      ← create (com DarBaixaEstoque opcional)
+PATCH  /api/pedidos/{id}/status          ← atualizar status
+DELETE /api/pedidos/{id}                 ← delete (cascade pedidoprodutos via CascadeType.ALL)
 POST   /api/pedidos/verificar-mapeamento ← verificar se todos ingredientes estão mapeados
-POST   /api/pedidos/{id}/baixa-estoque  ← dar baixa manual no estoque
-POST   /api/pedidos/verificar-estoque   ← verificar avisos de estoque antes de criar pedido
+POST   /api/pedidos/verificar-estoque    ← verificar avisos de estoque antes de criar pedido
+POST   /api/pedidos/{id}/baixa-estoque   ← dar baixa manual no estoque
 ```
 
-**Regras críticas a implementar:**
-1. **DarBaixaEstoque:** para cada produto → receita → ingrediente mapeado → `insumo.quantidade -= ingrediente.quantidade × fator_conversao × pedido.quantidade` (nunca negativo)
-2. **VerificarMapeamento:** detectar ingredientes sem mapeamento antes de criar pedido
-3. **VerificarEstoque:** 3 níveis de alerta (CRITICO/ALERTA/INFO) baseados em percentual restante
-4. **N+1 fix obrigatório:** o C# usa múltiplos `FindAsync` em loops — no Java usar JOIN FETCH
+**Arquivos criados:**
+- `orders/model/Order.java` — sem TenantAwareEntity (pedidos sem created_at), empresaId manual
+- `orders/model/OrderItem.java` — tabela pedidoprodutos, empresaId manual (sem created_at)
+- `orders/repository/OrderRepository.java` — JOIN FETCH para N+1 fix em findAll e findById
+- `orders/dto/OrderItemRequest.java` — produtoId, quantidade, precoUnitario (fallback)
+- `orders/dto/CreateOrderRequest.java` — clienteId, observacoes, produtos, darBaixaEstoque
+- `orders/dto/UpdateOrderStatusRequest.java` — status com @NotBlank
+- `orders/dto/OrderItemResponse.java` — id, produtoId, produtoNome, quantidade, precoUnitario
+- `orders/dto/OrderResponse.java` — id, clienteId, clienteNome, dataPedido, valorTotal, status, observacoes, produtos
+- `orders/dto/IngredienteNaoMapeadoResponse.java`
+- `orders/dto/VerificarMapeamentoResponse.java` — todosMapeados + lista de não mapeados
+- `orders/dto/AvisoEstoqueResponse.java` — tipo, mensagem, insumoNome, quantidades, produtoNome
+- `orders/dto/VerificarEstoqueResponse.java` — temAvisos + lista de avisos
+- `orders/service/OrderService.java` — interface
+- `orders/service/OrderServiceImpl.java` — implementação com N+1 fix e baixa de estoque
+- `orders/controller/OrderController.java` — REST controller /api/pedidos
 
-**Tabela nova a mapear:** `pedidoprodutos` (`PedidoItem` em Java)
+**Arquivos modificados:**
+- `recipes/repository/RecipeIngredientRepository.java` — adicionado `findAllByRecipe_Id(Long receitaId)`
+
+**Decisões tomadas:**
+- `Order` e `OrderItem` NÃO herdam `TenantAwareEntity` (tabela `pedidos` sem `created_at`) — empresaId manual
+- `BigDecimal` para `valor` do pedido (evitar TD-01 no módulo mais crítico)
+- `OrderItem.quantidade` como `Integer` (smallint PostgreSQL — JDBC faz coerção automaticamente)
+- N+1 fix via `JOIN FETCH o.items` na query do repositório (evita N+1 do C# com FindAsync em loop)
+- Nome do cliente carregado via `CustomerRepository.findByIdAndEmpresaId` (cross-module dependency aceita em monolito)
+- Nomes de produtos carregados em batch via `productRepository.findAllById(ids)` (1 query para todos)
+- DarBaixaEstoque: `insumo.quantidade -= qtdIngrediente × fatorConversao × qtdPedido`, mínimo 0
+- VerificarEstoque: 3 níveis — CRITICO (saldo negativo), ALERTA (<10% ou <10 unidades restantes), INFO (<30% restante)
 
 ---
 
@@ -272,20 +290,20 @@ POST   /api/pedidos/verificar-estoque   ← verificar avisos de estoque antes de
 ```
 ✅ [Módulo 5] Inventory (Insumos) — CONCLUÍDO
 ✅ [Módulo 6] Mapeamento — CONCLUÍDO
+✅ [Módulo 7] Pedidos — CONCLUÍDO (2026-06-12)
    ↓
 Próxima sessão:
-1. [Módulo 7] Pedidos (mais complexo)
-   - Entidades: Order, OrderItem (pedidoprodutos)
-   - DarBaixaEstoque, VerificarMapeamento, VerificarEstoque
-   - JOIN FETCH obrigatório (fix N+1 do C#)
+1. [Frontend] Integrar frontend com novo backend Java
+   - VITE_API_URL: 5191 → 8080
+   - Interceptor Axios para Bearer JWT
+   - customerService.js: remover user_id, remover usuario/{id} da URL
+   - productsService.js: PUT → PATCH
    ↓
-3. [Frontend] Integrar frontend com novo backend Java
+2. [TD-01] Corrigir double → BigDecimal em Products (preco/custo)
    ↓
-4. [TD-01] Corrigir double → BigDecimal em Products (preco/custo)
+3. Testes e validação end-to-end
    ↓
-5. Testes e validação end-to-end
-   ↓
-6. Go-live backend Java (descomissionar C#)
+4. Go-live backend Java (descomissionar C#)
 ```
 
 ---

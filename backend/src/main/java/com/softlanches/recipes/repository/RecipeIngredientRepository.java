@@ -4,6 +4,7 @@ import com.softlanches.recipes.model.RecipeIngredient;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -11,4 +12,6 @@ import java.util.UUID;
 public interface RecipeIngredientRepository extends JpaRepository<RecipeIngredient, Long> {
 
     Optional<RecipeIngredient> findByIdAndEmpresaId(Long id, UUID empresaId);
+
+    List<RecipeIngredient> findAllByRecipe_Id(Long receitaId);
 }
