@@ -11,7 +11,7 @@ import java.util.UUID;
 @Repository
 public interface InsumoRepository extends JpaRepository<Insumo, Long> {
 
-    List<Insumo> findAllByIdIn(List<Long> ids);
+    List<Insumo> findAllByIdInAndEmpresaId(List<Long> ids, UUID empresaId);
 
     List<Insumo> findAllByEmpresaId(UUID empresaId);
 

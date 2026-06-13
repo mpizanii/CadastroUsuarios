@@ -60,7 +60,7 @@ public class OrderServiceImpl implements OrderService {
         List<Long> produtoIds = request.produtos().stream()
                 .map(OrderItemRequest::produtoId)
                 .toList();
-        Map<Long, Product> produtosMap = productRepository.findAllById(produtoIds).stream()
+        Map<Long, Product> produtosMap = productRepository.findAllByIdInAndEmpresaId(produtoIds, empresaId).stream()
                 .collect(Collectors.toMap(Product::getId, p -> p));
 
         BigDecimal valorTotal = request.produtos().stream()
@@ -120,7 +120,7 @@ public class OrderServiceImpl implements OrderService {
         UUID empresaId = TenantContext.getRequiredEmpresaId();
 
         List<Long> produtoIds = produtos.stream().map(OrderItemRequest::produtoId).toList();
-        Map<Long, Product> produtosMap = productRepository.findAllById(produtoIds).stream()
+        Map<Long, Product> produtosMap = productRepository.findAllByIdInAndEmpresaId(produtoIds, empresaId).stream()
                 .collect(Collectors.toMap(Product::getId, p -> p));
 
         List<IngredienteNaoMapeadoResponse> naoMapeados = new ArrayList<>();
@@ -156,7 +156,7 @@ public class OrderServiceImpl implements OrderService {
         UUID empresaId = TenantContext.getRequiredEmpresaId();
 
         List<Long> produtoIds = produtos.stream().map(OrderItemRequest::produtoId).toList();
-        Map<Long, Product> produtosMap = productRepository.findAllById(produtoIds).stream()
+        Map<Long, Product> produtosMap = productRepository.findAllByIdInAndEmpresaId(produtoIds, empresaId).stream()
                 .collect(Collectors.toMap(Product::getId, p -> p));
 
         List<AvisoEstoqueResponse> avisos = new ArrayList<>();
@@ -199,7 +199,7 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new ResourceNotFoundException("Pedido", pedidoId));
 
         List<Long> produtoIds = order.getItems().stream().map(OrderItem::getProdutoId).toList();
-        Map<Long, Product> produtosMap = productRepository.findAllById(produtoIds).stream()
+        Map<Long, Product> produtosMap = productRepository.findAllByIdInAndEmpresaId(produtoIds, empresaId).stream()
                 .collect(Collectors.toMap(Product::getId, p -> p));
 
         darBaixaEstoqueInterno(order, produtosMap, empresaId);
@@ -274,7 +274,7 @@ public class OrderServiceImpl implements OrderService {
 
     private OrderResponse toResponse(Order order, UUID empresaId) {
         List<Long> produtoIds = order.getItems().stream().map(OrderItem::getProdutoId).toList();
-        Map<Long, Product> produtosMap = productRepository.findAllById(produtoIds).stream()
+        Map<Long, Product> produtosMap = productRepository.findAllByIdInAndEmpresaId(produtoIds, empresaId).stream()
                 .collect(Collectors.toMap(Product::getId, p -> p));
         return toResponse(order, produtosMap, resolveClienteNome(order.getClienteId(), empresaId));
     }

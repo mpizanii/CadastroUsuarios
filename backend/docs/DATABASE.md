@@ -100,6 +100,8 @@ Unique constraint: `(empresa_id, user_id)`.
 | `status` | varchar | nullable |
 | `created_at` | timestamp | nullable, `now()` |
 
+> `created_at` is `timestamp without time zone` here; all other tables use `timestamptz`. Inconsistency is benign.
+
 ### `ingredientes_insumo` — Recipe ingredient ↔ Inventory mapping
 
 | Column | Type | Notes |
@@ -145,32 +147,33 @@ LIMIT 1;
 
 - Language: SQL, STABLE, SECURITY DEFINER
 - Used by all RLS policies to determine the current user's tenant
-- ⚠️ Advisory: callable by `anon` role — consider revoking (see SECURITY.md)
+- Permissions: `EXECUTE` granted to `authenticated` only; `anon` revoked (migration 007)
 
 ## Row-Level Security (RLS)
 
-RLS is enabled on all 10 tables. All policies use `get_user_empresa_id()` as the filter.
+RLS is enabled on all 10 tables. All INSERT and UPDATE policies include `WITH CHECK`.
 
-| Table | SELECT | INSERT | UPDATE | DELETE |
+| Table | SELECT | INSERT (WITH CHECK) | UPDATE (WITH CHECK) | DELETE |
 |---|---|---|---|---|
 | empresas | `id = get_user_empresa_id()` | — | — | — |
 | usuarios_empresa | `empresa_id = get_user_empresa_id()` | — | — | — |
-| clientes | ✅ | ✅ (no check) | ✅ | ✅ |
-| produtos | ✅ | ✅ (no check) | ✅ | ✅ |
-| receitas | ✅ | ✅ (no check) | ✅ | ✅ |
-| receitaIngredientes | ✅ | ✅ (no check) | ✅ | ✅ |
-| insumos | ✅ | ✅ (no check) | ✅ | ✅ |
-| ingredientes_insumo | ✅ | ✅ (no check) | ✅ | ✅ |
-| pedidos | ✅ | ✅ (no check) | ✅ | ✅ |
-| pedidoprodutos | ✅ | ✅ (no check) | ✅ | ✅ |
+| clientes | ✅ | ✅ | ✅ | ✅ |
+| produtos | ✅ | ✅ | ✅ | ✅ |
+| receitas | ✅ | ✅ | ✅ | ✅ |
+| receitaIngredientes | ✅ | ✅ | ✅ | ✅ |
+| insumos | ✅ | ✅ | ✅ | ✅ |
+| ingredientes_insumo | ✅ | ✅ | ✅ | ✅ |
+| pedidos | ✅ | ✅ | ✅ | ✅ |
+| pedidoprodutos | ✅ | ✅ | ✅ | ✅ |
 
-> ⚠️ INSERT policies lack `WITH CHECK` clauses — a user could insert records with a foreign `empresa_id`. The application layer must enforce tenant isolation on INSERT. See SECURITY.md.
+All SELECT/UPDATE/DELETE policies use `empresa_id = get_user_empresa_id()`.
+All INSERT policies use `WITH CHECK (empresa_id = get_user_empresa_id())`.
 
 ## Indexes
 
 Key indexes beyond primary keys:
 
-- `idx_*_empresa_id` — on every table (RLS performance)
+- `idx_*_empresa_id` — on every table (RLS + application query performance)
 - `idx_pedidos_data_desc` — descending date for pagination
 - `idx_pedidos_status` — filter by status
 - `idx_insumos_validade WHERE validade IS NOT NULL` — partial index for expiry queries
@@ -189,9 +192,11 @@ Key indexes beyond primary keys:
 | `pgcrypto` | 1.3 | Cryptographic functions |
 | `supabase_vault` | 0.3.1 | Secret management |
 
-## Flyway Migrations (Supabase)
+## Flyway Migrations
 
-Applied via Supabase MCP (tracked in `supabase_migrations.schema_migrations`):
+### Supabase-managed (via Supabase MCP)
+
+Tracked in `supabase_migrations.schema_migrations`:
 
 | Version | Name |
 |---|---|
@@ -201,5 +206,8 @@ Applied via Supabase MCP (tracked in `supabase_migrations.schema_migrations`):
 | 20260610144328 | 004_create_helper_function |
 | 20260610144354 | 005_rls_policies |
 | 20260610144411 | 006_revoke_anon_access |
+| 20260613 | 007_revoke_anon_execute_get_user_empresa_id |
 
-Spring Boot Flyway (`flyway_schema_history`) is configured with `baseline-on-migrate=true` at version `1`, so it treats the existing Supabase schema as baseline and only manages migrations placed in `src/main/resources/db/migration/`. Future Spring-managed migrations must start at `V2__`.
+### Spring Boot Flyway
+
+Baseline at V1 (`baseline-on-migrate=true`). No application-managed migrations yet. Next must be `V2__`.

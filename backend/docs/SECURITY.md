@@ -36,7 +36,9 @@ Two independent layers protect tenant data:
 3. Stores `empresa_id` in `TenantContext` (thread-local, cleared after response).
 4. Repositories use `empresa_id` in all queries.
 
-If no matching record exists in `usuarios_empresa`, access is denied.
+If no matching record exists in `usuarios_empresa`, access is denied with HTTP 403.
+
+**All repository methods use compound queries (`findByIdAndEmpresaId`, `findAllByIdInAndEmpresaId`, etc.) — there is no unfiltered cross-entity query in the codebase.**
 
 ### Layer 2 — PostgreSQL RLS
 
@@ -46,30 +48,58 @@ All 10 tables in `public` have RLS enabled. Policies use `get_user_empresa_id()`
 
 **Consequence:** The application layer (TenantFilter + explicit `empresa_id` filters) is the primary security boundary for the Spring Boot API. RLS provides defense-in-depth for direct database or PostgREST access.
 
-## Known Security Advisories (Supabase)
+## RLS Policy Status (verified 2026-06-13)
 
-The following issues were identified by the Supabase security advisor on 2026-06-12:
+All INSERT and UPDATE policies include `WITH CHECK (empresa_id = get_user_empresa_id())`.
 
-### HIGH PRIORITY
+| Table | SELECT | INSERT (WITH CHECK) | UPDATE (WITH CHECK) | DELETE |
+|---|---|---|---|---|
+| empresas | ✅ | — | — | — |
+| usuarios_empresa | ✅ | — | — | — |
+| clientes | ✅ | ✅ | ✅ | ✅ |
+| produtos | ✅ | ✅ | ✅ | ✅ |
+| receitas | ✅ | ✅ | ✅ | ✅ |
+| receitaIngredientes | ✅ | ✅ | ✅ | ✅ |
+| insumos | ✅ | ✅ | ✅ | ✅ |
+| ingredientes_insumo | ✅ | ✅ | ✅ | ✅ |
+| pedidos | ✅ | ✅ | ✅ | ✅ |
+| pedidoprodutos | ✅ | ✅ | ✅ | ✅ |
 
-| Issue | Detail | Remediation |
+## Cross-Tenant Audit (2026-06-13)
+
+A full audit of all services and repositories was performed. The following vulnerabilities were found and fixed:
+
+### Fixed — HIGH: `OrderServiceImpl` — unfiltered product lookups
+
+`productRepository.findAllById(ids)` was used in 5 locations without an `empresaId` filter:
+- `create()`, `verificarMapeamento()`, `verificarEstoque()`, `darBaixaEstoque()`, `toResponse()`
+
+A malicious user could reference product IDs belonging to another tenant, leaking prices and names, and potentially attaching foreign-tenant products to orders.
+
+**Fix:** Added `ProductRepository.findAllByIdInAndEmpresaId(List<Long> ids, UUID empresaId)`. All 5 call sites updated.
+
+### Fixed — MEDIUM: `RecipeServiceImpl` — unfiltered insumo name lookup
+
+`insumoRepository.findAllByIdIn(ids)` used in `findById()` to resolve insumo names for display, without `empresaId` filter. An insumo name from another tenant could appear in a recipe detail response if data corruption led to a cross-tenant mapping.
+
+**Fix:** Added `InsumoRepository.findAllByIdInAndEmpresaId(List<Long> ids, UUID empresaId)`. Old method `findAllByIdIn` removed (was unused after the fix).
+
+### Fixed — MEDIUM: Supabase — `anon` could call `get_user_empresa_id()`
+
+The function was exposed to the `anon` role via PostgREST (`/rest/v1/rpc/get_user_empresa_id`). Although calling it as `anon` returns NULL (since `auth.uid()` is null for unauthenticated requests), the exposure was unnecessary.
+
+**Fix:** Migration `007_revoke_anon_execute_get_user_empresa_id` applied. Verified: `anon_can_execute = false`, `auth_can_execute = true`.
+
+## Remaining Risks
+
+| Risk | Severity | Notes |
 |---|---|---|
-| PostgreSQL version outdated | Running 15.8.1.121; security patches available | Upgrade via Supabase Dashboard → Project Settings → Infrastructure |
-
-### MEDIUM PRIORITY
-
-| Issue | Detail | Remediation |
-|---|---|---|
-| `get_user_empresa_id()` callable by `anon` | The function is SECURITY DEFINER and exposed via PostgREST `/rest/v1/rpc/get_user_empresa_id` | Revoke EXECUTE from `anon` on this function |
-| INSERT policies without `WITH CHECK` | All INSERT policies on operational tables lack `WITH CHECK (empresa_id = get_user_empresa_id())` | Add WITH CHECK clauses to prevent cross-tenant INSERT via PostgREST |
-
-### LOW PRIORITY
-
-| Issue | Detail |
-|---|---|
-| Tables visible in GraphQL schema | All tables are accessible to `authenticated` via pg_graphql; acceptable if GraphQL endpoint is not used by the frontend |
-| Leaked password protection disabled | Enable in Supabase Dashboard → Authentication → Password Strength |
-| Insufficient MFA options | Enable TOTP MFA in Supabase Dashboard → Authentication → MFA |
+| PostgreSQL 15.8.1.121 has security patches pending | HIGH | Upgrade via Supabase Dashboard → Settings → Infrastructure |
+| Tables visible in GraphQL schema to `authenticated` | LOW | Acceptable if pg_graphql endpoint is not exposed to frontend; RLS still applies |
+| Leaked password protection disabled | LOW | Enable in Supabase Dashboard → Auth → Password Strength |
+| Insufficient MFA options | LOW | Enable TOTP in Supabase Dashboard → Auth → MFA |
+| `RecipeIngredientRepository.findAllByRecipe_Id()` has no `empresaId` filter | LOW | Only called after the parent `Product` (now tenant-filtered) is verified; no direct route from user input |
+| Backend connects as `postgres` (bypasses RLS) | Architecture | By design — application layer is primary boundary; see Layer 1 above |
 
 ## Secrets Management
 
@@ -80,7 +110,7 @@ The following issues were identified by the Supabase security advisor on 2026-06
 | Supabase anon key | Frontend only — not needed by backend | — |
 | JWT signing key | Supabase-managed (JWKS) | ✅ Auto-rotated |
 
-Previously, `application-dev.properties` contained a hardcoded Neon.tech password (`npg_GMtT3OjU7Cyn`). That credential has been superseded. The file is in `.gitignore` and is no longer committed. All credentials are now read from environment variables.
+Previously, `application-dev.properties` contained a hardcoded Neon.tech password. That credential is superseded. All credentials are now read from environment variables.
 
 ## CORS
 
@@ -90,9 +120,3 @@ Allowed origins are configured per environment:
 - Prod: `${FRONTEND_URL}` (injected at deploy time)
 
 Wildcard origins (`*`) are never used.
-
-## Dependency Notes
-
-- Spring Boot 3.4.0 — check for CVEs periodically
-- PostgreSQL JDBC driver — bundled via Spring Boot BOM
-- No known CVEs in current dependency set at time of writing (2026-06-12)

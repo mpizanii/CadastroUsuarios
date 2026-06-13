@@ -54,7 +54,7 @@ public class RecipeServiceImpl implements RecipeService {
 
         Map<Long, String> insumoNames = insumoIds.isEmpty()
                 ? Collections.emptyMap()
-                : insumoRepository.findAllByIdIn(insumoIds).stream()
+                : insumoRepository.findAllByIdInAndEmpresaId(insumoIds, empresaId).stream()
                         .collect(Collectors.toMap(Insumo::getId, Insumo::getNome));
 
         List<IngredientWithMappingResponse> ingredientes = recipe.getIngredients().stream()
