@@ -77,7 +77,7 @@ export default function ProductsPage() {
     return(
       <div style={{ display: "flex", flexDirection: "column", gap: "15px", justifyContent: "center", alignItems: "center", height: "100vh" }}>
         <i className="bi bi-exclamation-triangle" style={{ fontSize: "48px", color: "#dc3545" }} />
-        <span style={{ color: "#666" }}>{error}</span>
+        <span style={{ color: "#666" }}>{isError}</span>
         <Button onClick={refetch} variant="outline-primary">
           Tentar Novamente
         </Button>
