@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 @Entity
 @Table(name = "produtos")
 @Getter
@@ -22,10 +24,10 @@ public class Product extends TenantAwareEntity {
     private String nome;
 
     @Column(name = "preco", nullable = false)
-    private double preco;
+    private BigDecimal preco;
 
     @Column(name = "custo", nullable = false)
-    private double custo;
+    private BigDecimal custo;
 
     @Column(name = "ativo", nullable = false)
     private boolean ativo = true;

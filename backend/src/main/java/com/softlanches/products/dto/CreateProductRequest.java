@@ -4,6 +4,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 
+import java.math.BigDecimal;
+
 public record CreateProductRequest(
 
         @NotBlank(message = "Nome é obrigatório")
@@ -11,10 +13,10 @@ public record CreateProductRequest(
         String nome,
 
         @PositiveOrZero(message = "Preço não pode ser negativo")
-        Double preco,
+        BigDecimal preco,
 
         @PositiveOrZero(message = "Custo não pode ser negativo")
-        Double custo,
+        BigDecimal custo,
 
         Boolean ativo,
 

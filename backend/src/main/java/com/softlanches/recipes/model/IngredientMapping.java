@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 // Tabela ingredientes_insumo tem empresa_id mas NÃO tem created_at.
@@ -28,7 +29,7 @@ public class IngredientMapping {
     private Long insumoId;
 
     @Column(name = "fator_conversao")
-    private Double fatorConversao;
+    private BigDecimal fatorConversao;
 
     @Column(name = "empresa_id")
     private UUID empresaId;

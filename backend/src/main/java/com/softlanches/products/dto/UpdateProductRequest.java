@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 
+import java.math.BigDecimal;
+
 // PUT semântica: todos os campos de dados são obrigatórios (full replace).
 // receitaId é nullable — enviar null desvincula a receita sem deletá-la.
 public record UpdateProductRequest(
@@ -15,11 +17,11 @@ public record UpdateProductRequest(
 
         @NotNull(message = "Preço é obrigatório")
         @PositiveOrZero(message = "Preço não pode ser negativo")
-        Double preco,
+        BigDecimal preco,
 
         @NotNull(message = "Custo é obrigatório")
         @PositiveOrZero(message = "Custo não pode ser negativo")
-        Double custo,
+        BigDecimal custo,
 
         @NotNull(message = "Campo ativo é obrigatório")
         Boolean ativo,

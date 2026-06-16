@@ -1,12 +1,14 @@
 package com.softlanches.recipes.dto;
 
+import java.math.BigDecimal;
+
 public record IngredientWithMappingResponse(
         Long id,
         String nome,
-        double quantidade,
+        BigDecimal quantidade,
         String unidade,
         boolean mapeado,
         Long insumoId,
         String insumoNome,
-        Double fatorConversao
+        BigDecimal fatorConversao
 ) {}

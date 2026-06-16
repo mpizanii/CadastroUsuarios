@@ -1,8 +1,10 @@
 package com.softlanches.recipes.dto;
 
+import java.math.BigDecimal;
+
 public record IngredientResponse(
         Long id,
         String nome,
-        double quantidade,
+        BigDecimal quantidade,
         String unidade
 ) {}

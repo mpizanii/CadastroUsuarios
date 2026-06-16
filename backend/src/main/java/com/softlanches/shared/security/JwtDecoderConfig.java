@@ -7,18 +7,22 @@ import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.jwt.*;
 
+import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
+
 @Configuration
 public class JwtDecoderConfig {
 
     @Bean
     public JwtDecoder jwtDecoder(
-            @Value("${supabase.jwks-uri}") String jwksUri,
+            @Value("${supabase.jwt-secret}") String jwtSecret,
             @Value("${supabase.issuer-uri}") String issuerUri) {
 
-        NimbusJwtDecoder decoder = NimbusJwtDecoder.withJwkSetUri(jwksUri).build();
+        SecretKeySpec secretKey = new SecretKeySpec(
+                jwtSecret.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
 
-        // Supabase usa "authenticated" como audience (string, não lista)
-        // e o issuer padrão é /auth/v1 — validamos apenas timestamp e issuer
+        NimbusJwtDecoder decoder = NimbusJwtDecoder.withSecretKey(secretKey).build();
+
         OAuth2TokenValidator<Jwt> timestampValidator = new JwtTimestampValidator();
         OAuth2TokenValidator<Jwt> issuerValidator = new JwtIssuerValidator(issuerUri);
 

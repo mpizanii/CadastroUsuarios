@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Service
@@ -36,7 +37,7 @@ public class MappingServiceImpl implements MappingService {
 
         mapping.setRecipeIngredient(ingredient);
         mapping.setInsumoId(request.insumoId());
-        mapping.setFatorConversao(request.fatorConversao() != null ? request.fatorConversao() : 1.0);
+        mapping.setFatorConversao(request.fatorConversao() != null ? request.fatorConversao() : BigDecimal.ONE);
         mapping.setEmpresaId(empresaId);
 
         IngredientMapping saved = ingredientMappingRepository.save(mapping);

@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 // Tabela "receitaIngredientes" tem empresa_id mas NÃO tem created_at,
@@ -29,7 +30,7 @@ public class RecipeIngredient {
     private String nome;
 
     @Column(name = "quantidade", nullable = false)
-    private double quantidade;
+    private BigDecimal quantidade;
 
     @Column(name = "unidade", nullable = false)
     private String unidade;

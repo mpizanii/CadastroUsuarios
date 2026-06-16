@@ -66,8 +66,8 @@ public class OrderServiceImpl implements OrderService {
         BigDecimal valorTotal = request.produtos().stream()
                 .map(item -> {
                     Product produto = produtosMap.get(item.produtoId());
-                    double preco = produto != null ? produto.getPreco() : item.precoUnitario();
-                    return BigDecimal.valueOf(preco).multiply(BigDecimal.valueOf(item.quantidade()));
+                    BigDecimal preco = produto != null ? produto.getPreco() : BigDecimal.valueOf(item.precoUnitario());
+                    return preco.multiply(BigDecimal.valueOf(item.quantidade()));
                 })
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
@@ -233,10 +233,10 @@ public class OrderServiceImpl implements OrderService {
         }
     }
 
-    private BigDecimal calcularQuantidade(double qtdIngrediente, Double fatorConversao, int qtdPedido) {
-        double fator = fatorConversao != null ? fatorConversao : 1.0;
-        return BigDecimal.valueOf(qtdIngrediente)
-                .multiply(BigDecimal.valueOf(fator))
+    private BigDecimal calcularQuantidade(BigDecimal qtdIngrediente, BigDecimal fatorConversao, int qtdPedido) {
+        BigDecimal fator = fatorConversao != null ? fatorConversao : BigDecimal.ONE;
+        return qtdIngrediente
+                .multiply(fator)
                 .multiply(BigDecimal.valueOf(qtdPedido));
     }
 
@@ -284,7 +284,7 @@ public class OrderServiceImpl implements OrderService {
                 .map(item -> {
                     Product produto = produtosMap.get(item.getProdutoId());
                     String nome = produto != null ? produto.getNome() : "Produto não encontrado";
-                    BigDecimal preco = produto != null ? BigDecimal.valueOf(produto.getPreco()) : BigDecimal.ZERO;
+                    BigDecimal preco = produto != null ? produto.getPreco() : BigDecimal.ZERO;
                     return new OrderItemResponse(item.getId(), item.getProdutoId(), nome, item.getQuantidade(), preco);
                 })
                 .toList();

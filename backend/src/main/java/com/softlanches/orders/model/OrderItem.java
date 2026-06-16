@@ -4,7 +4,9 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
 
+import java.sql.Types;
 import java.util.UUID;
 
 // Tabela pedidoprodutos não tem created_at, portanto não herda TenantAwareEntity.
@@ -27,6 +29,7 @@ public class OrderItem {
     @Column(name = "produto_id", nullable = false)
     private Long produtoId;
 
+    @JdbcTypeCode(Types.SMALLINT)
     @Column(name = "quantidade", nullable = false)
     private Integer quantidade;
 
