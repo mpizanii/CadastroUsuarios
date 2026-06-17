@@ -1,6 +1,8 @@
 package com.softlanches.recipes.repository;
 
 import com.softlanches.recipes.model.Recipe;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -14,6 +16,8 @@ import java.util.UUID;
 public interface RecipeRepository extends JpaRepository<Recipe, Long> {
 
     List<Recipe> findAllByEmpresaId(UUID empresaId);
+
+    Page<Recipe> findAllByEmpresaId(UUID empresaId, Pageable pageable);
 
     Optional<Recipe> findByIdAndEmpresaId(Long id, UUID empresaId);
 

@@ -6,9 +6,11 @@ import com.softlanches.customers.dto.UpdateCustomerRequest;
 import com.softlanches.customers.mapper.CustomerMapper;
 import com.softlanches.customers.model.Customer;
 import com.softlanches.customers.repository.CustomerRepository;
+import com.softlanches.shared.dto.PageResponse;
 import com.softlanches.shared.exception.ResourceNotFoundException;
 import com.softlanches.shared.tenant.TenantContext;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +30,13 @@ public class CustomerServiceImpl implements CustomerService {
     public List<CustomerResponse> findAll() {
         UUID empresaId = TenantContext.getRequiredEmpresaId();
         return mapper.toResponseList(repository.findAllByEmpresaId(empresaId));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PageResponse<CustomerResponse> findAll(Pageable pageable) {
+        UUID empresaId = TenantContext.getRequiredEmpresaId();
+        return PageResponse.of(repository.findAllByEmpresaId(empresaId, pageable).map(mapper::toResponse));
     }
 
     @Override

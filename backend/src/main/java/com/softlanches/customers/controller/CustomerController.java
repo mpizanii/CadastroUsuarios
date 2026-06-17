@@ -4,6 +4,7 @@ import com.softlanches.customers.dto.CreateCustomerRequest;
 import com.softlanches.customers.dto.CustomerResponse;
 import com.softlanches.customers.dto.UpdateCustomerRequest;
 import com.softlanches.customers.service.CustomerService;
+import com.softlanches.shared.dto.PageResponse;
 import com.softlanches.shared.exception.GlobalExceptionHandler;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -17,7 +18,11 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -34,13 +39,15 @@ public class CustomerController {
 
     @GetMapping
     @Operation(
-        summary = "Listar clientes",
-        description = "Retorna todos os clientes cadastrados no tenant do usuário autenticado."
+        summary = "Listar clientes (paginado)",
+        description = """
+            Retorna os clientes do tenant com suporte a paginação.
+            Use `?page=0&size=20&sort=nome,asc` para controlar a paginação.
+            Sem parâmetros, retorna a primeira página com 20 registros ordenados por `nome`.
+            """
     )
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Lista de clientes retornada com sucesso",
-            content = @Content(mediaType = "application/json",
-                array = @ArraySchema(schema = @Schema(implementation = CustomerResponse.class)))),
+        @ApiResponse(responseCode = "200", description = "Página de clientes retornada com sucesso"),
         @ApiResponse(responseCode = "401", description = "Token JWT ausente ou inválido",
             content = @Content),
         @ApiResponse(responseCode = "403", description = "Usuário autenticado sem empresa associada",
@@ -50,8 +57,9 @@ public class CustomerController {
             content = @Content(mediaType = "application/json",
                 schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class)))
     })
-    public ResponseEntity<List<CustomerResponse>> findAll() {
-        return ResponseEntity.ok(service.findAll());
+    public ResponseEntity<PageResponse<CustomerResponse>> findAll(
+            @ParameterObject @PageableDefault(size = 20, sort = "nome") Pageable pageable) {
+        return ResponseEntity.ok(service.findAll(pageable));
     }
 
     @GetMapping("/{id}")
@@ -82,6 +90,7 @@ public class CustomerController {
     }
 
     @PostMapping
+    @PreAuthorize("@tenantSecurity.isAdmin()")
     @Operation(
         summary = "Cadastrar cliente",
         description = "Cria um novo cliente vinculado ao tenant do usuário autenticado. O `empresa_id` é resolvido automaticamente pelo JWT."
@@ -140,6 +149,7 @@ public class CustomerController {
     }
 
     @PatchMapping("/{id}")
+    @PreAuthorize("@tenantSecurity.isAdmin()")
     @Operation(
         summary = "Atualizar cliente parcialmente",
         description = "Atualiza apenas os campos informados no body (PATCH semântico). Campos `null` são ignorados."
@@ -171,6 +181,7 @@ public class CustomerController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("@tenantSecurity.isAdmin()")
     @Operation(
         summary = "Remover cliente",
         description = "Remove permanentemente um cliente do tenant. Pedidos existentes que referenciam este cliente mantêm o `cliente_id`, mas `clienteNome` passa a ser `null` nas respostas."

@@ -5,6 +5,7 @@ import com.softlanches.recipes.dto.IngredientResponse;
 import com.softlanches.recipes.dto.RecipeDetailResponse;
 import com.softlanches.recipes.dto.RecipeResponse;
 import com.softlanches.recipes.service.RecipeService;
+import com.softlanches.shared.dto.PageResponse;
 import com.softlanches.shared.exception.GlobalExceptionHandler;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -18,7 +19,11 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -35,13 +40,11 @@ public class RecipeController {
 
     @GetMapping
     @Operation(
-        summary = "Listar receitas",
-        description = "Retorna todas as receitas do tenant. Retorna apenas os campos básicos (`id`, `nome`, `modoPreparo`, `createdAt`). Para detalhes com ingredientes, use `GET /api/receitas/{id}`."
+        summary = "Listar receitas (paginado)",
+        description = "Retorna as receitas do tenant (campos básicos: `id`, `nome`, `modoPreparo`, `createdAt`). Use `?page=0&size=20&sort=nome,asc`. Para detalhes com ingredientes, use `GET /api/receitas/{id}`."
     )
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Lista de receitas retornada com sucesso",
-            content = @Content(mediaType = "application/json",
-                array = @ArraySchema(schema = @Schema(implementation = RecipeResponse.class)))),
+        @ApiResponse(responseCode = "200", description = "Página de receitas retornada com sucesso"),
         @ApiResponse(responseCode = "401", description = "Token JWT ausente ou inválido",
             content = @Content),
         @ApiResponse(responseCode = "403", description = "Usuário sem empresa associada",
@@ -51,8 +54,9 @@ public class RecipeController {
             content = @Content(mediaType = "application/json",
                 schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class)))
     })
-    public ResponseEntity<List<RecipeResponse>> findAll() {
-        return ResponseEntity.ok(service.findAll());
+    public ResponseEntity<PageResponse<RecipeResponse>> findAll(
+            @ParameterObject @PageableDefault(size = 20, sort = "nome") Pageable pageable) {
+        return ResponseEntity.ok(service.findAll(pageable));
     }
 
     @GetMapping("/{id}")
@@ -156,6 +160,7 @@ public class RecipeController {
     }
 
     @PostMapping
+    @PreAuthorize("@tenantSecurity.isAdmin()")
     @Operation(
         summary = "Criar receita com ingredientes",
         description = """
@@ -217,6 +222,7 @@ public class RecipeController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("@tenantSecurity.isAdmin()")
     @Operation(
         summary = "Remover receita",
         description = """

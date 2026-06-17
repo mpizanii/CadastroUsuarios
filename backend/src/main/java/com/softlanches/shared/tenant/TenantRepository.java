@@ -12,6 +12,6 @@ import java.util.UUID;
 @Repository
 public interface TenantRepository extends JpaRepository<UsuariosEmpresa, UUID> {
 
-    @Query("SELECT ue.empresaId FROM UsuariosEmpresa ue WHERE ue.userId = :userId")
-    Optional<UUID> findEmpresaIdByUserId(@Param("userId") UUID userId);
+    @Query("SELECT new com.softlanches.shared.tenant.TenantInfo(ue.empresaId, ue.role) FROM UsuariosEmpresa ue WHERE ue.userId = :userId")
+    Optional<TenantInfo> findTenantInfoByUserId(@Param("userId") UUID userId);
 }

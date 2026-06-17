@@ -7,9 +7,11 @@ import com.softlanches.products.mapper.ProductMapper;
 import com.softlanches.products.model.Product;
 import com.softlanches.products.repository.ProductRepository;
 import com.softlanches.recipes.repository.RecipeRepository;
+import com.softlanches.shared.dto.PageResponse;
 import com.softlanches.shared.exception.ResourceNotFoundException;
 import com.softlanches.shared.tenant.TenantContext;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +32,13 @@ public class ProductServiceImpl implements ProductService {
     public List<ProductResponse> findAll() {
         UUID empresaId = TenantContext.getRequiredEmpresaId();
         return mapper.toResponseList(repository.findAllByEmpresaId(empresaId));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PageResponse<ProductResponse> findAll(Pageable pageable) {
+        UUID empresaId = TenantContext.getRequiredEmpresaId();
+        return PageResponse.of(repository.findAllByEmpresaId(empresaId, pageable).map(mapper::toResponse));
     }
 
     @Override

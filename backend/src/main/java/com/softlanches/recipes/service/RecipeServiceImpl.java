@@ -8,9 +8,11 @@ import com.softlanches.recipes.model.IngredientMapping;
 import com.softlanches.recipes.model.Recipe;
 import com.softlanches.recipes.model.RecipeIngredient;
 import com.softlanches.recipes.repository.RecipeRepository;
+import com.softlanches.shared.dto.PageResponse;
 import com.softlanches.shared.exception.ResourceNotFoundException;
 import com.softlanches.shared.tenant.TenantContext;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +36,13 @@ public class RecipeServiceImpl implements RecipeService {
     public List<RecipeResponse> findAll() {
         UUID empresaId = TenantContext.getRequiredEmpresaId();
         return mapper.toResponseList(recipeRepository.findAllByEmpresaId(empresaId));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PageResponse<RecipeResponse> findAll(Pageable pageable) {
+        UUID empresaId = TenantContext.getRequiredEmpresaId();
+        return PageResponse.of(recipeRepository.findAllByEmpresaId(empresaId, pageable).map(mapper::toResponse));
     }
 
     @Override

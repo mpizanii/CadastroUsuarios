@@ -2,6 +2,7 @@ package com.softlanches.orders.controller;
 
 import com.softlanches.orders.dto.*;
 import com.softlanches.orders.service.OrderService;
+import com.softlanches.shared.dto.PageResponse;
 import com.softlanches.shared.exception.GlobalExceptionHandler;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -15,7 +16,11 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -32,18 +37,16 @@ public class OrderController {
 
     @GetMapping
     @Operation(
-        summary = "Listar pedidos",
+        summary = "Listar pedidos (paginado)",
         description = """
-            Retorna todos os pedidos do tenant com itens embutidos (`produtos`).
-            O `clienteNome` é resolvido em tempo de execução — se o cliente foi removido, retorna `null`.
+            Retorna os pedidos do tenant com itens embutidos, ordenados por data decrescente.
+            Use `?page=0&size=20`. O `clienteNome` é resolvido em tempo de execução.
 
             **Status possíveis:** `Pendente` | `Em Preparo` | `Em Rota de Entrega` | `Entregue`
             """
     )
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Lista de pedidos",
-            content = @Content(mediaType = "application/json",
-                array = @ArraySchema(schema = @Schema(implementation = OrderResponse.class)))),
+        @ApiResponse(responseCode = "200", description = "Página de pedidos retornada com sucesso"),
         @ApiResponse(responseCode = "401", description = "Token JWT ausente ou inválido",
             content = @Content),
         @ApiResponse(responseCode = "403", description = "Usuário sem empresa associada",
@@ -53,8 +56,9 @@ public class OrderController {
             content = @Content(mediaType = "application/json",
                 schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class)))
     })
-    public ResponseEntity<List<OrderResponse>> findAll() {
-        return ResponseEntity.ok(orderService.findAll());
+    public ResponseEntity<PageResponse<OrderResponse>> findAll(
+            @ParameterObject @PageableDefault(size = 20) Pageable pageable) {
+        return ResponseEntity.ok(orderService.findAll(pageable));
     }
 
     @GetMapping("/{id}")
@@ -105,6 +109,7 @@ public class OrderController {
     }
 
     @PostMapping
+    @PreAuthorize("@tenantSecurity.isAdmin()")
     @Operation(
         summary = "Criar pedido",
         description = """
@@ -164,14 +169,22 @@ public class OrderController {
     }
 
     @PatchMapping("/{id}/status")
+    @PreAuthorize("@tenantSecurity.isAdmin()")
     @Operation(
         summary = "Atualizar status do pedido",
         description = """
-            Atualiza apenas o status do pedido. Não valida transições de status — qualquer valor de string é aceito,
-            mas os valores esperados pelo sistema são:
-            `Pendente` | `Em Preparo` | `Em Rota de Entrega` | `Entregue`
+            Atualiza apenas o status do pedido. Valores válidos (enum `OrderStatus`):
 
-            **Alerta:** ausência de validação de transição de status é um ponto de melhoria identificado.
+            | Valor | Significado |
+            |---|---|
+            | `Pendente` | Pedido recebido, aguardando preparo |
+            | `Em Preparo` | Em produção na cozinha |
+            | `Em Rota de Entrega` | Saiu para entrega |
+            | `Entregue` | Confirmado pelo cliente |
+            | `Cancelado` | Pedido cancelado |
+
+            Enviar um valor fora desta lista retorna **400 Bad Request**.
+            Somente usuários com role diferente de `visualizador` podem alterar status.
             """
     )
     @ApiResponses({
@@ -209,6 +222,7 @@ public class OrderController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("@tenantSecurity.isAdmin()")
     @Operation(
         summary = "Remover pedido",
         description = "Remove permanentemente o pedido e todos os seus itens (`pedidoprodutos`) em cascade. Não desfaz baixas de estoque já realizadas."
@@ -245,8 +259,7 @@ public class OrderController {
             **Recomendado chamar antes de `POST /api/pedidos`** quando `darBaixaEstoque = true`.
             Ingredientes não mapeados não bloqueiam a criação do pedido, mas bloqueiam a baixa de estoque.
 
-            **⚠ Problema de performance:** executa N+M queries (N produtos × M ingredientes por produto).
-            Para pedidos com muitos produtos ou receitas complexas, pode ser lento.
+            **Performance:** executa 2 queries no banco (1 batch produtos + 1 JOIN FETCH ingredientes+mapeamentos via `IN` clause).
             """
     )
     @ApiResponses({
@@ -308,7 +321,7 @@ public class OrderController {
 
             **Recomendado chamar antes de `POST /api/pedidos`** com `darBaixaEstoque = true`.
 
-            **⚠ Problema de performance:** executa N+M+M queries (N produtos × M ingredientes × 1 insumo por ingrediente).
+            **Performance:** executa 3 queries no banco (batch produtos + JOIN FETCH ingredientes/mapeamentos + batch insumos).
             """
     )
     @ApiResponses({
@@ -359,6 +372,7 @@ public class OrderController {
     }
 
     @PostMapping("/{id}/baixa-estoque")
+    @PreAuthorize("@tenantSecurity.isAdmin()")
     @Operation(
         summary = "Executar baixa de estoque de um pedido existente",
         description = """
@@ -368,7 +382,8 @@ public class OrderController {
             A baixa calcula: `quantidade_ingrediente × fator_conversao × quantidade_pedido` para cada insumo mapeado.
             O saldo do insumo nunca vai abaixo de zero (clamped ao mínimo de 0).
 
-            **Atenção:** não há controle de idempotência — chamar duas vezes desconta duas vezes o estoque.
+            **Idempotente:** após a primeira execução bem-sucedida, novas chamadas retornam **400 Bad Request**
+            com a mensagem `Baixa de estoque já foi executada para este pedido`.
             """
     )
     @ApiResponses({

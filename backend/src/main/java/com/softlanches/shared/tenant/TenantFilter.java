@@ -14,7 +14,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -31,8 +30,8 @@ public class TenantFilter extends OncePerRequestFilter {
 
             if (auth instanceof JwtAuthenticationToken jwtAuth && auth.isAuthenticated()) {
                 String userId = jwtAuth.getToken().getSubject();
-                UUID empresaId = tenantResolver.resolveEmpresaId(userId);
-                TenantContext.setEmpresaId(empresaId);
+                TenantInfo info = tenantResolver.resolveTenantInfo(userId);
+                TenantContext.set(info.empresaId(), info.role());
             }
 
             chain.doFilter(request, response);

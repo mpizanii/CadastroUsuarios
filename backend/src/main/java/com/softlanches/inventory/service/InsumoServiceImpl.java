@@ -7,12 +7,15 @@ import com.softlanches.inventory.mapper.InsumoMapper;
 import com.softlanches.inventory.model.Insumo;
 import com.softlanches.inventory.repository.InsumoRepository;
 import com.softlanches.recipes.repository.IngredientMappingRepository;
+import com.softlanches.shared.dto.PageResponse;
 import com.softlanches.shared.exception.ResourceNotFoundException;
 import com.softlanches.shared.tenant.TenantContext;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -34,6 +37,13 @@ public class InsumoServiceImpl implements InsumoService {
 
     @Override
     @Transactional(readOnly = true)
+    public PageResponse<InsumoResponse> findAll(Pageable pageable) {
+        UUID empresaId = TenantContext.getRequiredEmpresaId();
+        return PageResponse.of(repository.findAllByEmpresaId(empresaId, pageable).map(mapper::toResponse));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public InsumoResponse findById(Long id) {
         UUID empresaId = TenantContext.getRequiredEmpresaId();
         Insumo insumo = repository.findByIdAndEmpresaId(id, empresaId)
@@ -45,10 +55,9 @@ public class InsumoServiceImpl implements InsumoService {
     @Transactional(readOnly = true)
     public List<InsumoResponse> findAlertas() {
         UUID empresaId = TenantContext.getRequiredEmpresaId();
-        return repository.findAllByEmpresaId(empresaId).stream()
-                .map(mapper::toResponse)
-                .filter(r -> !r.statusEstoque().equals("OK"))
-                .toList();
+        // P5: filtro na camada de banco — evita carregar todos os insumos em memória
+        return mapper.toResponseList(
+                repository.findAlertasByEmpresaId(empresaId, LocalDate.now().plusDays(7)));
     }
 
     @Override

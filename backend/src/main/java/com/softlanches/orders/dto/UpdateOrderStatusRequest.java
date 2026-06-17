@@ -1,7 +1,8 @@
 package com.softlanches.orders.dto;
 
-import jakarta.validation.constraints.NotBlank;
+import com.softlanches.orders.model.OrderStatus;
+import jakarta.validation.constraints.NotNull;
 
 public record UpdateOrderStatusRequest(
-        @NotBlank String status
+        @NotNull OrderStatus status
 ) {}

@@ -4,6 +4,7 @@ import com.softlanches.inventory.dto.CreateInsumoRequest;
 import com.softlanches.inventory.dto.InsumoResponse;
 import com.softlanches.inventory.dto.UpdateInsumoRequest;
 import com.softlanches.inventory.service.InsumoService;
+import com.softlanches.shared.dto.PageResponse;
 import com.softlanches.shared.exception.GlobalExceptionHandler;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -17,7 +18,11 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -34,9 +39,9 @@ public class InsumoController {
 
     @GetMapping
     @Operation(
-        summary = "Listar todos os insumos",
+        summary = "Listar insumos (paginado)",
         description = """
-            Retorna todos os insumos do tenant com `statusEstoque` calculado automaticamente pelo mapper:
+            Retorna os insumos do tenant com `statusEstoque` calculado pelo mapper. Use `?page=0&size=20&sort=nome,asc`.
 
             | Condição | statusEstoque |
             |---|---|
@@ -48,9 +53,7 @@ public class InsumoController {
             """
     )
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Lista de insumos com status de estoque",
-            content = @Content(mediaType = "application/json",
-                array = @ArraySchema(schema = @Schema(implementation = InsumoResponse.class)))),
+        @ApiResponse(responseCode = "200", description = "Página de insumos com status de estoque"),
         @ApiResponse(responseCode = "401", description = "Token JWT ausente ou inválido",
             content = @Content),
         @ApiResponse(responseCode = "403", description = "Usuário sem empresa associada",
@@ -60,8 +63,9 @@ public class InsumoController {
             content = @Content(mediaType = "application/json",
                 schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class)))
     })
-    public ResponseEntity<List<InsumoResponse>> findAll() {
-        return ResponseEntity.ok(service.findAll());
+    public ResponseEntity<PageResponse<InsumoResponse>> findAll(
+            @ParameterObject @PageableDefault(size = 20, sort = "nome") Pageable pageable) {
+        return ResponseEntity.ok(service.findAll(pageable));
     }
 
     @GetMapping("/alertas")
@@ -71,8 +75,7 @@ public class InsumoController {
             Retorna apenas os insumos cujo `statusEstoque` **não é `OK`** — ou seja, insumos em estado crítico ou baixo.
             Usado para o painel de alertas/notificações do dashboard.
 
-            **Nota de performance:** o filtro é aplicado em memória após carregar todos os insumos do tenant.
-            Para tenants com muitos insumos, considere adicionar um filtro a nível de banco de dados.
+            **Performance:** o filtro é aplicado no banco de dados via JPQL com índice composto em `(empresa_id, validade)`.
             """
     )
     @ApiResponses({
@@ -146,6 +149,7 @@ public class InsumoController {
     }
 
     @PostMapping
+    @PreAuthorize("@tenantSecurity.isAdmin()")
     @Operation(
         summary = "Cadastrar insumo",
         description = "Cria um novo insumo no estoque do tenant. `validade` e `estoqueMinimo` são opcionais."
@@ -188,6 +192,7 @@ public class InsumoController {
     }
 
     @PatchMapping("/{id}")
+    @PreAuthorize("@tenantSecurity.isAdmin()")
     @Operation(
         summary = "Atualizar insumo parcialmente",
         description = """
@@ -237,6 +242,7 @@ public class InsumoController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("@tenantSecurity.isAdmin()")
     @Operation(
         summary = "Remover insumo",
         description = """

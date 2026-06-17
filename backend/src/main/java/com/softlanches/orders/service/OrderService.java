@@ -1,12 +1,16 @@
 package com.softlanches.orders.service;
 
 import com.softlanches.orders.dto.*;
+import com.softlanches.shared.dto.PageResponse;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
 public interface OrderService {
 
     List<OrderResponse> findAll();
+
+    PageResponse<OrderResponse> findAll(Pageable pageable);
 
     OrderResponse findById(Long id);
 

@@ -128,9 +128,22 @@ com.softlanches/
 │   │   └── RecipeIngredientRepository.java
 │   └── service/RecipeServiceImpl.java ← fix N+1 via JOIN FETCH + IN clause batch
 │
-└── inventory/                       ← Módulo Insumos ⚠️ STUB (pendente migração completa)
-    ├── model/Insumo.java            ← Apenas id + nome (stub para recipes usar)
-    └── repository/InsumoRepository.java
+├── inventory/                       ← Módulo Insumos ✅ MIGRADO
+│   ├── controller/InsumoController.java   GET/POST/PATCH/DELETE /api/insumos + /alertas
+│   ├── dto/
+│   ├── mapper/InsumoMapper.java     ← calcula statusEstoque
+│   ├── model/Insumo.java
+│   ├── repository/InsumoRepository.java   ← findAlertasByEmpresaId (filtro no banco)
+│   └── service/InsumoService{Impl}.java
+│
+└── orders/                          ← Módulo Pedidos ✅ MIGRADO
+    ├── controller/OrderController.java    GET/POST/PATCH/DELETE + verificar-* + baixa-estoque
+    ├── dto/
+    ├── model/
+    │   ├── Order.java               ← baixaExecutada flag (idempotência)
+    │   └── OrderItem.java
+    ├── repository/OrderRepository.java    ← findAllByIdInWithItems (batch items)
+    └── service/OrderService{Impl}.java    ← N+1 corrigido, batch completo
 ```
 
 ---
@@ -182,23 +195,43 @@ Ver `DATABASE.md` para detalhes completos. Em resumo:
 
 ## API Endpoints (Java — em operação)
 
+Todos os endpoints de listagem (`GET /api/*` sem `/{id}`) suportam paginação via `?page=0&size=20&sort=campo,asc`.
+A documentação interativa completa está em `/swagger-ui.html`.
+
 | Método | Endpoint | Módulo | Status |
 |---|---|---|---|
-| GET | `/api/clientes` | customers | ✅ |
+| GET | `/api/clientes` | customers | ✅ paginado |
 | GET | `/api/clientes/{id}` | customers | ✅ |
 | POST | `/api/clientes` | customers | ✅ |
 | PATCH | `/api/clientes/{id}` | customers | ✅ |
 | DELETE | `/api/clientes/{id}` | customers | ✅ |
-| GET | `/api/produtos` | products | ✅ |
+| GET | `/api/produtos` | products | ✅ paginado |
 | GET | `/api/produtos/{id}` | products | ✅ |
+| GET | `/api/produtos/receita/{receitaId}` | products | ✅ |
 | POST | `/api/produtos` | products | ✅ |
-| PATCH | `/api/produtos/{id}` | products | ✅ |
-| DELETE | `/api/produtos/{id}` | products | ✅ |
-| GET | `/api/receitas` | recipes | ✅ |
-| GET | `/api/receitas/{id}` | recipes | ✅ |
+| PUT | `/api/produtos/{id}` | products | ✅ (substituição completa) |
+| DELETE | `/api/produtos/{id}` | products | ✅ cascade receita |
+| GET | `/api/receitas` | recipes | ✅ paginado |
+| GET | `/api/receitas/{id}` | recipes | ✅ com ingredientes+mapeamentos |
 | GET | `/api/receitas/{id}/ingredientes` | recipes | ✅ |
 | POST | `/api/receitas` | recipes | ✅ |
-| DELETE | `/api/receitas/{id}` | recipes | ✅ |
+| DELETE | `/api/receitas/{id}` | recipes | ✅ cascade ingredientes |
+| PUT | `/api/receitas/ingredientes/{id}/mapeamento` | recipes | ✅ upsert |
+| DELETE | `/api/receitas/ingredientes/{id}/mapeamento` | recipes | ✅ |
+| GET | `/api/insumos` | inventory | ✅ paginado |
+| GET | `/api/insumos/alertas` | inventory | ✅ filtro no banco |
+| GET | `/api/insumos/{id}` | inventory | ✅ |
+| POST | `/api/insumos` | inventory | ✅ |
+| PATCH | `/api/insumos/{id}` | inventory | ✅ |
+| DELETE | `/api/insumos/{id}` | inventory | ✅ |
+| GET | `/api/pedidos` | orders | ✅ paginado |
+| GET | `/api/pedidos/{id}` | orders | ✅ |
+| POST | `/api/pedidos` | orders | ✅ |
+| PATCH | `/api/pedidos/{id}/status` | orders | ✅ enum validado |
+| DELETE | `/api/pedidos/{id}` | orders | ✅ |
+| POST | `/api/pedidos/verificar-mapeamento` | orders | ✅ batch N+1 fix |
+| POST | `/api/pedidos/verificar-estoque` | orders | ✅ batch N+1 fix |
+| POST | `/api/pedidos/{id}/baixa-estoque` | orders | ✅ idempotente |
 | GET | `/actuator/health` | shared | ✅ |
 | GET | `/actuator/info` | shared | ✅ |
 

@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -28,6 +29,7 @@ public class MappingController {
     private final MappingService mappingService;
 
     @PutMapping("/{ingredienteId}/mapeamento")
+    @PreAuthorize("@tenantSecurity.isAdmin()")
     @Operation(
         summary = "Criar ou atualizar mapeamento (upsert)",
         description = """
@@ -95,6 +97,7 @@ public class MappingController {
     }
 
     @DeleteMapping("/{ingredienteId}/mapeamento")
+    @PreAuthorize("@tenantSecurity.isAdmin()")
     @Operation(
         summary = "Remover mapeamento de ingrediente",
         description = """

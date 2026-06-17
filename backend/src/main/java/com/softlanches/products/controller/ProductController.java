@@ -4,6 +4,7 @@ import com.softlanches.products.dto.CreateProductRequest;
 import com.softlanches.products.dto.ProductResponse;
 import com.softlanches.products.dto.UpdateProductRequest;
 import com.softlanches.products.service.ProductService;
+import com.softlanches.shared.dto.PageResponse;
 import com.softlanches.shared.exception.GlobalExceptionHandler;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -17,7 +18,11 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -34,13 +39,11 @@ public class ProductController {
 
     @GetMapping
     @Operation(
-        summary = "Listar produtos",
-        description = "Retorna todos os produtos do tenant autenticado. O campo `margem` é calculado como `((preco - custo) / preco) * 100`."
+        summary = "Listar produtos (paginado)",
+        description = "Retorna os produtos do tenant com suporte a paginação. O campo `margem` é calculado como `((preco - custo) / preco) * 100`. Use `?page=0&size=20&sort=nome,asc`."
     )
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Lista de produtos retornada com sucesso",
-            content = @Content(mediaType = "application/json",
-                array = @ArraySchema(schema = @Schema(implementation = ProductResponse.class)))),
+        @ApiResponse(responseCode = "200", description = "Página de produtos retornada com sucesso"),
         @ApiResponse(responseCode = "401", description = "Token JWT ausente ou inválido",
             content = @Content),
         @ApiResponse(responseCode = "403", description = "Usuário sem empresa associada",
@@ -50,8 +53,9 @@ public class ProductController {
             content = @Content(mediaType = "application/json",
                 schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class)))
     })
-    public ResponseEntity<List<ProductResponse>> findAll() {
-        return ResponseEntity.ok(service.findAll());
+    public ResponseEntity<PageResponse<ProductResponse>> findAll(
+            @ParameterObject @PageableDefault(size = 20, sort = "nome") Pageable pageable) {
+        return ResponseEntity.ok(service.findAll(pageable));
     }
 
     @GetMapping("/{id}")
@@ -120,6 +124,7 @@ public class ProductController {
     }
 
     @PostMapping
+    @PreAuthorize("@tenantSecurity.isAdmin()")
     @Operation(
         summary = "Cadastrar produto",
         description = """
@@ -177,6 +182,7 @@ public class ProductController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("@tenantSecurity.isAdmin()")
     @Operation(
         summary = "Substituir produto (PUT completo)",
         description = """
@@ -227,6 +233,7 @@ public class ProductController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("@tenantSecurity.isAdmin()")
     @Operation(
         summary = "Remover produto",
         description = """

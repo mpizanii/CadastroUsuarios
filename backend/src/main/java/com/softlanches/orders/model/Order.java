@@ -37,7 +37,11 @@ public class Order {
     private BigDecimal valor;
 
     @Column(name = "status")
-    private String status = "Pendente";
+    @Convert(converter = OrderStatusConverter.class)
+    private OrderStatus status = OrderStatus.PENDENTE;
+
+    @Column(name = "baixa_executada", nullable = false)
+    private boolean baixaExecutada = false;
 
     @Column(name = "observacoes")
     private String observacoes;
