@@ -3,7 +3,7 @@ import api from '../utils/axiosInstance';
 export const getPedidos = async () => {
     try {
         const response = await api.get('/pedidos');
-        return response.data;
+        return response.data.content;
     } catch (error) {
         console.error('Erro ao buscar pedidos:', error);
         throw new Error('Erro ao carregar pedidos');

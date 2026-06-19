@@ -3,7 +3,7 @@ import api from '../utils/axiosInstance';
 export const getInsumos = async () => {
     try {
         const response = await api.get('/insumos');
-        return response.data;
+        return response.data.content;
     } catch (error) {
         console.error('Erro ao buscar insumos:', error);
         throw new Error('Erro ao carregar insumos');

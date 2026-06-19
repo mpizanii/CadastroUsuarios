@@ -3,7 +3,7 @@ import api from '../utils/axiosInstance';
 export async function getCustomers() {
     try {
         const response = await api.get('/clientes');
-        return response.data;
+        return response.data.content;
     } catch (error) {
         console.error("Erro ao buscar os clientes:", error);
         throw new Error("Erro ao carregar clientes");
