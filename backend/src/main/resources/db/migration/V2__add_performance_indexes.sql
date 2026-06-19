@@ -22,7 +22,7 @@ CREATE INDEX IF NOT EXISTS idx_insumos_validade             ON insumos(empresa_i
     WHERE validade IS NOT NULL;
 
 -- Baixa de estoque: ingredientes por receita (recipeIngredientRepository.findAllByRecipe_Id)
-CREATE INDEX IF NOT EXISTS idx_receita_ingredientes_receita ON "receitaIngredientes"(receita_id);
+CREATE INDEX IF NOT EXISTS idx_receita_ingredientes_receita ON receita_ingredientes(receita_id);
 
 -- Mapeamento ingrediente → insumo (IngredientMappingRepository queries)
 CREATE INDEX IF NOT EXISTS idx_ingredientes_insumo_ing      ON ingredientes_insumo(ingrediente_id);

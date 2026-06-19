@@ -11,7 +11,7 @@ import java.util.UUID;
 // Tabela "receitaIngredientes" tem empresa_id mas NÃO tem created_at,
 // por isso não herda de TenantAwareEntity.
 @Entity
-@Table(name = "`receitaIngredientes`")
+@Table(name = "receita_ingredientes")
 @Getter
 @Setter
 @NoArgsConstructor
