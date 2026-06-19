@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import LoginPage from "./pages/auth/LoginPage";
 import ResetPasswordPage from "./pages/auth/ResetPasswordPage"
+import LandingPage from "./pages/landingPage/LandingPage";
 import CustomersPage from './pages/customersPage/CustomersPage';
 import ProductsPage from './pages/productsPage/ProductsPage';
 import StockPage from './pages/stockPage/StockPage';
@@ -42,7 +43,7 @@ function Layout() {
   const path = location.pathname;
   const [activeItem, setActiveItem] = useState('');
 
-  const rotasSemNavbar = ["/", "/resetpassword"];
+  const rotasSemNavbar = ["/", "/login", "/resetpassword"];
 
   const routeToIdMap = {
     '/metricas': 'visao-geral',
@@ -86,7 +87,8 @@ function Layout() {
       )}
       {rotasSemNavbar.includes(path) && (
         <Routes>
-          <Route path='/' element={<LoginPage/>}/>
+          <Route path='/' element={<LandingPage/>}/>
+          <Route path='/login' element={<LoginPage/>}/>
           <Route path='/resetpassword' element={<ResetPasswordPage/>}/>
         </Routes>
       )}

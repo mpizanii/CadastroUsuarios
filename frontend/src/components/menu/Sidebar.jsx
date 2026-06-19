@@ -69,10 +69,10 @@ const SideBar = ({ activeItem, onItemClick, isCollapsed, onHideMobile }) => {
                     className="text-white rounded d-flex align-items-center justify-content-center"
                     style={{ width: '40px', height: '40px', backgroundColor: '#e76e50' }}
                 >
-                    KLG
+                    SCD
                 </div>
                 <div className="ms-3">
-                    <h5 className="mb-0 fw-bold" style={{ color: '#e76e50' }}>KLG</h5>
+                    <h5 className="mb-0 fw-bold" style={{ color: '#e76e50' }}>Scalda</h5>
                     <small className="text-muted">Sistema de Gestão</small>
                 </div>
             </div>
