@@ -71,11 +71,15 @@ export default function LoginPage() {
               </Col>
 
               <Col md={6}>
-                <div className="h-100 d-flex w-100 flex-column justify-content-center text-white text-center" style={{ backgroundColor: "#8B0000", padding: "2rem" }}>
-                  <h1>Login</h1>
+                <div className="h-100 d-flex w-100 flex-column justify-content-center text-center" style={{ backgroundColor: "#fff", padding: "2rem" }}>
+                  <div style={{ textAlign: "center", marginBottom: "1.5rem" }}>
+                    <img src="/scalda_logo.png" alt="Scalda" style={{ height: "56px", objectFit: "contain", marginBottom: "0.5rem" }} />
+                    <h2 style={{ fontWeight: 800, color: "#212121", marginBottom: "0.25rem" }}>Scalda</h2>
+                    <p style={{ color: "#666", fontSize: "0.95rem", margin: 0 }}>Acesse sua conta</p>
+                  </div>
                   <Form className="mt-3 d-flex justify-content-center align-items-center flex-column text-start w-100" onSubmit={(e) => e.preventDefault()}>
                     <Form.Group className="mb-3" controlId="formEmail" style={{ width: "70%" }}>
-                      <label htmlFor="formEmail">Email</label>
+                      <label htmlFor="formEmail" style={{ color: "#212121", fontWeight: 600, fontSize: "0.875rem" }}>Email</label>
                       <Form.Control
                         type="email"
                         placeholder="Digite seu email..."
@@ -86,7 +90,7 @@ export default function LoginPage() {
                     </Form.Group>
 
                     <Form.Group className="mb-3" controlId="formPassword" style={{ width: "70%" }}>
-                      <label htmlFor="formPassword">Senha</label>
+                      <label htmlFor="formPassword" style={{ color: "#212121", fontWeight: 600, fontSize: "0.875rem" }}>Senha</label>
                       <Form.Control
                         type="password"
                         placeholder="Digite sua senha..."
@@ -95,7 +99,10 @@ export default function LoginPage() {
                       />
                     </Form.Group>
 
-                    <Button variant="outline-light" style={{ width: "40%" }} onClick={handleSignIn}>
+                    <Button
+                      style={{ width: "40%", backgroundColor: "#e76e50", borderColor: "#e76e50", color: "#fff", fontWeight: 600, borderRadius: "8px" }}
+                      onClick={handleSignIn}
+                    >
                       Entrar
                     </Button>
                   </Form>
@@ -103,7 +110,7 @@ export default function LoginPage() {
                   <a
                     href="#"
                     className="mt-2"
-                    style={{ cursor: "pointer" }}
+                    style={{ cursor: "pointer", color: "#e76e50", fontWeight: 600 }}
                     onClick={(e) => {
                       e.preventDefault();
                       handleForgotPassword();
@@ -112,7 +119,7 @@ export default function LoginPage() {
                     Esqueceu a senha?
                   </a>
 
-                  {message && <div className="mt-3" style={{ color: messageType === "success" ? "green" : "red" }}>{message}</div>}
+                  {message && <div className="mt-3" style={{ color: messageType === "success" ? "#198754" : "#dc3545" }}>{message}</div>}
                 </div>
               </Col>
             </Row>

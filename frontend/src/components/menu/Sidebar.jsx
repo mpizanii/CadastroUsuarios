@@ -64,17 +64,18 @@ const SideBar = ({ activeItem, onItemClick, isCollapsed, onHideMobile }) => {
     const SidebarContent = () => (
         <div className="h-100 d-flex flex-column">
         <div className="p-3 border-bottom">
-            <div className="d-flex align-items-center">
-                <div 
-                    className="text-white rounded d-flex align-items-center justify-content-center"
-                    style={{ width: '40px', height: '40px', backgroundColor: '#e76e50' }}
-                >
-                    SCD
-                </div>
-                <div className="ms-3">
-                    <h5 className="mb-0 fw-bold" style={{ color: '#e76e50' }}>Scalda</h5>
-                    <small className="text-muted">Sistema de Gestão</small>
-                </div>
+            <div className={`d-flex align-items-center ${isCollapsed ? 'justify-content-center' : ''}`}>
+                <img
+                    src="/scalda_logo.png"
+                    alt="Scalda"
+                    style={{ height: isCollapsed ? '32px' : '38px', objectFit: 'contain', flexShrink: 0 }}
+                />
+                {!isCollapsed && (
+                    <div className="ms-2">
+                        <h5 className="mb-0 fw-bold" style={{ color: '#e76e50' }}>Scalda</h5>
+                        <small className="text-muted">Sistema de Gestão</small>
+                    </div>
+                )}
             </div>
         </div>
 

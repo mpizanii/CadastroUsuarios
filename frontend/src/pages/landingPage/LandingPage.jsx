@@ -14,7 +14,7 @@ const features = [
   {
     icon: <FiShoppingBag size={30} color={PRIMARY} />,
     title: "Pedidos organizados",
-    desc: "Registre e acompanhe cada pedido em tempo real — sem papel, sem risco de esquecer.",
+    desc: "Registre e acompanhe cada pedido em tempo real, sem papel, sem risco de perda, sem risco de esquecer.",
   },
   {
     icon: <FiPackage size={30} color={PRIMARY} />,
@@ -28,7 +28,7 @@ const features = [
   },
   {
     icon: <MdMenuBook size={30} color={PRIMARY} />,
-    title: "Custo por receita",
+    title: "C usto por receita",
     desc: "Calcule automaticamente quanto custa produzir cada item do cardápio.",
   },
 ];
@@ -144,12 +144,15 @@ export default function LandingPage() {
           boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
         }}
       >
-        <span style={{ fontWeight: 800, fontSize: "1.4rem", color: PRIMARY, letterSpacing: "-0.5px" }}>
-          Scalda
-        </span>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.3rem" }}>
+          <img src="/scalda_logo.png" alt="Scalda" style={{ height: "40px", objectFit: "contain" }} />
+          <span style={{ fontWeight: 800, fontSize: "1.4rem", color: PRIMARY, letterSpacing: "-0.5px" }}>
+            Scalda
+          </span>
+        </div>
         <div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
           <Button
-            variant="outline-secondary"
+            variant="outline-light"
             onClick={() => navigate("/login")}
             style={{ borderColor: PRIMARY, color: PRIMARY, fontWeight: 600 }}
           >
@@ -173,10 +176,10 @@ export default function LandingPage() {
                   marginBottom: "1.25rem",
                 }}
               >
-                Chega de controlar seu negócio de alimentação no papel e no WhatsApp.
+                Chega de controlar seu negócio no papel e no WhatsApp.
               </h1>
               <p style={{ fontSize: "1.1rem", color: GRAY, marginBottom: "2rem", lineHeight: 1.6 }}>
-                Scalda centraliza pedidos, estoque, clientes e receitas em um único sistema —
+                Scalda centraliza pedidos, estoque, clientes e receitas em um único sistema,
                 para você vender mais e perder menos.
               </p>
               <div
@@ -218,8 +221,9 @@ export default function LandingPage() {
                   <div style={{ width: 10, height: 10, borderRadius: "50%", backgroundColor: "#f87171" }} />
                   <div style={{ width: 10, height: 10, borderRadius: "50%", backgroundColor: "#fbbf24" }} />
                   <div style={{ width: 10, height: 10, borderRadius: "50%", backgroundColor: "#4ade80" }} />
-                  <span style={{ marginLeft: "0.5rem", fontSize: "0.8rem", color: GRAY, fontWeight: 600 }}>
-                    Scalda — Visão geral
+                  <img src="/scalda_logo.png" alt="Scalda" style={{ height: "22px", objectFit: "contain" }} />
+                  <span style={{ fontSize: "0.8rem", color: GRAY, fontWeight: 600 }}>
+                    Visão geral
                   </span>
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
@@ -252,7 +256,7 @@ export default function LandingPage() {
                     }}
                   >
                     <span style={{ color: PRIMARY, fontSize: "0.85rem", fontWeight: 600 }}>
-                      ⚠ 3 ingredientes abaixo do estoque mínimo
+                      3 ingredientes abaixo do estoque mínimo
                     </span>
                   </div>
                 </div>
@@ -588,8 +592,12 @@ export default function LandingPage() {
         }}
       >
         <Container>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "0.5rem", marginBottom: "0.5rem" }}>
+            <img src="/scalda_logo.png" alt="Scalda" style={{ height: "28px", objectFit: "contain", opacity: 0.85 }} />
+            <span style={{ fontWeight: 700, fontSize: "1.1rem", color: "#ccc", letterSpacing: "-0.5px" }}>Scalda</span>
+          </div>
           <p style={{ margin: 0, fontSize: "0.875rem" }}>
-            Scalda © {new Date().getFullYear()} —{" "}
+            © {new Date().getFullYear()} —{" "}
             <span
               onClick={() => navigate("/login")}
               style={{ color: PRIMARY, cursor: "pointer", textDecoration: "underline" }}

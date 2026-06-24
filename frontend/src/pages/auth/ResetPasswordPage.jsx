@@ -82,11 +82,15 @@ export default function ResetPasswordPage() {
               </Col>
 
               <Col md={6}>
-                <div className="h-100 d-flex w-100 flex-column justify-content-center text-white text-center" style={{ backgroundColor: "#8B0000", padding: "2rem" }}>
-                  <h1>Redefinir Senha</h1>
+                <div className="h-100 d-flex w-100 flex-column justify-content-center text-center" style={{ backgroundColor: "#fff", padding: "2rem" }}>
+                  <div style={{ textAlign: "center", marginBottom: "1.5rem" }}>
+                    <img src="/scalda_logo.png" alt="Scalda" style={{ height: "56px", objectFit: "contain", marginBottom: "0.5rem" }} />
+                    <h2 style={{ fontWeight: 800, color: "#212121", marginBottom: "0.25rem" }}>Scalda</h2>
+                    <p style={{ color: "#666", fontSize: "0.95rem", margin: 0 }}>Recuperar senha</p>
+                  </div>
                   <Form className="mt-3 d-flex justify-content-center align-items-center flex-column text-start w-100" onSubmit={handleSubmit}>
                     <Form.Group className="mb-3 position-relative" controlId="formNewPassword" style={{ width: "70%" }}>
-                      <label htmlFor="formNewPassword">Nova Senha</label>
+                      <label htmlFor="formNewPassword" style={{ color: "#212121", fontWeight: 600, fontSize: "0.875rem" }}>Nova Senha</label>
                       <Form.Control
                         type="password"
                         placeholder="Digite a nova senha..."
@@ -96,7 +100,7 @@ export default function ResetPasswordPage() {
                     </Form.Group>
 
                     <Form.Group className="mb-3 position-relative" controlId="formRepeatNewPassword" style={{ width: "70%" }}>
-                      <label htmlFor="formRepeatNewPassword">Repetir Nova Senha</label>
+                      <label htmlFor="formRepeatNewPassword" style={{ color: "#212121", fontWeight: 600, fontSize: "0.875rem" }}>Repetir Nova Senha</label>
                       <Form.Control
                         type="password"
                         placeholder="Repita a nova senha..."
@@ -105,12 +109,16 @@ export default function ResetPasswordPage() {
                       />
                     </Form.Group>
 
-                    <Button variant="outline-light" type="submit" style={{ width: "40%" }} className="mt-2">
+                    <Button
+                      type="submit"
+                      style={{ width: "40%", backgroundColor: "#e76e50", borderColor: "#e76e50", color: "#fff", fontWeight: 600, borderRadius: "8px" }}
+                      className="mt-2"
+                    >
                       Confirmar
                     </Button>
                   </Form>
 
-                  {message && <div className="mt-3" style={{ color: messageType === "success" ? "green" : "red" }}>{message}</div>}
+                  {message && <div className="mt-3" style={{ color: messageType === "success" ? "#198754" : "#dc3545" }}>{message}</div>}
                 </div>
               </Col>
             </Row>
