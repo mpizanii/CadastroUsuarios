@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback } from "react";
+import { createContext, useContext, useState, useCallback, useMemo } from "react";
 import { getCustomers } from "../services/customerService";
 
 const CustomersContext = createContext();
@@ -43,7 +43,7 @@ export function CustomersProvider({ children }) {
         console.log("Cliente removido localmente");
     }, []);
 
-    const value = {
+    const value = useMemo(() => ({
         customers,
         loading,
         error,
@@ -52,7 +52,7 @@ export function CustomersProvider({ children }) {
         addCustomer,
         updateCustomer,
         removeCustomer
-    };
+    }), [customers, loading, error, fetchCustomers, setCustomers, addCustomer, updateCustomer, removeCustomer]);
 
     return (
         <CustomersContext.Provider value={value}>

@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback } from "react";
+import { createContext, useContext, useState, useCallback, useMemo } from "react";
 import { getPedidos } from "../services/ordersService";
 import { getCustomers } from "../services/customerService";
 import { useProductsQuery } from "../hooks/useProductsQuery";
@@ -54,7 +54,7 @@ export function OrdersProvider({ children }) {
         console.log("Pedido removido localmente");
     }, []);
 
-    const value = {
+    const value = useMemo(() => ({
         orders,
         loading,
         error,
@@ -66,7 +66,7 @@ export function OrdersProvider({ children }) {
         addOrder,
         updateOrder,
         removeOrder
-    };
+    }), [orders, loading, error, produtosDisponiveis, clientesDisponiveis, fetchOrders, fetchCustomers, setOrders, addOrder, updateOrder, removeOrder]);
 
     return (
         <OrdersContext.Provider value={value}>

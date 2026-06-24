@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback } from "react";
+import { createContext, useContext, useState, useCallback, useMemo } from "react";
 import { getInsumos, getInsumosComAlertas } from "../services/stockService";
 
 const StockContext = createContext();
@@ -37,7 +37,7 @@ export function StockProvider({ children }) {
         }
     }, [insumosLoaded, insumos]);
 
-    const fetchAlertas = async () => {
+    const fetchAlertas = useCallback(async () => {
         setLoadingAlertas(true);
         try {
             const data = await getInsumosComAlertas();
@@ -47,7 +47,7 @@ export function StockProvider({ children }) {
         } finally {
             setLoadingAlertas(false);
         }
-    }
+    }, []);
 
     const addInsumo = useCallback((newInsumo) => {
         setInsumos((prevInsumos) => [...prevInsumos, newInsumo]);
@@ -64,7 +64,7 @@ export function StockProvider({ children }) {
         console.log("Insumo removido localmente");
     }, []);
 
-    const value = {
+    const value = useMemo(() => ({
         insumos,
         insumosLoaded,
         loading,
@@ -77,7 +77,7 @@ export function StockProvider({ children }) {
         addInsumo,
         updateInsumo,
         removeInsumo
-    };
+    }), [insumos, insumosLoaded, loading, error, alertas, loadingAlertas, fetchInsumos, fetchAlertas, setInsumos, addInsumo, updateInsumo, removeInsumo]);
 
     return (
         <StockContext.Provider value={value}>
