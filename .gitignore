@@ -1,0 +1,20 @@
+# IntelliJ / IDE
+.idea/
+
+# Maven
+backend/target/
+
+# Spring Boot
+backend/src/main/resources/application-dev.properties
+backend/src/main/resources/application-prod.properties
+
+# Node / frontend
+frontend/node_modules/
+frontend/dist/
+
+# .NET build artifacts (legado)
+*.sln.cache
+
+# OS
+.DS_Store
+Thumbs.db
