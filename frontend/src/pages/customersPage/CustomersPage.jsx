@@ -8,6 +8,17 @@ import { MdEmail, MdPhone, MdLocationOn } from "react-icons/md";
 import { useCustomers } from "../../contexts/index.js";
 import { FiPlus } from 'react-icons/fi';
 
+const AVATAR_COLORS = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F'];
+
+const getInitials = (name) => {
+  const names = name.split(' ');
+  return names.length > 1
+    ? names[0][0] + names[names.length - 1][0]
+    : names[0][0];
+};
+
+const getAvatarColor = (index) => AVATAR_COLORS[index % AVATAR_COLORS.length];
+
 export default function CustomersPage() {
   const { customers, loading, error, fetchCustomers } = useCustomers();
   const [menuAddCustomerAtivo, setMenuAddCustomerAtivo] = useState(false);
@@ -111,18 +122,6 @@ export default function CustomersPage() {
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)",  gap: "20px" }}>
             {clientesFiltrados.map((customer) => {
-              const getInitials = (name) => {
-                const names = name.split(' ');
-                return names.length > 1 
-                  ? names[0][0] + names[names.length - 1][0] 
-                  : names[0][0];
-              };
-
-              const getAvatarColor = (index) => {
-                const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F'];
-                return colors[index % colors.length];
-              };
-
               return (
                 <Card 
                   key={customer.id} 
