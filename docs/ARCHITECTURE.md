@@ -1,8 +1,8 @@
-# ARCHITECTURE.md — SoftLanches Backend
+# ARCHITECTURE.md — Scalda Backend
 
 ## Visão Geral do Sistema
 
-**SoftLanches** é um ERP SaaS para empresas do setor alimentício (lanchonetes, restaurantes, padarias, etc.).
+**Scalda** é um ERP SaaS para empresas do setor alimentício (lanchonetes, restaurantes, padarias, etc.).
 O sistema permite que múltiplas empresas se cadastrem na plataforma e gerenciem de forma isolada:
 clientes, produtos, receitas, insumos de estoque e pedidos.
 
@@ -75,8 +75,8 @@ O produto está em **migração ativa** de ASP.NET Core 8 (C#) para Spring Boot 
 O backend Java é organizado por módulo de domínio. Cada módulo é um pacote autossuficiente com sua própria camada controller → service → repository → model.
 
 ```
-com.softlanches/
-├── SoftLanchesApplication.java
+com.scalda/
+├── ScaldaApplication.java
 │
 ├── shared/                          ← Infraestrutura transversal
 │   ├── config/

@@ -1,6 +1,6 @@
-# DOMAIN.md — Domínio de Negócio SoftLanches
+# DOMAIN.md — Domínio de Negócio Scalda
 
-## O que é o SoftLanches?
+## O que é o Scalda?
 
 Um ERP SaaS voltado para empresas do setor alimentício. Cada empresa que se cadastra na plataforma
 recebe um ambiente isolado para gerenciar sua operação: desde o cadastro de clientes até o controle

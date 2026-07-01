@@ -1,10 +1,10 @@
 # Frontend Claude Context
 
-Este arquivo é o ponto de entrada para Claude Code trabalhar no frontend do SoftLanches.
+Este arquivo é o ponto de entrada para Claude Code trabalhar no frontend do Scalda.
 
 ## O que é este projeto
 
-SoftLanches é um ERP SaaS multi-tenant para negócios de alimentação. O frontend é uma SPA React que consome uma API Spring Boot 3.4.
+Scalda é um ERP SaaS multi-tenant para negócios de alimentação. O frontend é uma SPA React que consome uma API Spring Boot 3.4.
 
 ## Antes de modificar qualquer arquivo
 

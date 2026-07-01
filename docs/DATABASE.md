@@ -1,4 +1,4 @@
-# DATABASE.md — Banco de Dados SoftLanches
+# DATABASE.md — Banco de Dados Scalda
 
 ## Visão Geral
 

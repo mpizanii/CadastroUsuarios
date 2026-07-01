@@ -1,4 +1,4 @@
-# PROJECT_STRUCTURE.md — Estrutura do Projeto SoftLanches
+# PROJECT_STRUCTURE.md — Estrutura do Projeto Scalda
 
 ## Estrutura Raiz
 
@@ -23,8 +23,8 @@ backend/
 │   └── maven-wrapper.properties     ← Maven wrapper (3.9.14)
 └── src/
     ├── main/
-    │   ├── java/com/softlanches/
-    │   │   ├── SoftLanchesApplication.java      ← @SpringBootApplication
+    │   ├── java/com/scalda/
+    │   │   ├── ScaldaApplication.java      ← @SpringBootApplication
     │   │   │
     │   │   ├── shared/                           ← Infraestrutura transversal
     │   │   │   ├── config/
@@ -106,8 +106,8 @@ backend/
     │       └── db/migration/                     ← Scripts Flyway (vazio — schema pré-existente)
     │
     └── test/
-        └── java/com/softlanches/
-            └── SoftLanchesApplicationTests.java  ← Stub — sem testes reais
+        └── java/com/scalda/
+            └── ScaldaApplicationTests.java  ← Stub — sem testes reais
 ```
 
 ---
@@ -255,7 +255,7 @@ Endpoints em Português para manter compatibilidade com o frontend existente:
 
 ## Como Adicionar um Novo Módulo
 
-1. Criar pacote `com.softlanches.<modulo>/`
+1. Criar pacote `com.scalda.<modulo>/`
 2. Criar entidade extends `TenantAwareEntity` (se tiver `created_at`) ou adicionar `empresa_id` manualmente
 3. Criar `Repository` extends `JpaRepository<Entity, Long>`
 4. Criar interface `Service` e `ServiceImpl`

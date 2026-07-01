@@ -34,7 +34,7 @@
 
 **O que foi feito:**
 - Spring Boot 3.4.0, Java 21, Maven 3.9.14
-- Package base: `com.softlanches`
+- Package base: `com.scalda`
 - Spring Security + OAuth2 Resource Server
 - `JwtDecoderConfig` customizado (Supabase audience não-padrão)
 - `SupabaseJwtConverter`: sub → principal, role → ROLE_X
