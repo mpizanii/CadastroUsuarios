@@ -1,21 +1,23 @@
-import { useState, useEffect } from 'react';
+import { lazy, Suspense, useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
-import LoginPage from "./pages/auth/LoginPage";
-import ResetPasswordPage from "./pages/auth/ResetPasswordPage"
-import LandingPage from "./pages/landingPage/LandingPage";
-import CustomersPage from './pages/customersPage/CustomersPage';
-import ProductsPage from './pages/productsPage/ProductsPage';
-import StockPage from './pages/stockPage/StockPage';
-import OrdersPage from './pages/ordersPage/OrdersPage'
-import DashboardPage from './pages/dashboardPage/DashboardPage';
-import RecipeDetailPage from './pages/recipesPage/RecipeDetailPage';
-import SupportPage from './pages/supportPage/SupportPage';
 import { ProductsProvider, OrdersProvider, StockProvider, CustomersProvider } from './contexts';
 import ProtectedRoutes from './utils/protectedroutes';
 import "bootstrap-icons/font/bootstrap-icons.css";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import SideBar from './components/menu/Sidebar';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import PageLoader from './components/PageLoader';
+
+const LoginPage        = lazy(() => import('./pages/auth/LoginPage'));
+const ResetPasswordPage = lazy(() => import('./pages/auth/ResetPasswordPage'));
+const LandingPage      = lazy(() => import('./pages/landingPage/LandingPage'));
+const CustomersPage    = lazy(() => import('./pages/customersPage/CustomersPage'));
+const ProductsPage     = lazy(() => import('./pages/productsPage/ProductsPage'));
+const StockPage        = lazy(() => import('./pages/stockPage/StockPage'));
+const OrdersPage       = lazy(() => import('./pages/ordersPage/OrdersPage'));
+const DashboardPage    = lazy(() => import('./pages/dashboardPage/DashboardPage'));
+const RecipeDetailPage = lazy(() => import('./pages/recipesPage/RecipeDetailPage'));
+const SupportPage      = lazy(() => import('./pages/supportPage/SupportPage'));
 
 const queryClient = new QueryClient();
 
@@ -27,7 +29,9 @@ function App() {
           <ProductsProvider>
             <StockProvider>
               <CustomersProvider>
-                <Layout/>
+                <Suspense fallback={<PageLoader />}>
+                  <Layout/>
+                </Suspense>
               </CustomersProvider>
             </StockProvider>
           </ProductsProvider>
@@ -37,23 +41,23 @@ function App() {
   )
 }
 
+const routeToIdMap = {
+  '/metricas': 'visao-geral',
+  '/pedidos': 'pedidos',
+  '/produtos': 'produtos',
+  '/receitas': 'receitas',
+  '/estoque': 'estoque',
+  '/clientes': 'clientes',
+  '/suporte': 'suporte'
+};
+
+const rotasSemNavbar = ["/", "/login", "/resetpassword"];
+
 function Layout() {
   const location = useLocation();
   const navigate = useNavigate();
   const path = location.pathname;
   const [activeItem, setActiveItem] = useState('');
-
-  const rotasSemNavbar = ["/", "/login", "/resetpassword"];
-
-  const routeToIdMap = {
-    '/metricas': 'visao-geral',
-    '/pedidos': 'pedidos',
-    '/produtos': 'produtos',
-    '/receitas': 'receitas',
-    '/estoque': 'estoque',
-    '/clientes': 'clientes',
-    '/suporte': 'suporte'
-  };
 
   useEffect(() => {
     setActiveItem(routeToIdMap[path] || '');
@@ -68,33 +72,32 @@ function Layout() {
     <>
       {!rotasSemNavbar.includes(path) && (
         <>
-          <SideBar 
-            activeItem={activeItem} 
+          <SideBar
+            activeItem={activeItem}
             onItemClick={handleSidebarItemClick}
           />
           <div style={{ marginLeft: '280px' }}>
             <Routes>
-              <Route path='/clientes' element={<ProtectedRoutes><CustomersPage/></ProtectedRoutes>}/>
-              <Route path='/produtos' element={<ProtectedRoutes><ProductsPage/></ProtectedRoutes>}/>
-              <Route path='/estoque' element={<ProtectedRoutes><StockPage/></ProtectedRoutes>}/>
-              <Route path='/pedidos' element={<ProtectedRoutes><OrdersPage/></ProtectedRoutes>}/>
-              <Route path='/metricas' element={<ProtectedRoutes><DashboardPage/></ProtectedRoutes>}/>
+              <Route path='/clientes'    element={<ProtectedRoutes><CustomersPage/></ProtectedRoutes>}/>
+              <Route path='/produtos'    element={<ProtectedRoutes><ProductsPage/></ProtectedRoutes>}/>
+              <Route path='/estoque'     element={<ProtectedRoutes><StockPage/></ProtectedRoutes>}/>
+              <Route path='/pedidos'     element={<ProtectedRoutes><OrdersPage/></ProtectedRoutes>}/>
+              <Route path='/metricas'    element={<ProtectedRoutes><DashboardPage/></ProtectedRoutes>}/>
               <Route path='/receitas/:id' element={<ProtectedRoutes><RecipeDetailPage/></ProtectedRoutes>}/>
-              <Route path='/suporte' element={<ProtectedRoutes><SupportPage/></ProtectedRoutes>}/>
+              <Route path='/suporte'     element={<ProtectedRoutes><SupportPage/></ProtectedRoutes>}/>
             </Routes>
           </div>
         </>
       )}
       {rotasSemNavbar.includes(path) && (
         <Routes>
-          <Route path='/' element={<LandingPage/>}/>
-          <Route path='/login' element={<LoginPage/>}/>
+          <Route path='/'             element={<LandingPage/>}/>
+          <Route path='/login'        element={<LoginPage/>}/>
           <Route path='/resetpassword' element={<ResetPasswordPage/>}/>
         </Routes>
       )}
     </>
   );
 }
-
 
 export default App

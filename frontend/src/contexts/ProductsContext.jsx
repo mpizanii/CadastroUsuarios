@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback } from "react";
+import { createContext, useContext, useState, useCallback, useMemo } from "react";
 import { getProducts } from "../services/productsService";
 
 const ProductsContext = createContext();
@@ -43,7 +43,7 @@ export function ProductsProvider({ children }) {
         console.log("Produto removido localmente");
     }, []);
 
-    const value = {
+    const value = useMemo(() => ({
         products,
         loading,
         error,
@@ -52,7 +52,7 @@ export function ProductsProvider({ children }) {
         addProduct,
         updateProduct,
         removeProduct
-    };
+    }), [products, loading, error, fetchProducts, setProducts, addProduct, updateProduct, removeProduct]);
 
     return (
         <ProductsContext.Provider value={value}>

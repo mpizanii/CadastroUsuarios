@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { addRecipe } from "../services/recipesService";
 import { editProduct } from "../services/productsService";
+import { UNIT_OPTIONS } from "../constants/units";
 
 export const formAddRecipe = ({ onSuccess, selectedProduct }) => {
     const [name, setName] = useState("");
@@ -8,8 +9,6 @@ export const formAddRecipe = ({ onSuccess, selectedProduct }) => {
     const [ingredients, setIngredients] = useState([{ nome: "", quantidade: 0, unidade: "g" }]);
     const [messageFormAddRecipe, setMessageFormAddRecipe] = useState("");
     const [messageTypeFormAddRecipe, setMessageTypeFormAddRecipe] = useState("success");
-
-    const UNIT_OPTIONS = ["g", "ml", "un", "colher", "xícara"];
 
     const titleFormAddRecipe = `Criar Receita para ${selectedProduct?.nome}`;
 

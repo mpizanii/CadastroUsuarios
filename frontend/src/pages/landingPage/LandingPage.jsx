@@ -221,7 +221,7 @@ export default function LandingPage() {
                   <div style={{ width: 10, height: 10, borderRadius: "50%", backgroundColor: "#f87171" }} />
                   <div style={{ width: 10, height: 10, borderRadius: "50%", backgroundColor: "#fbbf24" }} />
                   <div style={{ width: 10, height: 10, borderRadius: "50%", backgroundColor: "#4ade80" }} />
-                  <img src="/scalda_logo.png" alt="Scalda" style={{ height: "22px", objectFit: "contain" }} />
+                  <img src="/scalda_logo.png" alt="Scalda" style={{ height: "22px", objectFit: "contain" }} loading="lazy" />
                   <span style={{ fontSize: "0.8rem", color: GRAY, fontWeight: 600 }}>
                     Visão geral
                   </span>
@@ -593,7 +593,7 @@ export default function LandingPage() {
       >
         <Container>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "0.5rem", marginBottom: "0.5rem" }}>
-            <img src="/scalda_logo.png" alt="Scalda" style={{ height: "28px", objectFit: "contain", opacity: 0.85 }} />
+            <img src="/scalda_logo.png" alt="Scalda" style={{ height: "28px", objectFit: "contain", opacity: 0.85 }} loading="lazy" />
             <span style={{ fontWeight: 700, fontSize: "1.1rem", color: "#ccc", letterSpacing: "-0.5px" }}>Scalda</span>
           </div>
           <p style={{ margin: 0, fontSize: "0.875rem" }}>

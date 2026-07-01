@@ -2,7 +2,7 @@
 
 ## Overview
 
-SoftLanches Backend is a multi-tenant SaaS REST API built with Spring Boot 3.4 / Java 21, backed by Supabase (PostgreSQL 15). It serves as the business logic layer for food-service companies managing customers, products, recipes, inventory, and orders.
+Scalda Backend is a multi-tenant SaaS REST API built with Spring Boot 3.4 / Java 21, backed by Supabase (PostgreSQL 15). It serves as the business logic layer for food-service companies managing customers, products, recipes, inventory, and orders.
 
 ## Stack
 
@@ -21,7 +21,7 @@ SoftLanches Backend is a multi-tenant SaaS REST API built with Spring Boot 3.4 /
 ## Module Structure
 
 ```
-com.softlanches
+com.scalda
 ├── customers        — Clientes (CRUD + tenant isolation)
 ├── products         — Produtos (catálogo + custo por receita)
 ├── recipes          — Receitas + RecipeIngredients

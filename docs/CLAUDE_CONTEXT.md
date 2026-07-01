@@ -9,7 +9,7 @@
 
 ## Resumo Executivo (leia em 60 segundos)
 
-**SoftLanches** é um ERP SaaS para empresas do setor alimentício.
+**Scalda** é um ERP SaaS para empresas do setor alimentício.
 Está em migração de ASP.NET Core 8 (C#) para Spring Boot 3.4 (Java 21).
 
 **O que existe:**
@@ -200,7 +200,7 @@ spring.datasource.hikari.connection-timeout=30000
 spring.jpa.hibernate.ddl-auto=none
 spring.jpa.show-sql=true
 cors.allowed-origins=http://localhost:5173
-logging.level.com.softlanches=DEBUG
+logging.level.com.scalda=DEBUG
 logging.level.org.springframework.security=DEBUG
 logging.level.org.flywaydb=INFO
 ```

@@ -66,12 +66,12 @@ export default function StockPage() {
   const getStatusBadge = (statusEstoque) => {
     const statusConfig = {
       'OK': { bg: 'success', text: 'OK' },
-      'Baixo Estoque Mínimo': { bg: 'warning', text: 'Estoque baixo' },
-      'Crítico Estoque Mínimo': { bg: 'danger', text: 'Estoque crítico' },
-      'Baixo Validade': { bg: 'warning', text: 'Perto da validade' },
-      'Crítico Validade': { bg: 'danger', text: 'Validade crítica' },
+      'BAIXO_ESTOQUE_MINIMO': { bg: 'warning', text: 'Estoque baixo' },
+      'CRITICO_ESTOQUE_MINIMO': { bg: 'danger', text: 'Estoque crítico' },
+      'BAIXO_VALIDADE': { bg: 'warning', text: 'Perto da validade' },
+      'CRITICO_VALIDADE': { bg: 'danger', text: 'Validade crítica' },
     };
-    
+
     const config = statusConfig[statusEstoque] || statusConfig['OK'];
     return <Badge bg={config.bg}>{config.text}</Badge>;
   };

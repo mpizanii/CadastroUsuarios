@@ -10,6 +10,12 @@ import { SlPencil, SlTrash } from "react-icons/sl";
 import { FiPlus } from 'react-icons/fi';
 import { useProductsQuery } from '../../hooks/useProductsQuery';
 
+const formatCurrency = (value) => {
+  try {
+    return Number(value).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  } catch { return value; }
+};
+
 export default function ProductsPage() {
   const navigate = useNavigate();
   const { data: products = [], isLoading, isError, refetch } = useProductsQuery();
@@ -120,13 +126,6 @@ export default function ProductsPage() {
             {produtosFiltrados.map((produto) => {
               const precoNum = Number(produto.preco) || 0;
               const custoNum = Number(produto.custo) || 0;
-
-              const formatCurrency = (value) => {
-                try {
-                  return Number(value).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-                } catch { return value; }
-              }
-
               const status = produto.ativo === false ? 'inativo' : 'Ativo';
 
               return (

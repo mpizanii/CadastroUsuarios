@@ -1,4 +1,4 @@
-# SECURITY.md — Segurança SoftLanches
+# SECURITY.md — Segurança Scalda
 
 ## Visão Geral
 

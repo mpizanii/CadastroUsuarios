@@ -11,10 +11,10 @@
         <relativePath/>
     </parent>
 
-    <groupId>com.softlanches</groupId>
+    <groupId>com.scalda</groupId>
     <artifactId>backend</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>SoftLanches Backend</name>
+    <name>Scalda Backend</name>
     <description>SaaS ERP para empresas do ramo alimentício</description>
 
     <properties>

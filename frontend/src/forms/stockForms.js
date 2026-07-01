@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { addInsumo, editInsumo, deleteInsumo } from "../services/stockService";
-
-const UNIT_OPTIONS = ["g", "ml", "un", "colher", "xícara"];
+import { UNIT_OPTIONS } from "../constants/units";
 
 export const formAddInsumo = ({ onSuccess }) => {
     const [nome, setNome] = useState("");

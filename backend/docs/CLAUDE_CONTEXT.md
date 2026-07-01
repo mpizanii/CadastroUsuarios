@@ -4,7 +4,7 @@ This document is the authoritative entry point for AI agents working on this cod
 
 ## Project Identity
 
-- **Name:** SoftLanches Backend
+- **Name:** Scalda Backend
 - **Type:** Multi-tenant SaaS REST API
 - **Domain:** Food-service ERP (clientes, produtos, receitas, insumos, pedidos)
 - **Stack:** Spring Boot 3.4 / Java 21 / PostgreSQL 15 (Supabase)
