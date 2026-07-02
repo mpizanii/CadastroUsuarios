@@ -1,13 +1,11 @@
 import { createContext, useContext, useState, useCallback, useMemo } from "react";
 import { getPedidos } from "../services/ordersService";
 import { getCustomers } from "../services/customerService";
-import { useProductsQuery } from "../hooks/useProductsQuery";
 
 const OrdersContext = createContext();
 
 export function OrdersProvider({ children }) {
     const [orders, setOrders] = useState([]);
-    const { data: produtosDisponiveis = [] } = useProductsQuery();
     const [clientesDisponiveis, setClientesDisponiveis] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -58,7 +56,6 @@ export function OrdersProvider({ children }) {
         orders,
         loading,
         error,
-        produtosDisponiveis,
         clientesDisponiveis,
         fetchOrders,
         fetchCustomers,
@@ -66,7 +63,7 @@ export function OrdersProvider({ children }) {
         addOrder,
         updateOrder,
         removeOrder
-    }), [orders, loading, error, produtosDisponiveis, clientesDisponiveis, fetchOrders, fetchCustomers, setOrders, addOrder, updateOrder, removeOrder]);
+    }), [orders, loading, error, clientesDisponiveis, fetchOrders, fetchCustomers, setOrders, addOrder, updateOrder, removeOrder]);
 
     return (
         <OrdersContext.Provider value={value}>
