@@ -1,0 +1,10 @@
+target/
+.idea/
+.claude/
+docs/
+src/test/
+
+src/main/resources/application-dev.properties
+.env
+.gitignore
+*.md
